@@ -141,7 +141,7 @@ html, body { height:100%; background:var(--bg); color:var(--text); font-family:'
     <div class="gauges">
       <div class="gauge">
         <div class="gauge-icon">⛽</div>
-        <div class="gauge-value" id="gFuel" style="color:var(--green)">72</div>
+        <div class="gauge-value" id="gFuel" style="color:var(--amber)">21</div>
         <div class="gauge-unit">%</div>
         <div class="gauge-label">Fuel</div>
       </div>
@@ -288,7 +288,7 @@ map.fitBounds(routeLineToStation.getBounds(), { padding: [50, 50] });
 // ═══════════════════════════════════════════
 // SIMULATION STATE
 // ═══════════════════════════════════════════
-let fuel = 72;
+let fuel = 21; // Start low so gauge goes red during demo
 let odometer = 42187;
 let battery = 12.8;
 let speed = 0;
