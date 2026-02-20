@@ -201,7 +201,7 @@ const HOME = [41.0775, -73.8560]; // 19 Grove Street, Tarrytown (2nd right off N
 const STATION = [41.0761, -73.8642]; // Tarrytown Metro North Station (1 Depot Plaza)
 
 // Actual driving route following streets
-// Grove St (away from Neperan) → skip Elizabeth → 2nd right onto Franklin → Station
+// Grove St (away from Neperan) → skip Elizabeth → 2nd right onto Franklin → to light → U-turn → wait outside station
 const ROUTE_TO_STATION = [
   [41.0775, -73.8560],  // Start: 19 Grove Street (parked on street, facing away from Neperan)
   [41.0776, -73.8558],  // Grove Street heading away from Neperan
@@ -212,15 +212,17 @@ const ROUTE_TO_STATION = [
   [41.0777, -73.8580],  // Franklin Street
   [41.0775, -73.8595],  // Franklin Street
   [41.0773, -73.8610],  // Franklin Street approaching station
-  [41.0770, -73.8625],  // Franklin Street/Station area
-  [41.0765, -73.8638],  // Approaching Depot Plaza
-  [41.0761, -73.8642],  // Arrive: Tarrytown Metro North Station
+  [41.0770, -73.8625],  // Franklin Street near station
+  [41.0765, -73.8640],  // Continue to traffic light
+  [41.0763, -73.8645],  // At traffic light - begin U-turn
+  [41.0762, -73.8644],  // Making U-turn
+  [41.0761, -73.8642],  // Complete U-turn - now facing east, parked outside station
 ];
 
-// Return route: Station → Franklin St → Grove St → Home
+// Return route: Pull away from station (already facing east) → Franklin St → Grove St → Home
 const ROUTE_TO_HOME = [
-  [41.0761, -73.8642],  // Start: Station
-  [41.0765, -73.8638],  // Leaving Depot Plaza
+  [41.0761, -73.8642],  // Start: Parked outside station (already facing east after U-turn)
+  [41.0765, -73.8640],  // Pull away from curb, heading east
   [41.0770, -73.8625],  // Franklin Street heading back east
   [41.0773, -73.8610],  // Franklin Street
   [41.0775, -73.8595],  // Franklin Street
