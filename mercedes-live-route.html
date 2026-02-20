@@ -201,34 +201,35 @@ const HOME = [41.0775, -73.8560]; // 19 Grove Street, Tarrytown (2nd right off N
 const STATION = [41.0761, -73.8642]; // Tarrytown Metro North Station (1 Depot Plaza)
 
 // Actual driving route following streets
-// Grove St (parked) → Neperan Rd (down toward Broadway) → Main St (west to river) → Station
+// Grove St (away from Neperan) → skip Elizabeth → 2nd right onto Franklin → Station
 const ROUTE_TO_STATION = [
-  [41.0775, -73.8560],  // Start: 19 Grove Street (parked on street)
-  [41.0774, -73.8562],  // Grove Street heading toward Neperan
-  [41.0773, -73.8565],  // Approaching Neperan Road
-  [41.0772, -73.8567],  // Turn left onto Neperan Road (heading downhill toward Broadway)
-  [41.0770, -73.8575],  // Neperan Road
-  [41.0768, -73.8580],  // Neperan Road approaching Broadway
-  [41.0767, -73.8587],  // Cross Broadway (Neperan becomes Main Street)
-  [41.0766, -73.8600],  // Main Street heading west toward river
-  [41.0765, -73.8615],  // Main Street
-  [41.0763, -73.8630],  // Main Street approaching station
-  [41.0762, -73.8638],  // Turn onto Depot Plaza/Station Lane
+  [41.0775, -73.8560],  // Start: 19 Grove Street (parked on street, facing away from Neperan)
+  [41.0776, -73.8558],  // Grove Street heading away from Neperan
+  [41.0777, -73.8556],  // Grove Street (passing Elizabeth St)
+  [41.0778, -73.8554],  // Grove Street continuing
+  [41.0779, -73.8555],  // Second right onto Franklin Street
+  [41.0778, -73.8565],  // Franklin Street heading west
+  [41.0777, -73.8580],  // Franklin Street
+  [41.0775, -73.8595],  // Franklin Street
+  [41.0773, -73.8610],  // Franklin Street approaching station
+  [41.0770, -73.8625],  // Franklin Street/Station area
+  [41.0765, -73.8638],  // Approaching Depot Plaza
   [41.0761, -73.8642],  // Arrive: Tarrytown Metro North Station
 ];
 
+// Return route: Station → Franklin St → Grove St → Home
 const ROUTE_TO_HOME = [
   [41.0761, -73.8642],  // Start: Station
-  [41.0762, -73.8638],  // Station Lane
-  [41.0763, -73.8630],  // Turn right onto Main Street (heading back east)
-  [41.0765, -73.8615],  // Main Street
-  [41.0766, -73.8600],  // Main Street
-  [41.0767, -73.8587],  // Cross Broadway (Main becomes Neperan)
-  [41.0768, -73.8580],  // Neperan Road heading uphill
-  [41.0770, -73.8575],  // Neperan Road
-  [41.0772, -73.8567],  // Turn right onto Grove Street
-  [41.0773, -73.8565],  // Grove Street
-  [41.0774, -73.8562],  // Grove Street
+  [41.0765, -73.8638],  // Leaving Depot Plaza
+  [41.0770, -73.8625],  // Franklin Street heading back east
+  [41.0773, -73.8610],  // Franklin Street
+  [41.0775, -73.8595],  // Franklin Street
+  [41.0777, -73.8580],  // Franklin Street
+  [41.0778, -73.8565],  // Franklin Street
+  [41.0779, -73.8555],  // Turn left onto Grove Street
+  [41.0778, -73.8554],  // Grove Street heading back to house
+  [41.0777, -73.8556],  // Grove Street
+  [41.0776, -73.8558],  // Grove Street
   [41.0775, -73.8560],  // Arrive: 19 Grove Street
 ];
 
