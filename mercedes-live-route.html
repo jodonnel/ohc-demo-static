@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercedes-Benz Live Route | Tarrytown Commute</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --surface2: #161B22; --border: #1C2333;
+  --text: #F0F4F8; --dim: #8B949E; --muted: #4E5D6C;
+  --rh-red: #EE0000; --red-glow: rgba(238,0,0,0.12);
+  --sap-gold: #F0AB00; --mb-silver: #00ADEF;
+  --green: #00D26A; --amber: #F59E0B; --blue: #0070F2;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; background:var(--bg); color:var(--text); font-family:'Red Hat Display',sans-serif; overflow:hidden; }
+
+.dashboard {
+  display:grid; height:100vh; padding:12px; gap:12px;
+  grid-template-columns: 450px 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "header header" "sidebar main";
+}
+
+.dash-header {
+  grid-area:header; display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+}
+.brand { display:flex; align-items:center; gap:12px; }
+.brand-logo { font-size:28px; }
+.brand-text { display:flex; flex-direction:column; }
+.brand-title { font-size:16px; font-weight:700; letter-spacing:0.5px; }
+.brand-sub { font-size:11px; color:var(--dim); letter-spacing:1px; }
+.route-info { display:flex; align-items:center; gap:16px; font-size:12px; }
+.route-badge {
+  background:var(--surface2); padding:6px 12px; border-radius:6px;
+  font-family:'Red Hat Mono',monospace; font-size:11px;
+}
+.live-badge { display:flex; align-items:center; gap:8px; }
+.live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+.live-label { font-family:'Red Hat Mono',monospace; font-size:11px; color:var(--green); }
+
+@keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.4; } }
+
+.sidebar { grid-area:sidebar; display:flex; flex-direction:column; gap:12px; overflow-y:auto; }
+
+.map-container {
+  grid-area:main; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; overflow:hidden; position:relative;
+}
+#map { width:100%; height:100%; }
+
+.map-overlay {
+  position:absolute; top:16px; left:16px; right:16px; z-index:1000;
+  background:rgba(13,17,23,0.95); border:1px solid var(--border);
+  border-radius:10px; padding:16px; backdrop-filter:blur(10px);
+}
+.trip-status { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.status-icon { font-size:32px; }
+.status-text { flex:1; }
+.status-title { font-size:14px; font-weight:700; }
+.status-detail { font-size:11px; color:var(--dim); margin-top:2px; }
+.trip-progress {
+  height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; margin-top:12px;
+}
+.trip-progress-fill {
+  height:100%; background:var(--mb-silver); border-radius:4px;
+  transition:width 1s linear;
+}
+
+.gauges {
+  display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;
+}
+.gauge {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; text-align:center;
+}
+.gauge-icon { font-size:28px; margin-bottom:6px; }
+.gauge-value {
+  font-family:'Red Hat Mono',monospace; font-size:28px; font-weight:900;
+  line-height:1; margin-bottom:2px;
+}
+.gauge-unit { font-size:12px; color:var(--dim); }
+.gauge-label { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:6px; }
+
+.train-schedule {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px;
+}
+.train-schedule h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.train-item {
+  background:var(--surface2); border-radius:6px; padding:10px; margin-bottom:8px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.train-item.active { border:1px solid var(--mb-silver); background:rgba(0,173,239,0.08); }
+.train-time { font-family:'Red Hat Mono',monospace; font-size:14px; font-weight:700; }
+.train-route { font-size:10px; color:var(--dim); margin-top:2px; }
+.train-status { font-size:10px; color:var(--green); }
+
+.trip-log {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; flex:1; overflow:hidden; display:flex; flex-direction:column;
+}
+.trip-log h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.log-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+.log-item {
+  background:var(--surface2); border-radius:6px; padding:8px;
+  font-size:11px; line-height:1.4;
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+.log-time { color:var(--mb-silver); font-family:'Red Hat Mono',monospace; }
+.log-msg { color:var(--text); }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+  <div class="dash-header">
+    <div class="brand">
+      <div class="brand-logo">🚗</div>
+      <div class="brand-text">
+        <div class="brand-title">Mercedes-Benz C-Class</div>
+        <div class="brand-sub">VIN: W1NKM4HB0PU012482</div>
+      </div>
+    </div>
+    <div class="route-info">
+      <div class="route-badge">📍 Tarrytown, NY</div>
+      <div class="route-badge">🚂 Metro North Pickup Loop</div>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      <div class="live-label">LIVE SIMULATION</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="gauges">
+      <div class="gauge">
+        <div class="gauge-icon">⛽</div>
+        <div class="gauge-value" id="gFuel" style="color:var(--green)">72</div>
+        <div class="gauge-unit">%</div>
+        <div class="gauge-label">Fuel</div>
+      </div>
+      <div class="gauge">
+        <div class="gauge-icon">📏</div>
+        <div class="gauge-value" id="gOdo" style="color:var(--mb-silver)">42,187</div>
+        <div class="gauge-unit">mi</div>
+        <div class="gauge-label">Odometer</div>
+      </div>
+      <div class="gauge">
+        <div class="gauge-icon">⚡</div>
+        <div class="gauge-value" id="gSpeed" style="color:var(--amber)">0</div>
+        <div class="gauge-unit">mph</div>
+        <div class="gauge-label">Speed</div>
+      </div>
+      <div class="gauge">
+        <div class="gauge-icon">🔋</div>
+        <div class="gauge-value" id="gBattery" style="color:var(--blue)">12.8</div>
+        <div class="gauge-unit">V</div>
+        <div class="gauge-label">Battery</div>
+      </div>
+    </div>
+
+    <div class="train-schedule">
+      <h3>Metro North Express Trains (GCT → Tarrytown)</h3>
+      <div id="trainList"></div>
+    </div>
+
+    <div class="trip-log">
+      <h3>Trip Log</h3>
+      <div class="log-list" id="logList"></div>
+    </div>
+  </div>
+
+  <div class="map-container">
+    <div class="map-overlay">
+      <div class="trip-status">
+        <div class="status-icon" id="statusIcon">🏠</div>
+        <div class="status-text">
+          <div class="status-title" id="statusTitle">Waiting at Home</div>
+          <div class="status-detail" id="statusDetail">19 Grove Street, Tarrytown</div>
+        </div>
+      </div>
+      <div class="trip-progress">
+        <div class="trip-progress-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// ROUTE & TRAIN SCHEDULE
+// ═══════════════════════════════════════════
+const HOME = [41.0762, -73.8587]; // 19 Grove Street, Tarrytown
+const STATION = [41.0761, -73.8642]; // Tarrytown Metro North Station
+
+// Metro North Hudson Line express trains (evening rush hour)
+const TRAIN_SCHEDULE = [
+  { time: '17:24', route: 'Grand Central → Tarrytown (Express)', arrivalMin: 0 },
+  { time: '18:09', route: 'Grand Central → Tarrytown (Express)', arrivalMin: 0 },
+  { time: '18:54', route: 'Grand Central → Tarrytown (Express)', arrivalMin: 0 },
+  { time: '19:39', route: 'Grand Central → Tarrytown (Express)', arrivalMin: 0 },
+  { time: '20:24', route: 'Grand Central → Tarrytown (Express)', arrivalMin: 0 },
+  { time: '21:09', route: 'Grand Central → Tarrytown (Express)', arrivalMin: 0 },
+];
+
+// ═══════════════════════════════════════════
+// MAP SETUP
+// ═══════════════════════════════════════════
+const map = L.map('map', { zoomControl: false }).setView([41.0762, -73.8610], 16);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap',
+  className: 'map-tiles'
+}).addTo(map);
+
+const carIcon = L.divIcon({
+  html: '<div style="font-size:24px;">🚗</div>',
+  className: 'car-marker',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15]
+});
+
+const homeIcon = L.divIcon({
+  html: '<div style="font-size:20px;">🏠</div>',
+  className: 'home-marker',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
+
+const stationIcon = L.divIcon({
+  html: '<div style="font-size:20px;">🚂</div>',
+  className: 'station-marker',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
+
+L.marker(HOME, { icon: homeIcon }).addTo(map).bindPopup('19 Grove Street');
+L.marker(STATION, { icon: stationIcon }).addTo(map).bindPopup('Tarrytown Station');
+
+const carMarker = L.marker(HOME, { icon: carIcon }).addTo(map);
+const routeLine = L.polyline([HOME, STATION], { color: '#00ADEF', weight: 3, opacity: 0.7 }).addTo(map);
+
+map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+// ═══════════════════════════════════════════
+// SIMULATION STATE
+// ═══════════════════════════════════════════
+let fuel = 72;
+let odometer = 42187;
+let battery = 12.8;
+let speed = 0;
+let currentTrain = 0;
+let tripPhase = 'WAITING_HOME'; // WAITING_HOME, DRIVING_TO_STATION, WAITING_STATION, DRIVING_HOME
+let tripProgress = 0;
+let engineRunning = false;
+
+// ═══════════════════════════════════════════
+// LOGGING
+// ═══════════════════════════════════════════
+function log(msg) {
+  const logList = document.getElementById('logList');
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+  item.innerHTML = `<span class="log-time">[${now}]</span> <span class="log-msg">${msg}</span>`;
+  logList.insertBefore(item, logList.firstChild);
+  while (logList.children.length > 50) logList.removeChild(logList.lastChild);
+}
+
+// ═══════════════════════════════════════════
+// TRAIN SCHEDULE DISPLAY
+// ═══════════════════════════════════════════
+function updateTrainSchedule() {
+  const trainList = document.getElementById('trainList');
+  trainList.innerHTML = TRAIN_SCHEDULE.map((train, idx) => {
+    const active = idx === currentTrain ? 'active' : '';
+    const status = idx === currentTrain ? '🎯 Picking up now' : idx < currentTrain ? '✓ Complete' : 'Scheduled';
+    return `
+      <div class="train-item ${active}">
+        <div>
+          <div class="train-time">${train.time}</div>
+          <div class="train-route">${train.route}</div>
+        </div>
+        <div class="train-status">${status}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// UPDATE UI
+// ═══════════════════════════════════════════
+function updateUI() {
+  document.getElementById('gFuel').innerText = Math.round(fuel);
+  document.getElementById('gOdo').innerText = Math.round(odometer).toLocaleString();
+  document.getElementById('gSpeed').innerText = Math.round(speed);
+  document.getElementById('gBattery').innerText = battery.toFixed(1);
+  document.getElementById('progressBar').style.width = tripProgress + '%';
+}
+
+function setStatus(icon, title, detail) {
+  document.getElementById('statusIcon').innerText = icon;
+  document.getElementById('statusTitle').innerText = title;
+  document.getElementById('statusDetail').innerText = detail;
+}
+
+// ═══════════════════════════════════════════
+// INTERPOLATE POSITION
+// ═══════════════════════════════════════════
+function lerp(start, end, t) {
+  return [
+    start[0] + (end[0] - start[0]) * t,
+    start[1] + (end[1] - start[1]) * t
+  ];
+}
+
+// ═══════════════════════════════════════════
+// TRIP PHASES
+// ═══════════════════════════════════════════
+let phaseTimer = 0;
+const DRIVE_DURATION = 180; // 3 minutes to station (in seconds, sped up)
+const WAIT_DURATION = 600; // 10 minutes at station
+const RETURN_DURATION = 180; // 3 minutes back home
+
+function tick() {
+  phaseTimer++;
+
+  if (tripPhase === 'WAITING_HOME') {
+    // Wait for next train (check every second)
+    const now = new Date();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    const train = TRAIN_SCHEDULE[currentTrain];
+    const [trainHour, trainMin] = train.time.split(':').map(Number);
+    const trainArrival = trainHour * 60 + trainMin;
+
+    // Start 5 minutes before train arrival
+    const departureTime = trainArrival - 5;
+
+    // For demo, just start every 15 minutes
+    if (phaseTimer % 900 === 0 || phaseTimer === 10) {
+      tripPhase = 'DRIVING_TO_STATION';
+      phaseTimer = 0;
+      engineRunning = true;
+      log(`🚗 Departing for ${train.time} train`);
+      setStatus('🚗', 'Driving to Station', 'Grove Street → Tarrytown Station');
+    }
+  }
+
+  else if (tripPhase === 'DRIVING_TO_STATION') {
+    const progress = phaseTimer / DRIVE_DURATION;
+    tripProgress = progress * 100;
+    speed = 15 + Math.sin(progress * Math.PI * 2) * 10;
+    fuel -= 0.01;
+    odometer += 0.002;
+    battery = 12.5 + Math.random() * 0.6;
+
+    const pos = lerp(HOME, STATION, progress);
+    carMarker.setLatLng(pos);
+
+    if (phaseTimer >= DRIVE_DURATION) {
+      tripPhase = 'WAITING_STATION';
+      phaseTimer = 0;
+      speed = 0;
+      log(`🚂 Arrived at station, waiting for ${TRAIN_SCHEDULE[currentTrain].time} train`);
+      setStatus('⏱️', 'Waiting at Station', 'Engine running, 10 minute wait');
+    }
+  }
+
+  else if (tripPhase === 'WAITING_STATION') {
+    speed = 0;
+    tripProgress = 100;
+    battery = 12.3 + Math.random() * 0.4; // Battery drains slightly with engine running
+    fuel -= 0.005; // Idling uses fuel
+
+    if (phaseTimer >= WAIT_DURATION) {
+      tripPhase = 'DRIVING_HOME';
+      phaseTimer = 0;
+      log(`👤 Passenger picked up, returning home`);
+      setStatus('🏠', 'Returning Home', 'Station → Grove Street');
+    }
+  }
+
+  else if (tripPhase === 'DRIVING_HOME') {
+    const progress = phaseTimer / RETURN_DURATION;
+    tripProgress = 100 - (progress * 100);
+    speed = 15 + Math.sin(progress * Math.PI * 2) * 10;
+    fuel -= 0.01;
+    odometer += 0.002;
+    battery = 12.5 + Math.random() * 0.6;
+
+    const pos = lerp(STATION, HOME, progress);
+    carMarker.setLatLng(pos);
+
+    if (phaseTimer >= RETURN_DURATION) {
+      tripPhase = 'WAITING_HOME';
+      phaseTimer = 0;
+      speed = 0;
+      engineRunning = false;
+      tripProgress = 0;
+      currentTrain = (currentTrain + 1) % TRAIN_SCHEDULE.length;
+      updateTrainSchedule();
+      log(`✓ Trip complete, odometer: ${Math.round(odometer).toLocaleString()} mi`);
+      setStatus('🏠', 'At Home', 'Waiting for next train');
+    }
+  }
+
+  updateUI();
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+updateTrainSchedule();
+log('🚗 Mercedes-Benz telemetry system online');
+log('📍 Location: 19 Grove Street, Tarrytown, NY');
+log('🚂 Metro North pickup loop initialized');
+
+setInterval(tick, 1000); // Tick every second
+</script>
+</body>
+</html>
