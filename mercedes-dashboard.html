@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercedes-Benz Live Telemetry | Red Hat + SAP</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --surface2: #161B22; --border: #1C2333;
+  --text: #F0F4F8; --dim: #8B949E; --muted: #4E5D6C;
+  --rh-red: #EE0000; --red-glow: rgba(238,0,0,0.12);
+  --sap-gold: #F0AB00; --mb-silver: #00ADEF;
+  --green: #00D26A; --amber: #F59E0B; --blue: #0070F2;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; background:var(--bg); color:var(--text); font-family:'Red Hat Display',sans-serif; overflow:hidden; }
+
+.dashboard {
+  display:grid; height:100vh; padding:12px; gap:12px;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "header header" "main sidebar";
+}
+
+.dash-header {
+  grid-area:header; display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px;
+}
+.brand { display:flex; align-items:center; gap:12px; }
+.brand-logo { font-size:28px; }
+.brand-text { display:flex; flex-direction:column; }
+.brand-title { font-size:16px; font-weight:700; letter-spacing:0.5px; }
+.brand-sub { font-size:11px; color:var(--dim); letter-spacing:1px; }
+.partners { display:flex; align-items:center; gap:16px; font-size:11px; font-weight:700; letter-spacing:2px; }
+.rh { color:var(--rh-red); }
+.sap { color:var(--sap-gold); }
+.mb { color:var(--mb-silver); }
+.sep { color:var(--muted); }
+.live-badge { display:flex; align-items:center; gap:8px; }
+.live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+.live-label { font-family:'Red Hat Mono',monospace; font-size:11px; color:var(--green); }
+
+@keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.4; } }
+
+.main { grid-area:main; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+
+.vehicle-hero {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:24px; display:flex; align-items:center; gap:24px; position:relative; overflow:hidden;
+}
+.vehicle-hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 30% 50%, rgba(0,173,239,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.vehicle-icon { font-size:64px; position:relative; }
+.vehicle-info { flex:1; position:relative; }
+.vehicle-model { font-size:24px; font-weight:700; margin-bottom:4px; }
+.vehicle-vin { font-family:'Red Hat Mono',monospace; font-size:12px; color:var(--dim); letter-spacing:1px; }
+.vehicle-status {
+  display:flex; gap:24px; margin-top:12px;
+}
+.v-stat { text-align:center; }
+.v-stat-val { font-family:'Red Hat Mono',monospace; font-size:20px; font-weight:700; }
+.v-stat-lbl { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+
+.gauges {
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;
+}
+.gauge {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:20px; text-align:center;
+}
+.gauge-icon { font-size:32px; margin-bottom:8px; }
+.gauge-value {
+  font-family:'Red Hat Mono',monospace; font-size:32px; font-weight:900;
+  line-height:1; margin-bottom:4px;
+}
+.gauge-unit { font-size:14px; color:var(--dim); }
+.gauge-label { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:8px; }
+.gauge-bar {
+  height:6px; background:var(--surface2); border-radius:3px; margin-top:12px; overflow:hidden;
+}
+.gauge-bar-fill {
+  height:100%; border-radius:3px; transition:width 0.8s ease;
+}
+
+.event-feed {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; flex:1; overflow:hidden; display:flex; flex-direction:column;
+}
+.event-feed h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.feed-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+.feed-item {
+  background:var(--surface2); border-radius:8px; padding:12px;
+  display:flex; gap:12px; align-items:flex-start;
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+.feed-icon { font-size:20px; flex-shrink:0; }
+.feed-body { flex:1; }
+.feed-type { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.feed-desc { font-size:13px; color:var(--text); margin-top:2px; line-height:1.3; }
+.feed-time { font-size:10px; color:var(--muted); margin-top:4px; font-family:'Red Hat Mono',monospace; }
+
+.sidebar { grid-area:sidebar; display:flex; flex-direction:column; gap:12px; }
+
+.sap-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px;
+}
+.sap-panel h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.sap-service {
+  background:var(--surface2); border-radius:6px; padding:10px;
+  margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;
+}
+.sap-service:last-child { margin-bottom:0; }
+.sap-name { font-size:11px; font-weight:600; }
+.sap-status { font-size:10px; color:var(--green); }
+
+.diagnostics {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; flex:1;
+}
+.diagnostics h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.diag-row {
+  display:flex; justify-content:space-between; padding:8px 0;
+  border-bottom:1px solid var(--surface2); font-size:12px;
+}
+.diag-row:last-child { border-bottom:none; }
+.diag-label { color:var(--dim); }
+.diag-value { font-family:'Red Hat Mono',monospace; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+  <div class="dash-header">
+    <div class="brand">
+      <div class="brand-logo">🚗</div>
+      <div class="brand-text">
+        <div class="brand-title">Mercedes-Benz Connected Vehicle</div>
+        <div class="brand-sub">LIVE TELEMETRY DASHBOARD</div>
+      </div>
+    </div>
+    <div class="partners">
+      <span class="rh">RED HAT</span>
+      <span class="sep">×</span>
+      <span class="sap">SAP</span>
+      <span class="sep">×</span>
+      <span class="mb">MERCEDES-BENZ</span>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      <div class="live-label">SIMULATED</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="vehicle-hero">
+      <div class="vehicle-icon">🏎️</div>
+      <div class="vehicle-info">
+        <div class="vehicle-model">Mercedes-Benz C-Class</div>
+        <div class="vehicle-vin">VIN: W1NKM4HB0PU012482</div>
+        <div class="vehicle-status">
+          <div class="v-stat"><div class="v-stat-val" id="vOdometer" style="color:var(--mb-silver)">42,187</div><div class="v-stat-lbl">Miles</div></div>
+          <div class="v-stat"><div class="v-stat-val" id="vEvents" style="color:var(--sap-gold)">0</div><div class="v-stat-lbl">Events</div></div>
+          <div class="v-stat"><div class="v-stat-val" id="vUptime" style="color:var(--green)">0m</div><div class="v-stat-lbl">Uptime</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gauges">
+      <div class="gauge">
+        <div class="gauge-icon">⛽</div>
+        <div class="gauge-value" id="gFuel" style="color:var(--green)">68</div>
+        <div class="gauge-unit">%</div>
+        <div class="gauge-label">Fuel Level</div>
+        <div class="gauge-bar"><div class="gauge-bar-fill" id="gFuelBar" style="width:68%;background:var(--green)"></div></div>
+      </div>
+
+      <div class="gauge">
+        <div class="gauge-icon">🔋</div>
+        <div class="gauge-value" id="gBattery" style="color:var(--blue)">12.8</div>
+        <div class="gauge-unit">V</div>
+        <div class="gauge-label">Battery</div>
+        <div class="gauge-bar"><div class="gauge-bar-fill" id="gBatteryBar" style="width:85%;background:var(--blue)"></div></div>
+      </div>
+
+      <div class="gauge">
+        <div class="gauge-icon">🛞</div>
+        <div class="gauge-value" id="gTire" style="color:var(--amber)">32</div>
+        <div class="gauge-unit">PSI</div>
+        <div class="gauge-label">Tire Pressure</div>
+        <div class="gauge-bar"><div class="gauge-bar-fill" id="gTireBar" style="width:88%;background:var(--amber)"></div></div>
+      </div>
+    </div>
+
+    <div class="event-feed">
+      <h3>CloudEvents Stream</h3>
+      <div class="feed-list" id="feedList"></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sap-panel">
+      <h3>SAP BTP Integration</h3>
+      <div class="sap-service">
+        <div class="sap-name">Event Mesh</div>
+        <div class="sap-status">● Connected</div>
+      </div>
+      <div class="sap-service">
+        <div class="sap-name">Integration Suite</div>
+        <div class="sap-status">● Active</div>
+      </div>
+      <div class="sap-service">
+        <div class="sap-name">S/4HANA PM</div>
+        <div class="sap-status">● Routing</div>
+      </div>
+      <div class="sap-service">
+        <div class="sap-name">SuccessFactors</div>
+        <div class="sap-status">● Synced</div>
+      </div>
+    </div>
+
+    <div class="diagnostics">
+      <h3>Vehicle Diagnostics</h3>
+      <div class="diag-row">
+        <div class="diag-label">Engine Status</div>
+        <div class="diag-value" style="color:var(--green)">Normal</div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Lock Status</div>
+        <div class="diag-value" id="dLock">Locked</div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Location</div>
+        <div class="diag-value" id="dLocation">Tracking</div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Range</div>
+        <div class="diag-value" id="dRange">287 mi</div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">OpenShift</div>
+        <div class="diag-value" style="color:var(--rh-red)">qr-demo-qa</div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">API Version</div>
+        <div class="diag-value">Vehicle Status 1.5</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// SIMULATION ENGINE
+// ═══════════════════════════════════════════
+let eventCount = 0;
+let startTime = Date.now();
+let fuel = 68;
+let battery = 12.8;
+let tire = 32;
+let odometer = 42187;
+let locked = true;
+
+const EVENT_TYPES = [
+  { type: 'fuel', icon: '⛽', color: 'var(--green)', generate: () => {
+    fuel = Math.max(5, fuel - (Math.random() * 2));
+    const range = Math.round(fuel * 4.2);
+    document.getElementById('dRange').innerText = range + ' mi';
+    return { level: fuel.toFixed(1) + '%', range: range + ' mi' };
+  }},
+  { type: 'odometer', icon: '📏', color: 'var(--mb-silver)', generate: () => {
+    odometer += Math.random() * 5;
+    document.getElementById('vOdometer').innerText = Math.round(odometer).toLocaleString();
+    return { reading: Math.round(odometer).toLocaleString() + ' mi' };
+  }},
+  { type: 'battery', icon: '🔋', color: 'var(--blue)', generate: () => {
+    battery = 12.4 + (Math.random() * 0.8);
+    return { voltage: battery.toFixed(2) + 'V', status: battery > 12.5 ? 'Good' : 'Low' };
+  }},
+  { type: 'tire_pressure', icon: '🛞', color: 'var(--amber)', generate: () => {
+    tire = 31 + (Math.random() * 2);
+    return { avgPressure: tire.toFixed(1) + ' PSI', status: 'Normal' };
+  }},
+  { type: 'lock_status', icon: '🔐', color: locked ? 'var(--green)' : 'var(--rh-red)', generate: () => {
+    locked = Math.random() > 0.3;
+    document.getElementById('dLock').innerText = locked ? 'Locked' : 'Unlocked';
+    document.getElementById('dLock').style.color = locked ? 'var(--green)' : 'var(--rh-red)';
+    return { status: locked ? 'Locked' : 'Unlocked', doors: locked ? 'All secured' : 'Driver door open' };
+  }},
+  { type: 'location_ping', icon: '📍', color: 'var(--sap-gold)', generate: () => {
+    const cities = ['Raleigh, NC', 'Durham, NC', 'Chapel Hill, NC', 'Cary, NC'];
+    const city = cities[Math.floor(Math.random() * cities.length)];
+    document.getElementById('dLocation').innerText = city;
+    return { location: city, privacy: 'Coordinates redacted' };
+  }},
+];
+
+function addEvent(evt) {
+  eventCount++;
+  document.getElementById('vEvents').innerText = eventCount;
+
+  const data = evt.generate();
+  const feedList = document.getElementById('feedList');
+
+  const item = document.createElement('div');
+  item.className = 'feed-item';
+
+  const desc = Object.entries(data).map(([k, v]) => `${k}: ${v}`).join(' • ');
+  const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+
+  item.innerHTML = `
+    <div class="feed-icon">${evt.icon}</div>
+    <div class="feed-body">
+      <div class="feed-type" style="color:${evt.color}">ohc.demo.vehicle.${evt.type}</div>
+      <div class="feed-desc">${desc}</div>
+      <div class="feed-time">${now} UTC</div>
+    </div>
+  `;
+
+  feedList.insertBefore(item, feedList.firstChild);
+
+  // Keep only last 20 events
+  while (feedList.children.length > 20) {
+    feedList.removeChild(feedList.lastChild);
+  }
+
+  // Update gauges
+  document.getElementById('gFuel').innerText = Math.round(fuel);
+  document.getElementById('gFuelBar').style.width = fuel + '%';
+  document.getElementById('gFuelBar').style.background = fuel > 20 ? 'var(--green)' : 'var(--rh-red)';
+
+  document.getElementById('gBattery').innerText = battery.toFixed(1);
+  const batteryPct = ((battery - 11) / 3) * 100;
+  document.getElementById('gBatteryBar').style.width = batteryPct + '%';
+
+  document.getElementById('gTire').innerText = Math.round(tire);
+  document.getElementById('gTireBar').style.width = ((tire - 28) / 8) * 100 + '%';
+}
+
+function updateUptime() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  document.getElementById('vUptime').innerText = mins + 'm ' + secs + 's';
+}
+
+// Simulation loop
+let delay = 3000;
+function simulate() {
+  const evt = EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
+  addEvent(evt);
+
+  if (delay > 800) delay *= 0.95;
+  setTimeout(simulate, delay * (0.7 + Math.random() * 0.6));
+}
+
+setInterval(updateUptime, 1000);
+setTimeout(simulate, 1500);
+</script>
+</body>
+</html>
