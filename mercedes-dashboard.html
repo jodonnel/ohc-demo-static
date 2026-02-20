@@ -71,6 +71,14 @@ html, body { height:100%; background:var(--bg); color:var(--text); font-family:'
 .v-stat { text-align:center; }
 .v-stat-val { font-family:'Red Hat Mono',monospace; font-size:20px; font-weight:700; }
 .v-stat-lbl { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+.vehicle-map-link {
+  text-decoration:none; display:flex; flex-direction:column; align-items:center;
+  gap:6px; padding:12px 20px; background:var(--surface2); border-radius:10px;
+  transition:all 0.2s; position:relative;
+}
+.vehicle-map-link:hover { background:var(--border); transform:translateY(-2px); }
+.map-icon { font-size:40px; }
+.map-label { font-size:9px; color:var(--mb-silver); font-weight:700; letter-spacing:1.5px; }
 
 .gauges {
   display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;
@@ -179,6 +187,10 @@ html, body { height:100%; background:var(--bg); color:var(--text); font-family:'
           <div class="v-stat"><div class="v-stat-val" id="vUptime" style="color:var(--green)">0m</div><div class="v-stat-lbl">Uptime</div></div>
         </div>
       </div>
+      <a href="mercedes-live-route.html" class="vehicle-map-link" title="View Live Route Map">
+        <div class="map-icon">🗺️</div>
+        <div class="map-label">ROUTE MAP</div>
+      </a>
     </div>
 
     <div class="gauges">
