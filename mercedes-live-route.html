@@ -406,7 +406,7 @@ function tick() {
     const progress = phaseTimer / DRIVE_DURATION;
     tripProgress = progress * 100;
     speed = 15 + Math.sin(progress * Math.PI * 2) * 10;
-    fuel -= 0.01;
+    fuel -= 0.001; // ~0.3% for 3-minute drive (0.3 miles)
     odometer += 0.002;
     battery = 12.5 + Math.random() * 0.6;
 
@@ -426,7 +426,7 @@ function tick() {
     speed = 0;
     tripProgress = 100;
     battery = 12.3 + Math.random() * 0.4; // Battery drains slightly with engine running
-    fuel -= 0.005; // Idling uses fuel
+    fuel -= 0.0008; // Idling uses ~0.5% for 10 minutes
 
     if (phaseTimer >= WAIT_DURATION) {
       tripPhase = 'DRIVING_HOME';
@@ -440,7 +440,7 @@ function tick() {
     const progress = phaseTimer / RETURN_DURATION;
     tripProgress = 100 - (progress * 100);
     speed = 15 + Math.sin(progress * Math.PI * 2) * 10;
-    fuel -= 0.01;
+    fuel -= 0.001; // ~0.3% for 3-minute drive (0.3 miles)
     odometer += 0.002;
     battery = 12.5 + Math.random() * 0.6;
 
