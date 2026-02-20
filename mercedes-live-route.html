@@ -198,7 +198,30 @@ html, body { height:100%; background:var(--bg); color:var(--text); font-family:'
 // ROUTE & TRAIN SCHEDULE
 // ═══════════════════════════════════════════
 const HOME = [41.0762, -73.8587]; // 19 Grove Street, Tarrytown
-const STATION = [41.0761, -73.8642]; // Tarrytown Metro North Station
+const STATION = [41.0761, -73.8642]; // Tarrytown Metro North Station (1 Depot Plaza)
+
+// Actual driving route following streets
+const ROUTE_TO_STATION = [
+  [41.0762, -73.8587],  // Start: 19 Grove Street
+  [41.0760, -73.8588],  // Grove Street (heading south)
+  [41.0758, -73.8589],  // Grove Street
+  [41.0756, -73.8595],  // Turn onto Main Street (US-9/Broadway)
+  [41.0757, -73.8605],  // Main Street heading west
+  [41.0759, -73.8620],  // Main Street
+  [41.0760, -73.8635],  // Turn onto Depot Plaza/Station Lane
+  [41.0761, -73.8642],  // Arrive: Tarrytown Metro North Station
+];
+
+const ROUTE_TO_HOME = [
+  [41.0761, -73.8642],  // Start: Station
+  [41.0760, -73.8635],  // Station Lane
+  [41.0759, -73.8620],  // Turn onto Main Street
+  [41.0757, -73.8605],  // Main Street heading east
+  [41.0756, -73.8595],  // Main Street
+  [41.0758, -73.8589],  // Turn onto Grove Street
+  [41.0760, -73.8588],  // Grove Street (heading north)
+  [41.0762, -73.8587],  // Arrive: 19 Grove Street
+];
 
 // Metro North Hudson Line express trains (evening rush hour)
 const TRAIN_SCHEDULE = [
@@ -242,12 +265,13 @@ const stationIcon = L.divIcon({
 });
 
 L.marker(HOME, { icon: homeIcon }).addTo(map).bindPopup('19 Grove Street');
-L.marker(STATION, { icon: stationIcon }).addTo(map).bindPopup('Tarrytown Station');
+L.marker(STATION, { icon: stationIcon }).addTo(map).bindPopup('Tarrytown Metro North Station');
 
 const carMarker = L.marker(HOME, { icon: carIcon }).addTo(map);
-const routeLine = L.polyline([HOME, STATION], { color: '#00ADEF', weight: 3, opacity: 0.7 }).addTo(map);
+const routeLineToStation = L.polyline(ROUTE_TO_STATION, { color: '#00ADEF', weight: 3, opacity: 0.7, dashArray: '5, 5' }).addTo(map);
+const routeLineToHome = L.polyline(ROUTE_TO_HOME, { color: '#00D26A', weight: 3, opacity: 0.7, dashArray: '5, 5' }).addTo(map);
 
-map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+map.fitBounds(routeLineToStation.getBounds(), { padding: [50, 50] });
 
 // ═══════════════════════════════════════════
 // SIMULATION STATE
@@ -312,12 +336,25 @@ function setStatus(icon, title, detail) {
 }
 
 // ═══════════════════════════════════════════
-// INTERPOLATE POSITION
+// INTERPOLATE POSITION ALONG ROUTE
 // ═══════════════════════════════════════════
-function lerp(start, end, t) {
+function getPositionAlongRoute(route, progress) {
+  // progress is 0.0 to 1.0
+  const totalSegments = route.length - 1;
+  const segmentProgress = progress * totalSegments;
+  const currentSegment = Math.floor(segmentProgress);
+  const segmentT = segmentProgress - currentSegment;
+
+  if (currentSegment >= totalSegments) {
+    return route[route.length - 1];
+  }
+
+  const start = route[currentSegment];
+  const end = route[currentSegment + 1];
+
   return [
-    start[0] + (end[0] - start[0]) * t,
-    start[1] + (end[1] - start[1]) * t
+    start[0] + (end[0] - start[0]) * segmentT,
+    start[1] + (end[1] - start[1]) * segmentT
   ];
 }
 
@@ -361,7 +398,7 @@ function tick() {
     odometer += 0.002;
     battery = 12.5 + Math.random() * 0.6;
 
-    const pos = lerp(HOME, STATION, progress);
+    const pos = getPositionAlongRoute(ROUTE_TO_STATION, progress);
     carMarker.setLatLng(pos);
 
     if (phaseTimer >= DRIVE_DURATION) {
@@ -395,7 +432,7 @@ function tick() {
     odometer += 0.002;
     battery = 12.5 + Math.random() * 0.6;
 
-    const pos = lerp(STATION, HOME, progress);
+    const pos = getPositionAlongRoute(ROUTE_TO_HOME, progress);
     carMarker.setLatLng(pos);
 
     if (phaseTimer >= RETURN_DURATION) {
