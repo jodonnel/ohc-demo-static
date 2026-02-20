@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OHC SAP Demo — Red Hat + SAP Reference Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --surface2: #161B22; --border: #1C2333;
+  --text: #F0F4F8; --dim: #8B949E; --muted: #4E5D6C;
+  --red: #EE0000; --red-glow: rgba(238,0,0,0.12);
+  --blue: #0070F2; --amber: #F59E0B; --green: #00D26A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg); color: var(--text); font-family:'Red Hat Display',sans-serif;
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:2rem;
+}
+.container { max-width:900px; width:100%; }
+.header {
+  text-align:center; margin-bottom:3rem;
+  padding-bottom:2rem; border-bottom:1px solid var(--border);
+}
+.brand { display:flex; align-items:center; justify-content:center; gap:1rem; margin-bottom:1rem; }
+.rh { color:var(--red); font-size:14px; font-weight:700; letter-spacing:2px; }
+.sap { color:var(--blue); font-size:14px; font-weight:700; letter-spacing:2px; }
+.sep { color:var(--muted); }
+h1 { font-size:2.5rem; font-weight:900; margin-bottom:0.5rem; line-height:1.2; }
+.subtitle { font-size:1rem; color:var(--dim); font-weight:300; }
+.status {
+  background:var(--surface); border:1px solid var(--border); border-radius:8px;
+  padding:1rem; margin-bottom:2rem; display:flex; align-items:center; gap:0.75rem;
+}
+.status-dot { width:8px; height:8px; border-radius:50%; background:var(--amber); }
+.status-text { font-size:0.9rem; color:var(--amber); font-family:'Red Hat Mono',monospace; }
+.demos { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; }
+.demo-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:1.5rem; transition:all 0.2s; text-decoration:none; color:var(--text);
+  display:block; position:relative; overflow:hidden;
+}
+.demo-card:hover {
+  border-color:var(--red); transform:translateY(-2px);
+  box-shadow:0 4px 16px var(--red-glow);
+}
+.demo-icon { font-size:2rem; margin-bottom:0.75rem; }
+.demo-title { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; }
+.demo-desc { font-size:0.85rem; color:var(--dim); line-height:1.4; }
+.footer {
+  text-align:center; margin-top:3rem; padding-top:2rem; border-top:1px solid var(--border);
+  font-size:0.85rem; color:var(--muted);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand">
+      <span class="rh">RED HAT</span>
+      <span class="sep">×</span>
+      <span class="sap">SAP</span>
+    </div>
+    <h1>OpenShift Hybrid Cloud Demo</h1>
+    <p class="subtitle">Edge-to-Cloud Reference Architecture</p>
+  </div>
+
+  <div class="status">
+    <div class="status-dot"></div>
+    <div class="status-text">STATIC MODE — Simulated data (live OpenShift cluster offline)</div>
+  </div>
+
+  <div class="demos">
+    <a href="dashboard.html" class="demo-card">
+      <div class="demo-icon">📊</div>
+      <div class="demo-title">Live Dashboard</div>
+      <div class="demo-desc">Real-time event monitoring with class visualization and activity feed</div>
+    </a>
+
+    <a href="qr.html" class="demo-card">
+      <div class="demo-icon">📱</div>
+      <div class="demo-title">Audience QR</div>
+      <div class="demo-desc">Interactive QR code for audience device participation</div>
+    </a>
+
+    <a href="present.html" class="demo-card">
+      <div class="demo-icon">🎤</div>
+      <div class="demo-title">Presenter View</div>
+      <div class="demo-desc">Speaker console with scenario controls and audience stats</div>
+    </a>
+
+    <a href="present-index.html" class="demo-card">
+      <div class="demo-icon">🗂️</div>
+      <div class="demo-title">Scenario Index</div>
+      <div class="demo-desc">Browse all available demo scenarios</div>
+    </a>
+
+    <a href="present-piport.html" class="demo-card">
+      <div class="demo-icon">🔄</div>
+      <div class="demo-title">PI/PO Migration</div>
+      <div class="demo-desc">SAP Process Integration to Integration Suite migration scenario</div>
+    </a>
+
+    <a href="present-mii.html" class="demo-card">
+      <div class="demo-icon">🏭</div>
+      <div class="demo-title">MII to DMC</div>
+      <div class="demo-desc">Manufacturing Integration to Digital Manufacturing Cloud migration</div>
+    </a>
+
+    <a href="present-shopfloor.html" class="demo-card">
+      <div class="demo-icon">⚙️</div>
+      <div class="demo-title">Shop Floor</div>
+      <div class="demo-desc">Industrial IoT and manufacturing operations scenario</div>
+    </a>
+
+    <a href="present-openblue.html" class="demo-card">
+      <div class="demo-icon">🏢</div>
+      <div class="demo-title">OpenBlue Facilities</div>
+      <div class="demo-desc">Building automation and facility management integration</div>
+    </a>
+
+    <a href="present-util.html" class="demo-card">
+      <div class="demo-icon">⚡</div>
+      <div class="demo-title">Utilities / OT</div>
+      <div class="demo-desc">Operational technology and utilities sector scenario</div>
+    </a>
+
+    <a href="present-rail.html" class="demo-card">
+      <div class="demo-icon">🚄</div>
+      <div class="demo-title">Rail / Transport</div>
+      <div class="demo-desc">Transportation and logistics operational intelligence</div>
+    </a>
+
+    <a href="present-grc-killchain.html" class="demo-card">
+      <div class="demo-icon">🛡️</div>
+      <div class="demo-title">GRC Kill Chain</div>
+      <div class="demo-desc">Governance, risk, and compliance security scenario</div>
+    </a>
+
+    <a href="present-ad.html" class="demo-card">
+      <div class="demo-icon">🏢</div>
+      <div class="demo-title">Active Directory</div>
+      <div class="demo-desc">Identity and access management integration</div>
+    </a>
+
+    <a href="mercedes-integration.html" class="demo-card">
+      <div class="demo-icon">🚗</div>
+      <div class="demo-title">Mercedes Integration</div>
+      <div class="demo-desc">Connected vehicle telemetry with SAP Business Technology Platform</div>
+    </a>
+
+    <a href="about.html" class="demo-card">
+      <div class="demo-icon">ℹ️</div>
+      <div class="demo-title">About</div>
+      <div class="demo-desc">Architecture overview and technical details</div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <p>Red Hat OpenShift + SAP Business Technology Platform</p>
+    <p style="margin-top:0.5rem;">Reference Architecture | February 2026</p>
+  </div>
+</div>
+</body>
+</html>

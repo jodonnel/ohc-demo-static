@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OHC — Stage Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&family=Red+Hat+Text:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --surface2: #161B22; --border: #1C2333;
+  --muted: #4E5D6C; --text: #F0F4F8; --dim: #8B949E;
+  --red: #EE0000; --red-glow: rgba(238,0,0,0.12);
+  --blue: #0070F2; --green: #00D26A; --amber: #F59E0B;
+  --teal: #14B8A6; --orange: #F97316; --purple: #A855F7;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; background:var(--bg); color:var(--text); font-family:'Red Hat Display',sans-serif; overflow:hidden; }
+
+/* ── Layout: 3 columns ── */
+.dashboard {
+  display:grid; height:100vh; padding:12px; gap:12px;
+  grid-template-columns: 1fr 320px 300px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header header header"
+    "main   feed   sidebar";
+}
+
+/* ── Header ── */
+.dash-header {
+  grid-area:header; display:flex; align-items:center; justify-content:space-between;
+  padding:8px 16px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px;
+}
+.dash-header .brand { display:flex; align-items:center; gap:12px; }
+.dash-header .rh { color:var(--red); font-size:11px; font-weight:700; letter-spacing:2px; }
+.dash-header .sep { color:var(--muted); }
+.dash-header .sap { color:var(--blue); font-size:11px; font-weight:700; letter-spacing:2px; }
+.dash-header .title { font-size:13px; font-weight:700; color:var(--dim); margin-left:16px; letter-spacing:0.5px; }
+.dash-header .live-badge { display:flex; align-items:center; gap:8px; }
+.dash-header .live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+.dash-header .live-label { font-family:'Red Hat Mono',monospace; font-size:11px; color:var(--green); }
+
+/* ── Main area (counter + class bars + timeline) ── */
+.main { grid-area:main; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+
+/* Hero counter */
+.hero {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:20px; text-align:center; position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 60%, var(--red-glow) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-count {
+  font-family:'Red Hat Mono',monospace; font-size:6rem; font-weight:900;
+  line-height:1; font-variant-numeric:tabular-nums;
+  text-shadow:0 0 40px var(--red-glow); transition:transform 0.08s;
+  position:relative;
+}
+.hero-count.bump { transform:scale(1.02); }
+.hero-label { font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:4px; position:relative; }
+.hero-stats {
+  display:flex; justify-content:center; gap:32px; margin-top:12px; position:relative;
+}
+.hero-stat { text-align:center; }
+.hero-stat .val { font-family:'Red Hat Mono',monospace; font-size:18px; font-weight:700; }
+.hero-stat .lbl { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+/* Event class bars */
+.class-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; flex:1; overflow:hidden; display:flex; flex-direction:column;
+}
+.class-panel h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; }
+.class-bars { flex:1; display:flex; flex-direction:column; gap:6px; justify-content:center; }
+.class-row { display:flex; align-items:center; gap:8px; }
+.class-icon { font-size:16px; width:24px; text-align:center; }
+.class-label { font-size:11px; color:var(--dim); width:80px; font-family:'Red Hat Text',sans-serif; }
+.class-bar-bg { flex:1; height:18px; background:var(--surface2); border-radius:4px; overflow:hidden; position:relative; }
+.class-bar-fill { height:100%; border-radius:4px; transition:width 0.4s ease; min-width:2px; }
+.class-count { font-family:'Red Hat Mono',monospace; font-size:11px; color:var(--dim); width:32px; text-align:right; }
+
+/* Last event card */
+.last-event {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; min-height:100px;
+}
+.last-event h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+.evt-card { display:flex; gap:12px; align-items:flex-start; }
+.evt-class-badge {
+  font-size:24px; width:44px; height:44px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.evt-card-body { flex:1; }
+.evt-card-type { font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.evt-card-summary { font-size:14px; font-weight:300; color:var(--text); margin-top:4px; line-height:1.4; font-family:'Red Hat Text',sans-serif; }
+.evt-card-meta { font-size:10px; color:var(--muted); margin-top:6px; font-family:'Red Hat Mono',monospace; }
+
+/* ── Activity feed (right column) ── */
+.feed-panel {
+  grid-area:feed; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; display:flex; flex-direction:column; overflow:hidden;
+}
+.feed-panel h3 {
+  font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px;
+  text-transform:uppercase; padding:14px 16px 10px; flex-shrink:0;
+}
+.feed-list { flex:1; overflow-y:auto; padding:0 12px 12px; }
+.feed-list::-webkit-scrollbar { width:4px; }
+.feed-list::-webkit-scrollbar-track { background:transparent; }
+.feed-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+.feed-item {
+  display:flex; gap:8px; align-items:flex-start; padding:8px 6px;
+  border-bottom:1px solid var(--border); animation:slideIn 0.3s ease;
+}
+.feed-item .fi-icon { font-size:14px; flex-shrink:0; margin-top:2px; }
+.feed-item .fi-body { flex:1; }
+.feed-item .fi-text { font-size:12px; color:var(--text); font-family:'Red Hat Text',sans-serif; line-height:1.3; }
+.feed-item .fi-time { font-size:9px; color:var(--muted); font-family:'Red Hat Mono',monospace; margin-top:2px; }
+.feed-item .fi-class { font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; }
+
+/* ── Sidebar (devices + status) ── */
+.sidebar { grid-area:sidebar; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+
+.device-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px; flex:1; display:flex; flex-direction:column;
+}
+.device-panel h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+.device-count { font-family:'Red Hat Mono',monospace; font-size:36px; font-weight:900; color:var(--blue); }
+.device-count-label { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; }
+.device-mosaic { display:flex; flex-wrap:wrap; gap:4px; flex:1; align-content:flex-start; }
+.device-dot {
+  width:28px; height:28px; border-radius:6px; background:var(--surface2);
+  display:flex; align-items:center; justify-content:center; font-size:14px;
+  animation:popIn 0.3s ease; border:1px solid var(--border);
+}
+.device-stats { margin-top:auto; padding-top:10px; border-top:1px solid var(--border); }
+.device-stats .ds-row { display:flex; justify-content:space-between; padding:2px 0; }
+.device-stats .ds-label { font-size:10px; color:var(--muted); }
+.device-stats .ds-val { font-size:10px; font-family:'Red Hat Mono',monospace; color:var(--dim); }
+
+/* Network & Locale breakdown panels */
+.breakdown { margin-top:8px; }
+.breakdown-title { font-size:9px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; font-weight:700; margin-bottom:4px; }
+.bd-row { display:flex; align-items:center; gap:6px; padding:2px 0; }
+.bd-icon { font-size:12px; flex-shrink:0; width:16px; text-align:center; }
+.bd-label { font-size:10px; color:var(--dim); font-family:'Red Hat Text',sans-serif; flex:1; }
+.bd-count { font-size:10px; font-family:'Red Hat Mono',monospace; color:var(--text); min-width:20px; text-align:right; }
+.bd-bar { width:48px; height:4px; background:var(--border); border-radius:2px; overflow:hidden; flex-shrink:0; }
+.bd-bar-fill { height:100%; border-radius:2px; transition:width 0.4s ease; }
+
+/* Status panel */
+.status-panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:14px 16px;
+}
+.status-panel h3 { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+.status-row { display:flex; justify-content:space-between; padding:3px 0; }
+.status-row .sl { font-size:11px; color:var(--dim); font-family:'Red Hat Text',sans-serif; }
+.status-row .sv { font-size:11px; font-family:'Red Hat Mono',monospace; color:var(--text); }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes popIn { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+@keyframes flashBorder { 0%{border-color:var(--flash-color)} 100%{border-color:var(--border)} }
+
+/* Mobile */
+@media (max-width:1024px) {
+  .dashboard { grid-template-columns:1fr 1fr; grid-template-rows:auto 1fr 1fr; grid-template-areas:"header header" "main feed" "sidebar sidebar"; }
+}
+@media (max-width:768px) {
+  .dashboard { grid-template-columns:1fr; grid-template-rows:auto auto 1fr auto; grid-template-areas:"header" "main" "feed" "sidebar"; overflow-y:auto; }
+  .hero-count { font-size:4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div style="display:flex;align-items:center">
+      <div class="brand"><span class="rh">RED HAT</span><span class="sep"> × </span><span class="sap">SAP</span></div>
+      <span class="title">EDGE OPERATIONS CENTER</span>
+    </div>
+    <div class="live-badge"><div class="live-dot"></div><span class="live-label" id="sseStatus">CONNECTING</span></div>
+  </div>
+
+  <!-- Main: counter + bars + last event -->
+  <div class="main">
+    <div class="hero">
+      <div class="hero-count" id="heroCount">0</div>
+      <div class="hero-label">Events Ingested</div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="val" id="hRate" style="color:var(--red)">0</div><div class="lbl">per sec</div></div>
+        <div class="hero-stat"><div class="val" id="hPeak" style="color:var(--amber)">0</div><div class="lbl">peak/s</div></div>
+        <div class="hero-stat"><div class="val" id="hDevices" style="color:var(--blue)">0</div><div class="lbl">devices</div></div>
+      </div>
+    </div>
+
+    <div class="class-panel">
+      <h3>Event Classes</h3>
+      <div class="class-bars" id="classBars"></div>
+    </div>
+
+    <div class="last-event">
+      <h3>Latest Event</h3>
+      <div id="lastEventCard">
+        <div class="evt-card">
+          <div class="evt-class-badge" style="background:var(--surface2)">⏳</div>
+          <div class="evt-card-body">
+            <div class="evt-card-type" style="color:var(--muted)">Waiting</div>
+            <div class="evt-card-summary" style="color:var(--muted)">No events received yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity feed -->
+  <div class="feed-panel">
+    <h3>Activity Feed</h3>
+    <div class="feed-list" id="feedList"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="device-panel">
+      <h3>Audience Devices</h3>
+      <div class="device-count" id="devCount">0</div>
+      <div class="device-count-label">Connected</div>
+      <div class="device-mosaic" id="deviceMosaic"></div>
+      <div class="device-stats">
+        <div class="ds-row"><span class="ds-label">Avg Battery</span><span class="ds-val" id="dsBattery">—</span></div>
+        <div class="breakdown" id="bdNetworks"></div>
+        <div class="breakdown" id="bdLocales"></div>
+      </div>
+    </div>
+    <div class="status-panel">
+      <h3>System</h3>
+      <div class="status-row"><span class="sl">Platform</span><span class="sv">OpenShift 4.x</span></div>
+      <div class="status-row"><span class="sl">Namespace</span><span class="sv">qr-demo-qa</span></div>
+      <div class="status-row"><span class="sl">Uptime</span><span class="sv" id="uptime">—</span></div>
+      <div class="status-row"><span class="sl">SSE</span><span class="sv" id="sseState" style="color:var(--green)">●</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// EVENT CLASS REGISTRY
+// Fixes: #31 — added 'status' class for game/session/action events
+// ═══════════════════════════════════════════
+const CLASSES = {
+  access:      { icon:'🔐', color:'var(--green)',  label:'Access' },
+  incident:    { icon:'🚨', color:'var(--red)',    label:'Incident' },
+  compliance:  { icon:'📋', color:'var(--amber)',  label:'Compliance' },
+  network:     { icon:'🌐', color:'var(--blue)',   label:'Network' },
+  surveillance:{ icon:'📹', color:'var(--teal)',   label:'Surveillance' },
+  building:    { icon:'🏢', color:'var(--orange)', label:'Building' },
+  physical:    { icon:'👣', color:'var(--purple)', label:'Physical' },
+  sensor:      { icon:'🌡️', color:'var(--muted)',  label:'Sensor' },
+  alert:       { icon:'⚠️', color:'var(--amber)',  label:'Alert' },
+  telem:       { icon:'📡', color:'var(--purple)', label:'Telemetry' },
+  presenter:   { icon:'🎤', color:'var(--dim)',    label:'Presenter' },
+  status:      { icon:'🎮', color:'var(--dim)',    label:'Status' },
+  command:     { icon:'⬇️', color:'var(--green)',  label:'Motor Command' },
+  vehicle:     { icon:'🚗', color:'#C0C0C0',       label:'Vehicle Telemetry' },
+  piport:      { icon:'🔄', color:'#00AEEF',       label:'PI/PO Migration' },
+  grc:         { icon:'🛡️', color:'#DC2626',       label:'GRC Kill Chain' },
+  shopfloor:   { icon:'🏭', color:'#7C3AED',       label:'Shop Floor' },
+  openblue:    { icon:'🏢', color:'#0EA5E9',       label:'OpenBlue / Facilities' },
+  ot:          { icon:'⚡', color:'#F59E0B',        label:'OT / Utilities' },
+  vision:      { icon:'👁️', color:'#EC4899',       label:'Edge Vision' },
+  iot:         { icon:'📱', color:'#10B981',       label:'Consumer IoT' },
+  unknown:     { icon:'📦', color:'var(--muted)',  label:'Other' },
+};
+
+// ═══════════════════════════════════════════
+// EVENT DESCRIPTIONS
+// Fixes: #32 — 13+ new entries for live game event types
+//        #34 — callers now strip ohc.demo. prefix before lookup
+//        Also fixed field name mismatches (badgeId→badgeID, etc.)
+// ═══════════════════════════════════════════
+const DESCRIPTIONS = {
+  // ── Access / OnGuard ──
+  'access.onguard.badge_scan': d => {
+    const action = d.action || 'scan';
+    const who = d.cardholderName || ('Badge ' + (d.badgeID || d.badgeId || '?'));
+    const where = d.readerName || d.inputPoint || 'reader';
+    if (action === 'ACCESS_DENIED') return '🚫 DENIED — ' + who + ' at ' + where;
+    return who + ' → ' + where;
+  },
+  'access.onguard.door_state': d => {
+    const action = (d.action || '').replace('DOOR_', '').toLowerCase();
+    const where = d.readerName || d.inputPoint || 'panel';
+    return 'Door ' + action + ' — ' + where;
+  },
+  'access.onguard.door_opened': d => 'Door opened — ' + (d.doorName || 'access granted'),
+  'access.onguard.door_closed': d => 'Door closed — ' + (d.doorName || 'secure'),
+  'access.onguard.door_forced': d => '⚠ Door forced open — ' + (d.doorName || 'breach detected'),
+  'access.onguard.door_held': d => 'Door held open — ' + (d.doorName || 'timeout warning'),
+  'access.onguard.badge_scan_denied': d => 'ACCESS DENIED — badge at ' + (d.readerName || 'reader'),
+  'access.biometric_enroll': d => 'Biometric ' + (d.method || 'scan') + ' — quality ' + (d.quality || '—') + '%',
+
+  // ── Incidents ──
+  'incident.credential_anomaly': d => 'Lost badge #' + (d.badgeId || '?') + ' used — reported lost',
+  'incident.camera_tamper': d => 'Camera tamper — ' + (d.cameraId || 'feed interrupted'),
+  'incident.brute_force_ssh': d => 'SSH brute force — ' + (d.attempts || 'many') + ' attempts from ' + (d.sourceIp || 'unknown'),
+  'incident.rogue_device': d => 'Rogue device — MAC ' + (d.mac || 'unknown'),
+  'incident.vault_breach': d => 'Vault breach — ' + (d.method || 'unauthorized'),
+
+  // ── Compliance / Safety ──
+  'compliance.fire_equipment': d => 'Fire extinguisher — ' + (d.status || 'inspected'),
+  'compliance.air_quality': d => 'Air quality — CO₂ ' + (d.co2 || '—') + 'ppm',
+  'safety.fire_equipment': d => 'Fire equipment — gauge ' + (d.gauge || d.status || 'checked'),
+  'maintenance.elevator_check': d => 'JCI OpenBlue — elevator ' + (d.unit || '?') + ' ' + (d.status || 'checked'),
+
+  // ── Network ──
+  'network.ssh_brute_force': d => 'SSH brute force — ' + (d.attempts || '?') + ' attempts',
+  'network.rogue_device': d => 'Rogue device — ' + (d.mac || 'unknown MAC'),
+
+  // ── Surveillance ──
+  'surveillance.camera_diag': d => 'Camera ' + (d.cameraID || d.cameraId || '?') + ' — ' + (d.status || 'checked') + (d.packetLoss ? ' (loss: ' + d.packetLoss + ')' : ''),
+
+  // ── Building ──
+  'building.hvac_override': d => 'HVAC zone ' + (d.zone || '?') + ' — ' + (d.currentTemp || d.temp || '?') + '°F' + (d.threshold ? ' (threshold ' + d.threshold + '°F)' : ''),
+  'building.privacy_film': d => 'Privacy film ' + (d.filmState || d.state || 'toggled') + ' — ' + (d.zone || 'zone'),
+
+  // ── Sensor ──
+  'sensor.environmental': d => (d.metric || 'Sensor') + ': ' + (d.value || '—') + ' in ' + (d.room || 'zone'),
+
+  // ── Telemetry ──
+  'telemetry.rack_temp': d => 'Rack ' + (d.rack || '?') + ' — Δ' + (d.delta || '?') + '°F (' + (d.status || 'nominal') + ')',
+  'telemetry.ups_diag': d => 'UPS ' + (d.model || '?') + ' — ' + (d.runtime_min || d.runtime || '?') + 'min, ' + (d.batteryHealth || d.health || '?') + '% health',
+  'telemetry.air_quality': d => 'Air quality — CO₂ ' + (d.co2_ppm || d.co2 || '?') + 'ppm, VOCs ' + (d.voc_ppb || d.vocs || '?') + 'ppb',
+  'telemetry.battery': d => 'Battery: ' + (d.level || '—'),
+  'telemetry.locale': d => 'Locale: ' + (d.value || '—'),
+  'telemetry.network': d => 'Network: ' + (d.type || '—'),
+
+  // ── Alerts ──
+  'alert.proximity': d => 'Motion anomaly — ' + (d.room || 'nearby') + ' (' + (d.severity || 'warning') + ')',
+  'alert.threat_adjacent': d => 'Threat detected in adjacent zone',
+
+  // ── Game / Session / Actions ──
+  'game.complete': d => 'Game ' + (d.result === 'threat_neutralized' ? 'won 🏆' : 'over') + ' — ' + (d.totalEvents || '?') + ' events in ' + (d.elapsedSeconds || '?') + 's',
+  'session.start': d => 'Session started — badge ' + (d.badgeID || 'activated'),
+  'action.inspect': d => 'Inspected ' + (d.room || 'zone'),
+  'action.listen': d => 'Listening in ' + (d.room || 'zone'),
+
+  // ── Presenter ──
+  'presenter.slide_change': d => 'Slide ' + (d.slide || '?') + '/' + (d.total || '?'),
+
+  // ── Motor Commands (north→south) ──
+  'command.lockdown': d => '🚨 Lockdown initiated via ' + (d.initiated_by || 'unknown').replace(/_/g, ' '),
+
+  // ── GRC Kill Chain ──
+  'grc.badge_anomaly':         d => '🚨 Badge anomaly — ' + (d.cardholder || d.badge_id || '?') + ' at ' + (d.reader || 'reader') + ' [' + (d.anomaly || 'flagged') + ']',
+  'grc.it_lateral':            d => '🔓 IT lateral — ' + (d.credential || 'credential') + ' → ' + (d.target || 'target') + ' (GRC: ' + (d.sap_grc_alert || '?') + ')',
+  'grc.ot_lockdown':           d => '🔒 OT lockdown — ' + (d.plcs_isolated || '?') + ' PLCs isolated via Ansible in ' + (d.latency_ms || '?') + 'ms',
+  'grc.timesheet_discrepancy': d => '💸 Timesheet flagged — ' + (d.contractor_id || '?') + ': ' + (d.invoice_hours || '?') + 'h claimed vs ' + (d.actual_hours || '?') + 'h actual',
+
+  // ── Shop Floor ──
+  'shopfloor.defect_detected':   d => '🔍 Defect: ' + (d.defect_type || '?') + ' [' + (d.severity || '?') + '] on ' + (d.line_id || 'line') + ' — lot ' + (d.inspection_lot || '?') + ' in ' + (d.latency_ms || '?') + 'ms',
+  'shopfloor.production_order':  d => '🏭 Order ' + (d.order_id || '?') + ' → MII ' + (d.mii_response && d.mii_response.latency_ms || '?') + 'ms + SAP DM ' + (d.sapdm_response && d.sapdm_response.latency_ms || '?') + 'ms',
+
+  // ── OpenBlue / Facilities ──
+  'openblue.asset_fault': d => '🏢 ' + (d.asset_id || 'Asset') + ' [' + (d.fault_code || '?') + '] in ' + (d.zone || 'zone') + ' → WO ' + (d.sap_pm_work_order || '?'),
+
+  // ── OT / Utilities ──
+  'ot.anomaly_detected': d => '⚡ ' + (d.anomaly_type || 'Anomaly') + ' at ' + (d.asset_id || 'asset') + ' — ' + (d.sensor_reading || '?') + ' vs ' + (d.threshold || '?') + ' → EAM ' + (d.sap_eam_work_order || '?'),
+
+  // ── Consumer IoT ──
+  'iot.biometric': d => d.source === 'withings' ? '⚖️ Weight: ' + (d.value_kg || '?') + 'kg (Withings)' : d.source === 'garmin' ? '❤️ HR: ' + (d.heart_rate || '?') + 'bpm · steps: ' + (d.steps || 0) + ' (Garmin)' : '📱 ' + (d.device || 'IoT device'),
+
+  // ── Edge Vision ──
+  'vision.blackjack_decision': d => '🃏 ' + (d.player_cards || []).join(' ') + ' (' + (d.player_total || '?') + ') vs ' + (d.dealer_up || '?') + ' → ' + (d.action || '?') + ' in ' + (d.latency_ms || '?') + 'ms',
+
+  // ── PI/PO Migration (IDoc → EIC → S/4HANA) ──
+  'piport.idoc_goods_receipt': d => '📦 IDoc ' + (d.idoc_type || 'MBGMCR002') + ' → ' + (d.routing_path || 'EIC → S/4HANA') + (d.s4_confirmation ? ' ✓ ' + d.s4_confirmation : ' (pending)'),
+  'piport.idoc_routing_failed': d => '❌ IDoc routing failed — ' + (d.idoc_type || 'MBGMCR002') + ': ' + (d.reason || 'unknown error'),
+  'piport.eic_handoff': d => '🔁 EIC handoff — ' + (d.idoc_type || 'IDoc') + ' queued at ' + (d.eic_endpoint || 'edge integration cell'),
+
+  // ── Vehicle Telemetry (Mercedes-Benz connected vehicle relay) ──
+  'vehicle.fuel':          d => '⛽ Fuel level: ' + (d.level_pct !== undefined ? d.level_pct + '%' : (d.level || '—')),
+  'vehicle.odometer':      d => '🔢 Odometer: ' + (d.km !== undefined ? d.km.toLocaleString() + ' km' : (d.reading || '—')),
+  'vehicle.lock_status':   d => '🔐 Vehicle ' + (d.locked ? 'locked' : 'unlocked') + (d.vin_partial ? ' (' + d.vin_partial + ')' : ''),
+  'vehicle.tire_pressure': d => '🛞 Tires — FL:' + (d.fl_kpa || '—') + ' FR:' + (d.fr_kpa || '—') + ' RL:' + (d.rl_kpa || '—') + ' RR:' + (d.rr_kpa || '—') + ' kPa',
+  'vehicle.location_ping': d => '📍 Vehicle location ping' + (d.has_fix ? ' (GPS fix)' : ' (no fix)') + ' — coords redacted',
+};
+
+// ═══════════════════════════════════════════
+// FIX #34: Strip ohc.demo. prefix before DESCRIPTIONS lookup
+// ═══════════════════════════════════════════
+function describeEvent(type, data) {
+  const t = (type || '').replace(/^ohc\.demo\./, '');
+  const fn = DESCRIPTIONS[t];
+  if (fn) try { return fn(data || {}); } catch(e) {}
+  const short = (t || 'event').split('.').pop().replace(/_/g, ' ');
+  return short.charAt(0).toUpperCase() + short.slice(1);
+}
+
+// ═══════════════════════════════════════════
+// FIX #34: Strip ohc.demo. prefix before class matching
+// FIX #31: Handle game/session/action → 'status' class
+// ═══════════════════════════════════════════
+function classifyEvent(type) {
+  if (!type) return 'unknown';
+  const t = type.replace(/^ohc\.demo\./, '');
+  const prefix = t.split('.')[0];
+  // Prefix-based classification — telemetry.network → telem, not network
+  if (prefix === 'telemetry') return 'telem';
+  if (prefix === 'maintenance' || prefix === 'safety') return 'compliance';
+  if (prefix === 'game' || prefix === 'session' || prefix === 'action') return 'status';
+  if (prefix === 'command') return 'command';
+  if (CLASSES[prefix] && prefix !== 'unknown') return prefix;
+  // Fallback to substring for compound types like access.onguard.badge_scan
+  for (const cls of Object.keys(CLASSES)) {
+    if (cls !== 'unknown' && cls !== 'status' && cls !== 'telem' && t.includes(cls)) return cls;
+  }
+  return 'unknown';
+}
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let eventCount = 0;
+let peakRate = 0;
+let eventTimes = [];
+let classCounts = {};
+let feedItems = [];
+let deviceCount = 0;
+let deviceIcons = [];
+const startTime = Date.now();
+
+// ═══════════════════════════════════════════
+// DOM REFS
+// ═══════════════════════════════════════════
+const heroCountEl = document.getElementById('heroCount');
+const hRateEl = document.getElementById('hRate');
+const hPeakEl = document.getElementById('hPeak');
+const hDevicesEl = document.getElementById('hDevices');
+const classBarsEl = document.getElementById('classBars');
+const lastEventCardEl = document.getElementById('lastEventCard');
+const feedListEl = document.getElementById('feedList');
+const deviceMosaicEl = document.getElementById('deviceMosaic');
+const devCountEl = document.getElementById('devCount');
+
+// ═══════════════════════════════════════════
+// RENDER CLASS BARS
+// ═══════════════════════════════════════════
+function renderClassBars() {
+  const entries = Object.entries(classCounts).sort((a,b) => b[1] - a[1]);
+  const max = entries.length > 0 ? entries[0][1] : 1;
+  classBarsEl.innerHTML = '';
+  for (const [cls, count] of entries) {
+    const info = CLASSES[cls] || CLASSES.unknown;
+    const pct = (count / max * 100).toFixed(0);
+    const row = document.createElement('div');
+    row.className = 'class-row';
+    row.innerHTML = `
+      <span class="class-icon">${info.icon}</span>
+      <span class="class-label">${info.label}</span>
+      <div class="class-bar-bg"><div class="class-bar-fill" style="width:${pct}%;background:${info.color}"></div></div>
+      <span class="class-count">${count}</span>
+    `;
+    classBarsEl.appendChild(row);
+  }
+}
+
+// ═══════════════════════════════════════════
+// RENDER LAST EVENT CARD
+// ═══════════════════════════════════════════
+function renderLastEvent(type, data, ts) {
+  const cls = classifyEvent(type);
+  const info = CLASSES[cls] || CLASSES.unknown;
+  const desc = describeEvent(type, data);
+  const time = ts ? new Date(ts).toLocaleTimeString() : new Date().toLocaleTimeString();
+  const shortType = cls.toUpperCase();
+  lastEventCardEl.innerHTML = `
+    <div class="evt-card">
+      <div class="evt-class-badge" style="background:${info.color}20;border:1px solid ${info.color}40">${info.icon}</div>
+      <div class="evt-card-body">
+        <div class="evt-card-type" style="color:${info.color}">${shortType}</div>
+        <div class="evt-card-summary">${desc}</div>
+        <div class="evt-card-meta">${time} · ${type||'—'}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════
+// RENDER FEED ITEM
+// ═══════════════════════════════════════════
+function addFeedItem(type, data, ts) {
+  const cls = classifyEvent(type);
+  const info = CLASSES[cls] || CLASSES.unknown;
+  const desc = describeEvent(type, data);
+  const time = ts ? new Date(ts).toLocaleTimeString() : new Date().toLocaleTimeString();
+
+  const item = document.createElement('div');
+  item.className = 'feed-item';
+  item.innerHTML = `
+    <span class="fi-icon">${info.icon}</span>
+    <div class="fi-body">
+      <div class="fi-text">${desc}</div>
+      <div class="fi-time"><span class="fi-class" style="color:${info.color}">${info.label}</span> · ${time}</div>
+    </div>
+  `;
+  feedListEl.insertBefore(item, feedListEl.firstChild);
+
+  // Keep max 50 items
+  while (feedListEl.children.length > 50) feedListEl.removeChild(feedListEl.lastChild);
+}
+
+// ═══════════════════════════════════════════
+// DEVICE MOSAIC
+// ═══════════════════════════════════════════
+function addDevice(data) {
+  const cls = data?.deviceClass || data?.class || 'phone';
+  const icon = cls === 'laptop' ? '💻' : cls === 'tablet' ? '📱' : '📱';
+  if (deviceIcons.length < 60) {
+    const dot = document.createElement('div');
+    dot.className = 'device-dot';
+    dot.innerText = icon;
+    dot.title = `${data?.os||'—'} · ${data?.browser||'—'}`;
+    deviceMosaicEl.appendChild(dot);
+    deviceIcons.push(dot);
+  }
+}
+
+// ═══════════════════════════════════════════
+// UPDATE COUNTERS
+// ═══════════════════════════════════════════
+function updateCounters() {
+  heroCountEl.innerText = eventCount.toLocaleString();
+  heroCountEl.classList.add('bump');
+  setTimeout(() => heroCountEl.classList.remove('bump'), 80);
+
+  const now = Date.now();
+  eventTimes = eventTimes.filter(t => now - t < 5000);
+  const rate = eventTimes.length > 0 ? (eventTimes.length / 5).toFixed(1) : '0';
+  hRateEl.innerText = rate;
+  if (parseFloat(rate) > peakRate) {
+    peakRate = parseFloat(rate);
+    hPeakEl.innerText = peakRate.toFixed(0);
+  }
+}
+
+// Rate ticker
+setInterval(() => {
+  const now = Date.now();
+  eventTimes = eventTimes.filter(t => now - t < 5000);
+  hRateEl.innerText = eventTimes.length > 0 ? (eventTimes.length / 5).toFixed(1) : '0';
+
+  // Uptime
+  const up = Math.floor((Date.now() - startTime) / 1000);
+  const m = Math.floor(up / 60); const s = up % 60;
+  document.getElementById('uptime').innerText = `${m}m ${s}s`;
+}, 1000);
+
+// ═══════════════════════════════════════════
+// PROCESS EVENT
+// ═══════════════════════════════════════════
+function processEvent(d) {
+  eventCount = d.count || (eventCount + 1);
+  eventTimes.push(Date.now());
+  updateCounters();
+
+  const payload = d.payload || d.data || d;
+  const type = d.type || payload.type || payload.action || '';
+  const data = payload.data || payload;
+  const cls = classifyEvent(type);
+
+  // Update class counts
+  classCounts[cls] = (classCounts[cls] || 0) + 1;
+  renderClassBars();
+
+  // Last event card
+  renderLastEvent(type, data, d.ts || d.timestamp);
+
+  // Feed
+  addFeedItem(type, data, d.ts || d.timestamp);
+
+  // Device tracking
+  if (type.includes('telemetry.device') || type.includes('telemetry.battery') || d.deviceClass) {
+    deviceCount++;
+    devCountEl.innerText = deviceCount;
+    hDevicesEl.innerText = deviceCount;
+    addDevice(data);
+  }
+}
+
+// ═══════════════════════════════════════════
+// SSE CONNECTION
+// ═══════════════════════════════════════════
+function connectSSE() {
+  const statusEl = document.getElementById('sseStatus');
+  const stateEl = document.getElementById('sseState');
+  try {
+    const es = new EventSource('/events');
+    es.onopen = () => {
+      statusEl.innerText = 'LIVE';
+      stateEl.innerText = '●'; stateEl.style.color = 'var(--green)';
+    };
+    es.onmessage = (e) => {
+      const d = JSON.parse(e.data);
+      processEvent(d);
+    };
+    es.onerror = () => {
+      statusEl.innerText = 'RECONNECTING';
+      stateEl.innerText = '●'; stateEl.style.color = 'var(--amber)';
+      es.close();
+      setTimeout(connectSSE, 3000);
+    };
+  } catch(e) {
+    statusEl.innerText = 'OFFLINE';
+    stateEl.innerText = '●'; stateEl.style.color = 'var(--red)';
+    startSimulator();
+  }
+}
+
+// ═══════════════════════════════════════════
+// FETCH INITIAL STATE
+// ═══════════════════════════════════════════
+function fetchState() {
+  return fetch('/state').then(r => r.json()).then(d => {
+    if (d.count && d.count > eventCount) {
+      eventCount = d.count;
+      updateCounters();
+    }
+  }).catch(() => {});
+}
+
+// Hydrate feed from /log
+function hydrateFeed() {
+  return fetch('/log').then(r => r.json()).then(events => {
+    // events is an array, oldest first
+    for (const d of events) {
+      const payload = d.payload || d.data || d;
+      const type = d.type || payload.type || payload.action || '';
+      const data = payload.data || payload;
+      const cls = classifyEvent(type);
+      classCounts[cls] = (classCounts[cls] || 0) + 1;
+      addFeedItem(type, data, d.ts || d.timestamp);
+    }
+    renderClassBars();
+  }).catch(() => {});
+}
+
+// Breakdown renderer for sidebar panels
+const LOCALE_FLAGS = {
+  'en-US':'🇺🇸','en-GB':'🇬🇧','en':'🇺🇸','de':'🇩🇪','fr':'🇫🇷','es':'🇪🇸',
+  'ja':'🇯🇵','ko':'🇰🇷','zh':'🇨🇳','pt':'🇧🇷','it':'🇮🇹','nl':'🇳🇱','ar':'🇸🇦',
+};
+function renderBreakdown(elId, title, data, iconMap, barColor) {
+  const el = document.getElementById(elId);
+  const entries = Object.entries(data).sort((a,b) => b[1] - a[1]);
+  if (!entries.length) { el.innerHTML = ''; return; }
+  const max = Math.max(...entries.map(e => e[1]));
+  let html = '<div class="breakdown-title">' + title + '</div>';
+  for (const [key, count] of entries) {
+    const icon = iconMap[key.toLowerCase()] || (title === 'Locales' ? (LOCALE_FLAGS[key] || '🌐') : '🌐');
+    const pct = Math.round((count / max) * 100);
+    html += '<div class="bd-row">'
+      + '<span class="bd-icon">' + icon + '</span>'
+      + '<span class="bd-label">' + key + '</span>'
+      + '<span class="bd-count">' + count + '</span>'
+      + '<span class="bd-bar"><span class="bd-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></span></span>'
+      + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// Telemetry polling
+function pollTelemetry() {
+  fetch('/telemetry').then(r => r.json()).then(d => {
+    if (d.devices) { deviceCount = d.devices; devCountEl.innerText = d.devices; hDevicesEl.innerText = d.devices; }
+    document.getElementById('dsBattery').innerText = d.avgBattery ? d.avgBattery + '%' : '—';
+    renderBreakdown('bdNetworks', 'Networks', d.networks || {}, {wifi:'📶','4g':'📱','3g':'📱',wired:'🔌',ethernet:'🔌'}, 'var(--blue)');
+    renderBreakdown('bdLocales', 'Locales', d.locales || {}, {}, 'var(--green)');
+    // #37: seed classCounts from server-side eventClasses (authoritative from eventclass field)
+    const ec = d.eventClasses || {};
+    if (Object.keys(ec).length) {
+      for (const [cls, cnt] of Object.entries(ec)) {
+        if (cnt > (classCounts[cls] || 0)) classCounts[cls] = cnt;
+      }
+      renderClassBars();
+    }
+  }).catch(() => {});
+}
+setInterval(pollTelemetry, 5000);
+
+// ═══════════════════════════════════════════
+// SIMULATOR (local/offline)
+// ═══════════════════════════════════════════
+function startSimulator() {
+  const simEvents = [
+    {type:'access.onguard.badge_scan', data:{badgeId:'4471', readerName:'Main Lobby'}},
+    {type:'access.onguard.door_opened', data:{doorName:'East Wing'}},
+    {type:'surveillance.camera_diag', data:{cameraId:'CAM-7', status:'degraded'}},
+    {type:'incident.credential_anomaly', data:{badgeId:'4471', source:'Elevator Bay'}},
+    {type:'compliance.fire_equipment', data:{status:'gauge yellow'}},
+    {type:'building.hvac_override', data:{temp:'81', zone:'4'}},
+    {type:'network.ssh_brute_force', data:{attempts:'47', sourceIp:'10.0.88.3'}},
+    {type:'telemetry.rack_temp', data:{delta:'22'}},
+    {type:'incident.camera_tamper', data:{cameraId:'CAM-3', feed:'interrupted'}},
+    {type:'access.biometric_enroll', data:{quality:'92'}},
+    {type:'network.rogue_device', data:{mac:'DE:AD:BE:EF:CA:FE'}},
+    {type:'incident.vault_breach', data:{method:'tailgating'}},
+    {type:'telemetry.ups_diag', data:{runtime:'34', health:'71'}},
+    {type:'compliance.air_quality', data:{co2:'1150', vocs:'elevated'}},
+  ];
+  let delay = 2000;
+  let idx = 0;
+  let simDevices = 0;
+  function sim() {
+    const evt = simEvents[idx % simEvents.length];
+    idx++;
+    processEvent({count: idx, type: evt.type, data: evt.data, ts: new Date().toISOString()});
+    if (idx % 3 === 0) { simDevices++; deviceCount = simDevices; devCountEl.innerText = simDevices; hDevicesEl.innerText = simDevices; addDevice({deviceClass:'phone',os:'iOS'}); }
+    if (delay > 400) delay *= 0.94;
+    setTimeout(sim, delay * (0.5 + Math.random()));
+  }
+  setTimeout(sim, 1000);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+// hydrateFeed first (populates feed + classCounts), then fetchState (authoritative count)
+hydrateFeed().then(() => fetchState());
+pollTelemetry();
+connectSSE();
+</script>
+</body>
+</html>

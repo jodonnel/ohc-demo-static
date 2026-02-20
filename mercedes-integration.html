@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mercedes-Benz Connected Vehicle Integration | Red Hat + SAP</title>
+  <meta name="description" content="Enterprise edge-to-cloud integration: Mercedes-Benz connected vehicles with Red Hat OpenShift and SAP Business Technology Platform">
+  <style>
+    :root {
+      --rh-red: #EE0000;
+      --sap-gold: #F0AB00;
+      --mb-silver: #00ADEF;
+      --dark: #1a1a1a;
+      --light: #f5f5f5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background: var(--light);
+    }
+
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 2rem 0;
+      border-bottom: 4px solid var(--rh-red);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: #ccc;
+      font-weight: 300;
+    }
+
+    .partners {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .partner {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .partner.redhat { color: var(--rh-red); }
+    .partner.sap { color: var(--sap-gold); }
+    .partner.mercedes { color: var(--mb-silver); }
+
+    main {
+      padding: 3rem 0;
+    }
+
+    section {
+      background: white;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--rh-red);
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--dark);
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    ul, ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .architecture {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-left: 4px solid var(--mb-silver);
+      margin: 1.5rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .use-cases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .use-case {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 6px;
+      border-left: 4px solid var(--sap-gold);
+    }
+
+    .use-case h4 {
+      color: var(--sap-gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .tech-stack {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .tech {
+      background: var(--dark);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .contact {
+      background: var(--dark);
+      color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .contact h3 {
+      color: var(--rh-red);
+      margin-top: 0;
+    }
+
+    .contact a {
+      color: var(--mb-silver);
+      text-decoration: none;
+    }
+
+    .contact a:hover {
+      text-decoration: underline;
+    }
+
+    .demo-link {
+      display: inline-block;
+      background: var(--rh-red);
+      color: white;
+      padding: 1rem 2rem;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: background 0.3s;
+    }
+
+    .demo-link:hover {
+      background: #cc0000;
+    }
+
+    footer {
+      background: var(--dark);
+      color: #999;
+      text-align: center;
+      padding: 2rem;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Mercedes-Benz Connected Vehicle Integration</h1>
+      <p class="subtitle">Enterprise Edge-to-Cloud Architecture</p>
+      <div class="partners">
+        <span class="partner redhat">● Red Hat OpenShift</span>
+        <span class="partner sap">● SAP Business Technology Platform</span>
+        <span class="partner mercedes">● Mercedes-Benz Developer APIs</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>Project Overview</h2>
+      <p>
+        This project demonstrates enterprise-grade integration of connected vehicle telemetry
+        with SAP Business Technology Platform (BTP) using Red Hat OpenShift as the orchestration layer.
+      </p>
+      <p>
+        Built in collaboration with <strong>Red Hat</strong> and <strong>SAP</strong>, this reference
+        architecture proves how modern enterprises can leverage vehicle data for asset management,
+        predictive maintenance, and operational intelligence.
+      </p>
+    </section>
+
+    <section>
+      <h2>Business Context</h2>
+      <p>
+        SAP customers face two critical platform migrations by December 31, 2027:
+      </p>
+      <ul>
+        <li><strong>SAP PI/PO</strong> (Process Integration) → SAP Integration Suite</li>
+        <li><strong>SAP MII/ME</strong> (Manufacturing Integration) → SAP Digital Manufacturing</li>
+      </ul>
+      <p>
+        This creates an urgent need for proven edge-to-cloud patterns. Our Mercedes-Benz integration
+        demonstrates how <strong>any connected asset</strong> — from luxury vehicles to industrial sensors —
+        can flow through the same OpenShift → SAP BTP pipeline.
+      </p>
+    </section>
+
+    <section>
+      <h2>Technical Architecture</h2>
+      <div class="architecture">
+Mercedes-Benz Vehicle (VIN: W1NKM4HB0PU012482)
+  ↓ OAuth2 (Vehicle Status 1.5 API)
+  ↓ CloudEvents (fuel, odometer, location, diagnostics)
+    ↓
+Red Hat OpenShift (qr-demo-qa namespace)
+  • Flask API (gunicorn, 2 pods, horizontal scaling)
+  • Redis (pub/sub + persistence)
+  • nginx (static assets + reverse proxy)
+    ↓
+SAP Business Technology Platform
+  • SAP Event Mesh (CloudEvents ingestion)
+  • SAP Integration Suite (EIC routing)
+  • SAP S/4HANA (PM: Maintenance, EAM: Asset Management)
+  • SAP SuccessFactors (Mileage tracking)
+      </div>
+
+      <h3>Technology Stack</h3>
+      <div class="tech-stack">
+        <span class="tech">Red Hat OpenShift 4.x</span>
+        <span class="tech">Python 3.12 (Flask + gunicorn)</span>
+        <span class="tech">Redis 7.x</span>
+        <span class="tech">nginx (unprivileged)</span>
+        <span class="tech">CloudEvents 1.0</span>
+        <span class="tech">Mercedes-Benz API Platform</span>
+        <span class="tech">SAP BTP</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Use Cases</h2>
+      <div class="use-cases">
+        <div class="use-case">
+          <h4>Predictive Maintenance</h4>
+          <p>Vehicle diagnostics → SAP PM work orders. Odometer + fault codes trigger maintenance scheduling before failures occur.</p>
+        </div>
+        <div class="use-case">
+          <h4>Fleet Asset Management</h4>
+          <p>Real-time location + status → SAP EAM. Track high-value assets across distributed operations.</p>
+        </div>
+        <div class="use-case">
+          <h4>Expense Management</h4>
+          <p>Mileage data → SAP SuccessFactors. Automated expense reporting for company vehicles.</p>
+        </div>
+        <div class="use-case">
+          <h4>Operational Intelligence</h4>
+          <p>Fuel consumption patterns, utilization metrics, and location analytics for strategic planning.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Data Flow & Privacy</h2>
+      <p><strong>Authentication:</strong> OAuth2 authorization with Mercedes me account (vehicle owner consent required)</p>
+      <p><strong>Data Sources:</strong></p>
+      <ul>
+        <li>Fuel level & range (read-only)</li>
+        <li>Odometer reading (read-only)</li>
+        <li>Lock status (read-only)</li>
+        <li>Tire pressure (read-only)</li>
+        <li>Location ping (coordinates redacted, only existence confirmed)</li>
+        <li>Battery voltage (read-only)</li>
+      </ul>
+      <p><strong>Privacy:</strong> No remote commands (lock/unlock/climate), no persistent location storage, coordinates redacted in event payloads.</p>
+    </section>
+
+    <section>
+      <h2>Demonstration Venues</h2>
+      <ul>
+        <li><strong>SAP Insider Las Vegas</strong> (March 2026) — Live vehicle telemetry integration</li>
+        <li><strong>Red Hat Summit</strong> (2026) — Edge-to-cloud reference architecture</li>
+        <li><strong>SAP Customer Briefings</strong> — RISE/BTP migration patterns</li>
+      </ul>
+
+      <a href="https://north-qr-demo-qa.apps.cluster-nlthm.nlthm.sandbox3528.opentlc.com/dashboard" class="demo-link">View Live Demo Dashboard →</a>
+    </section>
+
+    <section class="contact">
+      <h3>Project Contact</h3>
+      <p><strong>Jim O'Donnell</strong></p>
+      <p>Red Hat / SAP Solutions Architecture</p>
+      <p>Email: <a href="mailto:jim.odonnell@gmail.com">jim.odonnell@gmail.com</a></p>
+      <p style="margin-top: 1rem; color: #999;">
+        This project is built in collaboration with Red Hat and SAP to demonstrate
+        enterprise integration patterns for connected assets and SAP Business Technology Platform.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Red Hat OpenShift + SAP Business Technology Platform + Mercedes-Benz Developer APIs</p>
+      <p style="margin-top: 0.5rem;">Reference Architecture | February 2026</p>
+    </div>
+  </footer>
+</body>
+</html>
