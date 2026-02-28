@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OHC Demo — Shared Logo Pool</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #151515;
+    color: #f0e6d0;
+    font-family: 'Courier New', monospace;
+    padding: 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 { color: #EE0000; font-size: 1.4rem; margin-bottom: 0.4rem; letter-spacing: 0.1em; }
+  .meta { color: #555; font-size: 0.75rem; margin-bottom: 2rem; }
+  .meta a { color: #888; text-decoration: none; }
+  .meta a:hover { color: #EE0000; }
+  h2 { color: #888; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+  .card { border: 1px solid #2a2a2a; padding: 1.5rem; background: #0a0a0a; }
+  .card-preview {
+    background: #1a1a1a;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+  }
+  .card-preview img { max-height: 48px; max-width: 100%; }
+  .card-name { font-size: 0.7rem; color: #888; margin-bottom: 0.5rem; word-break: break-all; }
+  .card-url { font-size: 0.65rem; color: #555; word-break: break-all; margin-bottom: 0.75rem; }
+  .card-usage { font-size: 0.65rem; color: #555; }
+  .card-usage span { color: #888; }
+  code {
+    background: #111;
+    border: 1px solid #333;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.65rem;
+    color: #D4AF37;
+    display: block;
+    margin-top: 1rem;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+  .notice {
+    border: 1px solid #333;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.75rem;
+    color: #888;
+    line-height: 1.6;
+  }
+  .notice strong { color: #f0e6d0; }
+</style>
+</head>
+<body>
+
+<h1>OHC Demo — Shared Logo Pool</h1>
+<p class="meta">
+  Source: <a href="https://jodonnel.github.io/ohc-demo-static/assets/logos/">jodonnel.github.io/ohc-demo-static/assets/logos/</a>
+  &nbsp;·&nbsp; Maintainer: Jim O'Donnell, Red Hat
+  &nbsp;·&nbsp; Last updated: 2026-02-28
+</p>
+
+<div class="notice">
+  <strong>One source of truth for logos across all OHC demos.</strong><br>
+  When a product is renamed or a logo changes (e.g. Insights → Lightspeed), update the file here.
+  All demo pages that reference these URLs get the fix automatically.<br><br>
+  <strong>Rule:</strong> Only logos <em>actively in use</em> belong here. Don't add logos speculatively.
+  The full Red Hat brand asset kit lives locally at <code>~/brand-assets/</code> — never commit it to git.
+</div>
+
+<h2>Logos in active use</h2>
+<div class="grid">
+
+  <div class="card">
+    <div class="card-preview">
+      <img src="Logo-Red_Hat-SAP_Platinum-C-Reverse-RGB.svg" alt="Red Hat × SAP co-brand">
+    </div>
+    <div class="card-name">Logo-Red_Hat-SAP_Platinum-C-Reverse-RGB.svg</div>
+    <div class="card-url">assets/logos/Logo-Red_Hat-SAP_Platinum-C-Reverse-RGB.svg</div>
+    <div class="card-usage">Used in: <span>present-csx.html, present-csx-deck.html, present-shopfloor.html, present-rail.html, present-util.html, present-ad.html</span></div>
+    <code>&lt;img src="https://jodonnel.github.io/ohc-demo-static/assets/logos/Logo-Red_Hat-SAP_Platinum-C-Reverse-RGB.svg"&gt;</code>
+  </div>
+
+  <div class="card">
+    <div class="card-preview">
+      <img src="Logo-Red_Hat-OpenShift-A-Reverse-RGB.svg" alt="Red Hat OpenShift">
+    </div>
+    <div class="card-name">Logo-Red_Hat-OpenShift-A-Reverse-RGB.svg</div>
+    <div class="card-url">assets/logos/Logo-Red_Hat-OpenShift-A-Reverse-RGB.svg</div>
+    <div class="card-usage">Used in: <span>present-csx.html, present-csx-deck.html, present-shopfloor.html, present-rail.html, present-util.html</span></div>
+    <code>&lt;img src="https://jodonnel.github.io/ohc-demo-static/assets/logos/Logo-Red_Hat-OpenShift-A-Reverse-RGB.svg"&gt;</code>
+  </div>
+
+  <div class="card">
+    <div class="card-preview">
+      <img src="Logo-Red_Hat-Enterprise_Linux-A-Reverse-RGB.svg" alt="Red Hat Enterprise Linux">
+    </div>
+    <div class="card-name">Logo-Red_Hat-Enterprise_Linux-A-Reverse-RGB.svg</div>
+    <div class="card-url">assets/logos/Logo-Red_Hat-Enterprise_Linux-A-Reverse-RGB.svg</div>
+    <div class="card-usage">Used in: <span>present-csx.html, present-csx-deck.html, present-shopfloor.html, present-rail.html, present-util.html</span></div>
+    <code>&lt;img src="https://jodonnel.github.io/ohc-demo-static/assets/logos/Logo-Red_Hat-Enterprise_Linux-A-Reverse-RGB.svg"&gt;</code>
+  </div>
+
+  <div class="card">
+    <div class="card-preview">
+      <img src="Logo-Red_Hat-Ansible_Automation_Platform-A-Reverse-RGB.svg" alt="Red Hat Ansible Automation Platform">
+    </div>
+    <div class="card-name">Logo-Red_Hat-Ansible_Automation_Platform-A-Reverse-RGB.svg</div>
+    <div class="card-url">assets/logos/Logo-Red_Hat-Ansible_Automation_Platform-A-Reverse-RGB.svg</div>
+    <div class="card-usage">Used in: <span>present-csx.html, present-csx-deck.html, present-shopfloor.html, present-rail.html, present-util.html</span></div>
+    <code>&lt;img src="https://jodonnel.github.io/ohc-demo-static/assets/logos/Logo-Red_Hat-Ansible_Automation_Platform-A-Reverse-RGB.svg"&gt;</code>
+  </div>
+
+  <div class="card">
+    <div class="card-preview">
+      <img src="Logo-Red_Hat-A-Reverse-RGB.svg" alt="Red Hat">
+    </div>
+    <div class="card-name">Logo-Red_Hat-A-Reverse-RGB.svg</div>
+    <div class="card-url">assets/logos/Logo-Red_Hat-A-Reverse-RGB.svg</div>
+    <div class="card-usage">Used in: <span>present-csx-deck.html, csx-brief.html</span></div>
+    <code>&lt;img src="https://jodonnel.github.io/ohc-demo-static/assets/logos/Logo-Red_Hat-A-Reverse-RGB.svg"&gt;</code>
+  </div>
+
+</div>
+
+<h2>How to add a new logo</h2>
+<div class="notice" style="margin-bottom:0">
+  1. Source the file from the Red Hat brand portal (AEM) or <code>~/brand-assets/</code><br>
+  2. Copy to <code>~/ohc-demo-static/assets/logos/</code><br>
+  3. Add a card to this page<br>
+  4. Commit and push to GitHub (<code>git push origin main</code> from <code>~/ohc-demo-static</code>)<br>
+  5. Update <strong>Chloe MEMORY.md</strong> and <strong>CHANGELOG.md</strong><br>
+  6. Update any demo pages to reference the GitHub Pages URL (not a local path)
+</div>
+
+</body>
+</html>
