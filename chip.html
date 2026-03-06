@@ -61,7 +61,19 @@ h1 { font-size:2.5rem; font-weight:900; margin-bottom:0.5rem; }
     <p>Find Jim O'Donnell or Azizur Rahman at the Red Hat booth. Mention the chip.</p>
   </div>
 
+  <p class="chip-id" id="chipId"></p>
   <p class="footer">SAP Insider 2026 &mdash; Las Vegas</p>
 </div>
+<script>
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  var id = p.get('id');
+  if (id) {
+    document.getElementById('chipId').textContent = 'CHIP #' + id;
+    document.getElementById('chipId').style.cssText =
+      'font-family:Red Hat Mono,monospace;font-size:0.9rem;color:#00D26A;letter-spacing:3px;margin-top:1rem;';
+  }
+})();
+</script>
 </body>
 </html>
