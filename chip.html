@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You Found It — OHC Secret Invite</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06090F; --surface: #0D1117; --border: #1C2333;
+  --text: #F0F4F8; --dim: #8B949E; --red: #EE0000; --green: #00D26A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg); color: var(--text); font-family:'Red Hat Display',sans-serif;
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:2rem;
+}
+.container { max-width:600px; width:100%; text-align:center; }
+.brand { display:flex; align-items:center; justify-content:center; gap:1rem; margin-bottom:2rem; }
+.rh { color:var(--red); font-size:14px; font-weight:700; letter-spacing:2px; }
+.sep { color:#4E5D6C; font-size:20px; }
+.sap { color:#0070F2; font-size:14px; font-weight:700; letter-spacing:2px; }
+h1 { font-size:2.5rem; font-weight:900; margin-bottom:0.5rem; }
+.subtitle { font-size:1.1rem; color:var(--dim); margin-bottom:2rem; }
+.card {
+  background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  padding:2.5rem; margin-bottom:1.5rem; text-align:left;
+}
+.card h2 { font-size:1.3rem; margin-bottom:1rem; color:var(--green); }
+.card p { color:var(--dim); line-height:1.7; font-size:1rem; }
+.card a { color:var(--red); text-decoration:none; font-weight:700; }
+.card a:hover { text-decoration:underline; }
+.footer { color:#4E5D6C; font-size:0.8rem; margin-top:2rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">
+    <span class="rh">RED HAT</span><span class="sep">&times;</span><span class="sap">SAP</span>
+  </div>
+  <h1>You're In.</h1>
+  <p class="subtitle">You scanned the chip. That means someone trusted you with it.</p>
+
+  <div class="card">
+    <h2>What is this?</h2>
+    <p>This is the <strong>Operational Hub Console</strong> — a live demo of Red Hat OpenShift,
+    Red Hat Ansible Automation Platform, and Red Hat Enterprise Linux running real SAP integration
+    patterns at the edge. 15 labs. Real events. Real automation.</p>
+  </div>
+
+  <div class="card">
+    <h2>See it live</h2>
+    <p><a href="https://jodonnel.github.io/ohc-demo-static/labs.html">Browse all 15 labs</a></p>
+    <p><a href="https://north-qr-demo-qa.apps.rosa.rosa-rvdtn.ypet.p3.openshiftapps.com/present">Launch the live demo</a></p>
+    <p><a href="https://jodonnel.github.io/ohc-sap-demo/architecture.html">Architecture deep-dive</a></p>
+  </div>
+
+  <div class="card">
+    <h2>Talk to us</h2>
+    <p>Find Jim O'Donnell or Azizur Rahman at the Red Hat booth. Mention the chip.</p>
+  </div>
+
+  <p class="footer">SAP Insider 2026 &mdash; Las Vegas</p>
+</div>
+</body>
+</html>
