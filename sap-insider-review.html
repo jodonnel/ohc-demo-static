@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Insider 2026 — Daily Content Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06090F; --surface:#0D1117; --border:#1C2333;
+  --text:#F0F4F8; --dim:#8B949E; --muted:#4E5D6C;
+  --red:#EE0000; --blue:#0070F2; --green:#00D26A; --amber:#F59E0B;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Red Hat Display',sans-serif;}
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:4rem 6rem;position:relative;}
+.slide-num{position:absolute;top:2rem;right:3rem;color:var(--muted);font-family:'Red Hat Mono',monospace;font-size:0.8rem;}
+.brand{display:flex;gap:1rem;align-items:center;margin-bottom:2rem;}
+.brand .rh{color:var(--red);font-size:12px;font-weight:700;letter-spacing:2px;}
+.brand .sep{color:var(--muted);font-size:16px;}
+.brand .sap{color:var(--blue);font-size:12px;font-weight:700;letter-spacing:2px;}
+h1{font-size:3rem;font-weight:900;line-height:1.15;margin-bottom:1rem;}
+h2{font-size:2rem;font-weight:900;line-height:1.2;margin-bottom:1.5rem;}
+h3{font-size:1.2rem;font-weight:700;margin-bottom:0.75rem;}
+.subtitle{font-size:1.2rem;color:var(--dim);font-weight:300;margin-bottom:2rem;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;}
+.card h3{font-size:1rem;}
+.card p{color:var(--dim);font-size:0.9rem;line-height:1.6;}
+.card a{color:var(--blue);text-decoration:none;font-family:'Red Hat Mono',monospace;font-size:0.8rem;}
+.stat{font-size:4rem;font-weight:900;color:var(--green);line-height:1;}
+.stat-label{font-size:0.9rem;color:var(--dim);margin-top:0.25rem;}
+.tag{display:inline-block;font-size:0.7rem;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:4px;margin-right:6px;}
+.tag-green{background:#00D26A22;color:var(--green);}
+.tag-amber{background:#F59E0B22;color:var(--amber);}
+.tag-red{background:#EE000022;color:var(--red);}
+.tag-blue{background:#0070F222;color:var(--blue);}
+ul{list-style:none;padding:0;}
+ul li{color:var(--dim);font-size:0.95rem;line-height:2;padding-left:1.5rem;position:relative;}
+ul li::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--red);}
+.divider{border:none;border-top:1px solid var(--border);margin:2rem 0;}
+.mono{font-family:'Red Hat Mono',monospace;font-size:0.85rem;color:var(--dim);}
+.highlight{color:var(--red);font-weight:700;}
+.countdown{font-size:6rem;font-weight:900;color:var(--red);}
+.countdown-label{font-size:1.5rem;color:var(--dim);}
+nav{position:fixed;bottom:2rem;right:3rem;display:flex;gap:0.5rem;z-index:10;}
+nav a{background:var(--surface);border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:8px 14px;text-decoration:none;font-size:0.8rem;font-family:'Red Hat Mono',monospace;}
+nav a:hover{border-color:var(--red);color:var(--text);}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="#s1">1</a><a href="#s2">2</a><a href="#s3">3</a><a href="#s4">4</a><a href="#s5">5</a><a href="#s6">6</a><a href="#s7">7</a>
+</nav>
+
+<!-- SLIDE 1: Title -->
+<div class="slide" id="s1">
+<span class="slide-num">1/7</span>
+<div class="brand"><span class="rh">RED HAT</span><span class="sep">&times;</span><span class="sap">SAP</span></div>
+<h1>SAP Insider 2026<br>Daily Content Review</h1>
+<p class="subtitle">March 6, 2026 &mdash; Las Vegas prep</p>
+<div style="margin-top:3rem;display:flex;gap:3rem;align-items:baseline;">
+  <div><span class="countdown">11</span><br><span class="countdown-label">days to go</span></div>
+  <div><span class="stat">3</span><br><span class="stat-label">sessions</span></div>
+  <div><span class="stat">15</span><br><span class="stat-label">live labs</span></div>
+</div>
+</div>
+
+<!-- SLIDE 2: Session Status -->
+<div class="slide" id="s2">
+<span class="slide-num">2/7</span>
+<h2>Session Status</h2>
+<div class="grid3">
+  <div class="card">
+    <h3><span class="tag tag-green">READY</span> Session 1</h3>
+    <p><strong>Run. Simplify.</strong><br>Jim O'Donnell &mdash; 20 min<br><br>Deck: i20_v4 + CHLOE_v3<br>Fact-checked against sourced fact sheet<br>85% HANA stat removed (SUSE's)<br><br><span class="tag tag-amber">NEEDS</span> Booth number<br><span class="tag tag-amber">NEEDS</span> Final review pass</p>
+  </div>
+  <div class="card">
+    <h3><span class="tag tag-green">READY</span> Session 2</h3>
+    <p><strong>Expand.</strong><br>Azizur Rahman &mdash; 20 min<br><br>Deck: Z V2 (Mar 4, pencils down)<br>Hexion variant in Google Slides<br><br><span class="tag tag-amber">NEEDS</span> Final review pass</p>
+  </div>
+  <div class="card">
+    <h3><span class="tag tag-red">NOT STARTED</span> Session 3</h3>
+    <p><strong>Ballroom (Joint)</strong><br>Jim + Z &mdash; 40 min<br><br>No deck yet<br>Need outline stitching S1 + S2<br>Run/Simplify/Expand + use cases + OHC demo<br><br><span class="tag tag-red">BLOCKED</span> Outline needed</p>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 3: Open Items -->
+<div class="slide" id="s3">
+<span class="slide-num">3/7</span>
+<h2>Open Items &mdash; Decisions Needed Today</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>Booth Number</h3>
+    <p>Placeholder in all decks and landing pages. Who has it?</p>
+  </div>
+  <div class="card">
+    <h3>Poker Chips</h3>
+    <p>Serialized QR codes, red + black. Need to order by <strong>Saturday Mar 8</strong> for 5-day delivery. Serialization requires a vendor call.</p>
+  </div>
+  <div class="card">
+    <h3>Meta Ray-Bans</h3>
+    <p>Confirmed as giveaway. Need: quantity, distribution method (raffle? chip-holders only?), procurement/legal approval.</p>
+  </div>
+  <div class="card">
+    <h3>Chip Concept</h3>
+    <p>What does scanning the QR get you? Secret demo? Priority booth? Raffle entry? Landing page is live, needs final concept.</p>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 4: Shared Repo -->
+<div class="slide" id="s4">
+<span class="slide-num">4/7</span>
+<h2>Shared Repo</h2>
+<p class="subtitle">All decks, fact sheet, and issues in one place</p>
+<div class="card" style="max-width:700px;">
+  <h3>github.com/jodonnel/sap-insider-2026</h3>
+  <p><span class="tag tag-blue">PRIVATE</span> Send Jim your GitHub username to get access</p>
+  <hr class="divider">
+  <p>
+    <code class="mono">session-1-run-simplify/</code> &mdash; Jim's deck (i20_v4 + CHLOE_v3)<br>
+    <code class="mono">session-2-expand/</code> &mdash; Z's deck (V2)<br>
+    <code class="mono">session-3-ballroom/</code> &mdash; Joint deck (TBD)<br>
+    <code class="mono">fact-sheet.md</code> &mdash; Every claim sourced and verified<br>
+  </p>
+  <hr class="divider">
+  <p>8 open issues tracking all action items</p>
+</div>
+</div>
+
+<!-- SLIDE 5: Infrastructure -->
+<div class="slide" id="s5">
+<span class="slide-num">5/7</span>
+<h2>Demo Infrastructure</h2>
+<div class="grid2">
+  <div>
+    <h3>ROSA Cluster</h3>
+    <ul>
+      <li>15 live labs on Red Hat OpenShift (ROSA/AWS)</li>
+      <li>GitOps pipeline: push &rarr; build &rarr; auto-rollout</li>
+      <li>Health endpoint + GitHub Pages smart redirect</li>
+      <li><span class="highlight">Expires Mar 22</span> &mdash; renew before Mar 16</li>
+    </ul>
+  </div>
+  <div>
+    <h3>QR Links</h3>
+    <ul>
+      <li>All scannable URLs on one page</li>
+      <li>Chip landing page live</li>
+      <li>Stale OPENTLC URLs need updating</li>
+    </ul>
+    <br>
+    <a href="https://jodonnel.github.io/ohc-demo-static/qr-index.html" style="color:var(--blue);font-family:'Red Hat Mono',monospace;font-size:0.85rem;">qr-index.html &rarr;</a>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 6: Timeline -->
+<div class="slide" id="s6">
+<span class="slide-num">6/7</span>
+<h2>Critical Path</h2>
+<div style="max-width:700px;">
+<ul>
+  <li><strong>Today (Mar 6)</strong> &mdash; Decisions: booth #, chip concept, Ray-Ban logistics</li>
+  <li><strong>Sat Mar 8</strong> &mdash; Poker chip order deadline (5-day turnaround)</li>
+  <li><strong>Mon Mar 9</strong> &mdash; SAPinsider KBYG call</li>
+  <li><strong>Mon-Fri Mar 9-13</strong> &mdash; Ballroom deck build + rehearsal</li>
+  <li><strong>Fri Mar 13</strong> &mdash; All decks final, stale URLs fixed</li>
+  <li><strong>Sun Mar 15</strong> &mdash; ROSA cluster renewal confirmed</li>
+  <li><strong>Mon Mar 16</strong> &mdash; Travel day</li>
+  <li><strong>Tue Mar 17</strong> &mdash; SAP Insider Day 1</li>
+</ul>
+</div>
+</div>
+
+<!-- SLIDE 7: Actions -->
+<div class="slide" id="s7">
+<span class="slide-num">7/7</span>
+<h2>Actions From This Call</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>Team</h3>
+    <ul>
+      <li>Get booth number</li>
+      <li>Send GitHub usernames to Jim</li>
+      <li>Decide chip concept + Ray-Ban distribution</li>
+      <li>Jim + Z: ballroom outline by Monday</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Chloe</h3>
+    <ul>
+      <li>Generate serialized QR codes for chips</li>
+      <li>Fix stale OPENTLC URLs in demo pages</li>
+      <li>Build ballroom deck once outline lands</li>
+      <li>Renew ROSA cluster before Mar 16</li>
+    </ul>
+  </div>
+</div>
+<div style="margin-top:3rem;">
+  <p class="mono">Repo: github.com/jodonnel/sap-insider-2026</p>
+  <p class="mono">QR Index: jodonnel.github.io/ohc-demo-static/qr-index.html</p>
+  <p class="mono">Issues: github.com/jodonnel/sap-insider-2026/issues</p>
+</div>
+</div>
+
+</body>
+</html>
