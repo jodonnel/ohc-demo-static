@@ -134,6 +134,7 @@
 
   .card-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
   .tag { font-size: 0.55rem; color: var(--text-muted); border: 1px solid var(--border-bright); padding: 0.15rem 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .concept-badge { font-size: 0.5rem; color: #888; border: 1px solid #444; padding: 0.1rem 0.4rem; letter-spacing: 0.12em; text-transform: uppercase; border-radius: 2px; margin-left: 0.5rem; vertical-align: middle; }
 
   .card-footer {
     display: flex; align-items: center; justify-content: space-between;
@@ -222,7 +223,7 @@
   </p>
   <div class="hero-meta">
     <div class="hero-stat">
-      <span class="hero-stat-num">10</span>
+      <span class="hero-stat-num">20</span>
       <span class="hero-stat-label">experiments</span>
     </div>
     <div class="hero-stat">
@@ -244,6 +245,7 @@
   <button class="filter-btn" data-filter="AI">Edge AI</button>
   <button class="filter-btn" data-filter="Security">Security / GRC</button>
   <button class="filter-btn" data-filter="IoT">IoT / Device</button>
+  <button class="filter-btn" data-filter="Ansible">Ansible</button>
 </div>
 
 <div class="grid" id="card-grid"></div>
@@ -344,6 +346,14 @@ const USE_CASES = [
     filters:["AI","IoT"]
   },
   {
+    num:"12", issue:"csx", demo:"/present-csx-deck",
+    title:"CSX Rail Edge AI — Predictive Maintenance",
+    tagline:"Bearing failure caught before the car leaves the yard.",
+    abstract:"A wayside hotbox detector fires a bearing anomaly. A RHEL for Edge node on a Jetson Orin scores the signature, emits a CloudEvent to OpenShift, and SAP S/4HANA PM creates a work order — automatically holding the car before departure. Post-East Palestine regulatory pressure (TSA SD 1580/82, FRA wayside rules) makes this a compliance story as much as a maintenance story. Ubuntu Core is already calling. RHEL for Edge + AAP + SAP PM closes the loop they can't.",
+    tags:["RHEL for Edge","MicroShift","OpenShift","Ansible","SAP PM","Jetson Orin"],
+    filters:["AI","IoT","Edge","OpenShift"]
+  },
+  {
     num:"11", issue:"job-coach", demo:"/present-job-coach",
     title:"Meta Glasses Job Coach",
     tagline:"AI-powered independence for adults with IDD. Privacy-first edge AI.",
@@ -351,6 +361,72 @@ const USE_CASES = [
     tags:["OpenShift AI","Device Edge","MicroShift","BTP","Meta Glasses"],
     filters:["AI","IoT","Edge"],
     repo:"https://github.com/jodonnel/job-coach"
+  },
+  {
+    num:"13", issue:88, demo:null,
+    title:"Alexa Voice Control — Building Ops Skill",
+    tagline:"\"Alexa, tell building ops to initiate lockdown.\" Live. On stage.",
+    abstract:"A custom Alexa skill wired directly into the OHC north API. Five intents: status report, device count, event rate, lockdown, and reset. Voice → OpenShift → SAP. The Flask blueprint is complete and deployed. What's needed: Alexa developer account, skill registration, endpoint pointed at the live ROSA cluster. Closes the loop without touching a screen.",
+    tags:["OpenShift","CloudEvents","Alexa","Voice","BTP"],
+    filters:["OpenShift","IoT"]
+  },
+  {
+    num:"14", issue:93, demo:"/present-lightspeed",
+    title:"Red Hat Lightspeed: The Art of the Possible",
+    tagline:"AI-powered ops from RHEL to OpenShift to Ansible.",
+    abstract:"Three products. One story. RHEL Lightspeed answers plain-English sysadmin questions against a live RHEL system — CVE scanning, SAP HANA tuning, kernel diagnostics. OpenShift Lightspeed lives in the web console and explains crashloops and resource exhaustion without kubectl archaeology. Ansible Lightspeed turns a sentence into a production-ready playbook in seconds. The skills gap doesn't close with training cycles. It closes with AI that knows your environment.",
+    tags:["RHEL","OpenShift","Ansible","AI","Lightspeed"],
+    filters:["AI","RHEL","OpenShift","Ansible"]
+  },
+  {
+    num:"15", issue:100, demo:null,
+    title:"Mixture of Mixtures",
+    tagline:"Because one model's 256 experts still drink from the same well.",
+    abstract:"A meta-routing layer that treats entire open-source models as experts — Granite 8B for enterprise trust, HuggingFace specialists for domain depth, local DeepSeek-R1 distill 14B for heavy reasoning — orchestrated by a fast Granite 3B router. The key insight: a single MoE model's 256 experts share one training distribution. A mixture-of-mixtures doesn't. No egress. No phone-home. Provenance you can audit. Air-gapped on RTX 3070 + Ryzen 3900X. This is what AI sovereignty actually looks like.",
+    tags:["OpenShift AI","RHEL","Granite","Local AI","MoE","DeepSeek"],
+    filters:["AI","OpenShift"],
+    repo:"https://github.com/jodonnel/mixture-of-mixtures",
+    status:"concept"
+  },
+  {
+    num:"16", issue:"retail", demo:"/present-retail",
+    title:"Retail POS Shrinkage Detection → SAP S/4HANA",
+    tagline:"Every 30 seconds, $50 walks out the door.",
+    abstract:"Edge AI analyzes POS transaction streams in real time — void-after-scan, sweethearting, quantity overrides. Anomalies fire CloudEvents through EIC to SAP S/4HANA MM, creating inventory adjustments and loss prevention cases automatically. $112B/year US shrinkage problem. SOX Section 404 audit trail built in.",
+    tags:["OpenShift AI","EIC","SAP S/4HANA","Device Edge","RHEL"],
+    filters:["AI","EIC","IoT"]
+  },
+  {
+    num:"17", issue:"aerospace", demo:"/present-aerospace",
+    title:"Aerospace MRO Blade Inspection → SAP EAM",
+    tagline:"A single missed crack grounds a $400M airframe.",
+    abstract:"AI-augmented borescope inspection at the MRO hangar edge. A defect classifier scores blade images for cracks, erosion, FOD impact, and coating loss. Findings flow as CloudEvents through EIC to SAP EAM — creating inspection tasks, part reservations, and airworthiness holds. FAA AD traceability and EASA Part-145 compliance built into the pipeline.",
+    tags:["OpenShift AI","EIC","SAP EAM","Device Edge","NVIDIA"],
+    filters:["AI","EIC","IoT"]
+  },
+  {
+    num:"18", issue:"water", demo:"/present-water",
+    title:"Water Treatment SCADA → SAP PM",
+    tagline:"Oldsmar, Florida. A mouse click nearly poisoned a city.",
+    abstract:"Edge AI on RHEL monitors SCADA chemical dosing sensors — distinguishing attack patterns from normal process drift across 200+ sensors. Anomalies fire CloudEvents through EIC to SAP PM, triggering emergency work orders and chemical isolation procedures. CISA cross-sector goals, EPA SDWA, and AWIA 2018 compliance. 151,000 US public water systems, most running 1990s SCADA.",
+    tags:["RHEL AI","EIC","SAP PM","Device Edge","CISA"],
+    filters:["AI","EIC","IoT","Security"]
+  },
+  {
+    num:"19", issue:"supplychain", demo:"/present-supplychain",
+    title:"Supplier Disruption Detection → SAP IBP",
+    tagline:"Your Tier 2 supplier just went dark. You find out in 6 weeks.",
+    abstract:"Multi-signal supplier risk scoring: port congestion APIs, financial distress feeds, sanctions lists, weather events. OpenShift AI computes composite risk scores and fires CloudEvents through EIC to SAP IBP — triggering supply plan adjustments and alternate sourcing before the assembly line idles. Average disruption detection: 22 days. This pipeline: 2 hours. Automotive line-down: $5M/day.",
+    tags:["OpenShift AI","EIC","SAP IBP","Kafka","NIST CSF"],
+    filters:["AI","EIC","OpenShift"]
+  },
+  {
+    num:"20", issue:"smartmeter", demo:"/present-smartmeter",
+    title:"Smart Meter Tamper Detection → SAP IS-U",
+    tagline:"6% of all electricity is stolen. $96 billion globally.",
+    abstract:"Edge AI on RHEL analyzes AMI head-end data for consumption pattern anomalies — magnetic interference, bypass, reverse flow. Tamper events fire CloudEvents through EIC to SAP IS-U, creating revenue protection cases with evidence-backed field investigation orders. NERC CIP-007, state PUC mandates, FERC Order 2222. Tampered meters don't just bleed revenue — they corrupt grid load models.",
+    tags:["RHEL AI","EIC","SAP IS-U","Device Edge","NERC"],
+    filters:["AI","EIC","IoT"]
   }
 ];
 
@@ -415,6 +491,7 @@ async function renderCards() {
           <div class="card-title">${uc.title}</div>
           <div class="card-tagline">${uc.tagline}</div>
         </div>
+        ${uc.status === 'concept' ? '<span class="concept-badge">concept</span>' : ''}
       </div>
       <div class="card-abstract">${uc.abstract}</div>
       <div class="card-tags">${uc.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
