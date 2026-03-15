@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chapeaux Rouge</title>
+<script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&display=swap');
 
@@ -66,6 +67,93 @@
     margin: 1.5rem 0;
   }
 
+  /* BADGE SCAN */
+  .scan-area {
+    position: relative;
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .scan-area video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .scan-area canvas { display: none; }
+
+  .scan-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .scan-placeholder {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .scan-placeholder .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+
+  .scan-placeholder p {
+    font-size: 0.8rem;
+    color: #666;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .scan-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: transparent;
+    border: 1px solid #EE0000;
+    color: #EE0000;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-bottom: 0.3rem;
+    transition: all 0.2s;
+  }
+
+  .scan-btn:hover { background: rgba(238,0,0,0.1); }
+  .scan-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .skip-link {
+    font-size: 0.7rem;
+    color: #555;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .skip-link:hover { color: #888; }
+
+  .ocr-status {
+    font-size: 0.75rem;
+    color: #888;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    min-height: 1.2em;
+  }
+
+  .ocr-status.scanning { color: #EE0000; }
+  .ocr-status.done { color: #4CAF50; }
+
   .form-group {
     margin-bottom: 1rem;
     text-align: left;
@@ -94,6 +182,7 @@
   }
 
   input:focus { border-color: #EE0000; }
+  input.autofilled { border-color: #4CAF50; background: #0d1a0d; }
 
   .submit-btn {
     width: 100%;
@@ -185,6 +274,21 @@
       REGISTER BELOW TO SECURE YOUR SPOT.
     </p>
 
+    <!-- BADGE SCAN -->
+    <div class="scan-area" id="scanArea" onclick="startCamera()">
+      <video id="video" playsinline autoplay></video>
+      <canvas id="canvas"></canvas>
+      <img id="preview">
+      <div class="scan-placeholder" id="scanPlaceholder">
+        <div class="icon">📛</div>
+        <p>Tap to photograph<br>your conference badge</p>
+      </div>
+    </div>
+
+    <button class="scan-btn" id="scanBtn" onclick="capturePhoto()">Capture Badge</button>
+    <span class="skip-link" id="skipLink" onclick="skipScan()">Enter manually instead</span>
+    <div class="ocr-status" id="ocrStatus"></div>
+
     <!-- FORM FIELDS -->
     <div class="form-group">
       <label>Full Name</label>
@@ -233,6 +337,129 @@
 </div>
 
 <script>
+  let stream = null;
+  let badgeImageData = null; // base64 JPEG of the badge photo
+
+  // ── CAMERA ──
+  async function startCamera() {
+    if (stream) return; // already running
+    const video = document.getElementById('video');
+    const placeholder = document.getElementById('scanPlaceholder');
+    const preview = document.getElementById('preview');
+    const btn = document.getElementById('scanBtn');
+    const status = document.getElementById('ocrStatus');
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } }
+      });
+      video.srcObject = stream;
+      video.style.display = 'block';
+      preview.style.display = 'none';
+      placeholder.style.display = 'none';
+      btn.textContent = 'Capture Badge';
+      btn.disabled = false;
+      status.textContent = 'Point camera at your badge, then tap Capture.';
+      status.className = 'ocr-status scanning';
+    } catch (e) {
+      status.textContent = 'Camera unavailable — enter details manually.';
+      status.className = 'ocr-status';
+      skipScan();
+    }
+  }
+
+  // ── CAPTURE + OCR ──
+  async function capturePhoto() {
+    if (!stream) { startCamera(); return; }
+
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const preview = document.getElementById('preview');
+    const status = document.getElementById('ocrStatus');
+    const btn = document.getElementById('scanBtn');
+
+    // Draw frame to canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    // Store as base64 JPEG
+    badgeImageData = canvas.toDataURL('image/jpeg', 0.8);
+
+    // Show preview
+    preview.src = badgeImageData;
+    preview.style.display = 'block';
+    video.style.display = 'none';
+
+    // Stop camera
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+
+    // Update UI
+    btn.textContent = 'Retake';
+    btn.onclick = retake;
+    status.textContent = 'Reading badge...';
+    status.className = 'ocr-status scanning';
+
+    // Run OCR in background
+    try {
+      const result = await Tesseract.recognize(canvas, 'eng');
+      const lines = result.data.lines
+        .filter(l => l.confidence > 40)
+        .map(l => l.text.trim())
+        .filter(l => l.length > 2 && l.length < 60);
+
+      if (lines.length > 0) {
+        // Heuristic: first long-ish line is likely the name, second is company
+        const sorted = lines.sort((a, b) => b.confidence - a.confidence);
+        const nameGuess = sorted[0];
+        const companyGuess = sorted.length > 1 ? sorted[1] : '';
+
+        const nameField = document.getElementById('nameField');
+        const companyField = document.getElementById('companyField');
+
+        if (!nameField.value) {
+          nameField.value = nameGuess;
+          nameField.classList.add('autofilled');
+        }
+        if (!companyField.value && companyGuess) {
+          companyField.value = companyGuess;
+          companyField.classList.add('autofilled');
+        }
+
+        status.textContent = 'Badge captured — confirm details below.';
+        status.className = 'ocr-status done';
+      } else {
+        status.textContent = 'Badge captured — enter your details below.';
+        status.className = 'ocr-status done';
+      }
+    } catch (e) {
+      status.textContent = 'Badge captured — enter your details below.';
+      status.className = 'ocr-status done';
+    }
+  }
+
+  function retake() {
+    badgeImageData = null;
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('scanBtn').textContent = 'Capture Badge';
+    document.getElementById('scanBtn').onclick = capturePhoto;
+    document.getElementById('ocrStatus').textContent = '';
+    startCamera();
+  }
+
+  function skipScan() {
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    document.getElementById('video').style.display = 'none';
+    document.getElementById('scanPlaceholder').style.display = 'none';
+    document.getElementById('scanArea').style.display = 'none';
+    document.getElementById('scanBtn').style.display = 'none';
+    document.getElementById('skipLink').style.display = 'none';
+    document.getElementById('ocrStatus').textContent = '';
+    document.getElementById('nameField').focus();
+  }
+
+  // ── SUBMIT ──
   async function submitRegistration() {
     const name = document.getElementById('nameField').value.trim();
     const company = document.getElementById('companyField').value.trim();
@@ -244,11 +471,25 @@
     btn.disabled = true;
     btn.textContent = 'Registering...';
 
+    const payload = {
+      name,
+      company,
+      email,
+      ts: new Date().toISOString(),
+      ua: navigator.userAgent,
+      src: new URLSearchParams(window.location.search).get('src') || ''
+    };
+
+    // Include badge image if captured
+    if (badgeImageData) {
+      payload.badge_image = badgeImageData;
+    }
+
     try {
       await fetch('https://north-qr-demo-qa.apps.rosa.rosa-rvdtn.ypet.p3.openshiftapps.com/api/speakeasy/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, company, email, ts: new Date().toISOString() })
+        body: JSON.stringify(payload)
       });
     } catch(e) {
       // Offline — still show success
