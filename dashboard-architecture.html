@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OHC Demo — How It Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #06090F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 32px;
+    font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+  }
+  @media (max-width: 768px) {
+    body { padding: 12px 8px; }
+    .header h1 { font-size: 22px; }
+  }
+  .header { text-align: center; margin-bottom: 36px; animation: fadeIn 0.8s ease-out; }
+  .brands { display: flex; align-items: center; justify-content: center; gap: 32px; margin-bottom: 14px; }
+  .brands span { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .brands .rh { color: #EE0000; }
+  .brands .sep { color: #4E5D6C; font-size: 20px; }
+  .brands .sap { color: #0070F2; }
+  h1 { font-size: 32px; color: #F0F4F8; font-weight: 300; letter-spacing: -0.5px; }
+  .subtitle { color: #8B98A5; font-size: 15px; margin-top: 10px; line-height: 1.6; }
+  svg { max-width: 100%; height: auto; animation: fadeIn 1s ease-out 0.3s both; }
+  .caption { max-width: 800px; margin-top: 32px; animation: fadeIn 1s ease-out 0.5s both; }
+  .caption h2 { color: #F0F4F8; font-size: 18px; font-weight: 400; margin-bottom: 12px; }
+  .caption p { color: #8B98A5; font-size: 13px; line-height: 1.8; margin-bottom: 12px; }
+  .caption strong { color: #F0F4F8; font-weight: 600; }
+  .caption .rh-red { color: #EE0000; }
+  .caption .sap-blue { color: #0070F2; }
+  .stats { display: flex; gap: 16px; margin-top: 28px; flex-wrap: wrap; justify-content: center; animation: fadeIn 1s ease-out 0.6s both; }
+  .stat { background: #0D1117; border: 1px solid #1C2333; border-radius: 10px; padding: 16px 24px; text-align: center; min-width: 140px; }
+  .stat-num { font-size: 22px; font-weight: 700; }
+  .stat-label { font-size: 10px; color: #4E5D6C; letter-spacing: 1.5px; margin-top: 4px; }
+  .hint { color: #4E5D6C; font-size: 10px; margin-top: 20px; text-align: center; line-height: 1.8; animation: fadeIn 1s ease-out 0.7s both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brands">
+    <span class="rh">Red Hat OpenShift</span>
+    <span class="sep">×</span>
+    <span class="sap">SAP</span>
+  </div>
+  <h1>How the Dashboard Works</h1>
+  <p class="subtitle">
+    Real-time event ingestion, processing, and visualization<br>
+    on Red Hat OpenShift — the same pattern at any scale.
+  </p>
+</div>
+
+<svg viewBox="0 0 800 600" style="width:100%;max-width:800px;height:auto" font-family="'Red Hat Display', 'Red Hat Text', sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4E5D6C" />
+    </marker>
+    <marker id="arr-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#00D26A" />
+    </marker>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#EE0000" />
+    </marker>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0070F2" />
+    </marker>
+    <marker id="arr-amber" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F59E0B" />
+    </marker>
+    <filter id="glow-green"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-amber"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-blue"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="flowUp" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#00D26A" />
+      <stop offset="100%" stop-color="#0070F2" />
+    </linearGradient>
+    <linearGradient id="flowDown" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0070F2" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+  </defs>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SOUTH: Edge Devices                                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <rect x="40" y="20" width="720" height="130" rx="14"
+    fill="rgba(0,210,106,0.04)" stroke="#00D26A" stroke-width="1" opacity="0.8" />
+
+  <text x="70" y="44" fill="#00D26A" font-size="11" font-weight="700" letter-spacing="1.5">
+    SOUTH · EDGE DEVICES
+  </text>
+  <text x="720" y="44" text-anchor="end" fill="#4E5D6C" font-size="10">
+    Phones, sensors, scan guns — anything that generates events
+  </text>
+
+  <rect x="70" y="62" width="130" height="70" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="135" y="88" text-anchor="middle" fill="#F0F4F8" font-size="22">🪪</text>
+  <text x="135" y="108" text-anchor="middle" fill="#4E5D6C" font-size="10">Badge Readers</text>
+  <text x="135" y="120" text-anchor="middle" fill="#4E5D6C" font-size="9">Access control events</text>
+
+  <rect x="220" y="62" width="130" height="70" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="285" y="88" text-anchor="middle" fill="#F0F4F8" font-size="22">🚪</text>
+  <text x="285" y="108" text-anchor="middle" fill="#4E5D6C" font-size="10">Door Sensors</text>
+  <text x="285" y="120" text-anchor="middle" fill="#4E5D6C" font-size="9">Open / close / alarm</text>
+
+  <rect x="370" y="62" width="130" height="70" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="435" y="88" text-anchor="middle" fill="#F0F4F8" font-size="22">🌡️</text>
+  <text x="435" y="108" text-anchor="middle" fill="#4E5D6C" font-size="10">HVAC / Environ</text>
+  <text x="435" y="120" text-anchor="middle" fill="#4E5D6C" font-size="9">Temperature, air quality</text>
+
+  <rect x="520" y="62" width="130" height="70" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="585" y="88" text-anchor="middle" fill="#F0F4F8" font-size="22">🔥</text>
+  <text x="585" y="108" text-anchor="middle" fill="#4E5D6C" font-size="10">Safety Systems</text>
+  <text x="585" y="120" text-anchor="middle" fill="#4E5D6C" font-size="9">Fire, biometric, alerts</text>
+
+  <rect x="665" y="62" width="80" height="70" rx="10" fill="#0D1117" stroke="#00D26A" stroke-width="1" />
+  <text x="705" y="88" text-anchor="middle" fill="#F0F4F8" font-size="22">📱</text>
+  <text x="705" y="108" text-anchor="middle" fill="#00D26A" font-size="10">Your Phone</text>
+  <text x="705" y="120" text-anchor="middle" fill="#4E5D6C" font-size="9">In the demo</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- EVENTS FLOW UP                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <text x="360" y="170" fill="#00D26A" font-size="11" font-weight="600" text-anchor="end">CloudEvents ▼</text>
+
+  <line x1="380" y1="150" x2="380" y2="210" stroke="url(#flowUp)" stroke-width="3" opacity="0.15" />
+
+  <!-- Animated event dots going south → north -->
+  <circle r="5" fill="#00D26A" filter="url(#glow-green)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0s" path="M380,150 L380,210" />
+    <animate attributeName="opacity" values="1;0.4;1" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="4" fill="#3B82F6" filter="url(#glow-blue)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.35s" path="M380,150 L380,210" />
+    <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="5" fill="#00D26A" filter="url(#glow-green)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.6s" path="M380,150 L380,210" />
+    <animate attributeName="opacity" values="0.95;0.4;0.95" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3.5" fill="#F97316">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.85s" path="M380,150 L380,210" />
+    <animate attributeName="opacity" values="0.85;0.3;0.85" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="4" fill="#A855F7">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="1.1s" path="M380,150 L380,210" />
+    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- NORTH: Platform                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <rect x="40" y="210" width="720" height="155" rx="14"
+    fill="rgba(238,0,0,0.03)" stroke="#EE0000" stroke-width="1.2" opacity="0.8" />
+
+  <text x="70" y="234" fill="#EE0000" font-size="11" font-weight="700" letter-spacing="1.5">
+    NORTH · RED HAT OPENSHIFT
+  </text>
+  <text x="720" y="234" text-anchor="end" fill="#4E5D6C" font-size="10">
+    Managed Kubernetes · Runs on any cloud
+  </text>
+
+  <rect x="70" y="252" width="160" height="80" rx="10" fill="#0D1117" stroke="#00D26A" stroke-width="1" />
+  <text x="150" y="278" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Ingest</text>
+  <text x="150" y="296" text-anchor="middle" fill="#4E5D6C" font-size="10">CloudEvents receiver</text>
+  <text x="150" y="310" text-anchor="middle" fill="#4E5D6C" font-size="10">Classify · Validate · Route</text>
+
+  <line x1="230" y1="292" x2="268" y2="292" stroke="#4E5D6C" stroke-width="1.2" marker-end="url(#arr)" />
+
+  <rect x="270" y="252" width="160" height="80" rx="10" fill="#0D1117" stroke="#EE0000" stroke-width="1" />
+  <text x="350" y="278" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Process</text>
+  <text x="350" y="296" text-anchor="middle" fill="#4E5D6C" font-size="10">Business rules engine</text>
+  <text x="350" y="310" text-anchor="middle" fill="#4E5D6C" font-size="10">Correlate · Aggregate</text>
+
+  <line x1="430" y1="292" x2="468" y2="292" stroke="#4E5D6C" stroke-width="1.2" marker-end="url(#arr)" />
+
+  <rect x="470" y="252" width="130" height="80" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="535" y="278" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">State</text>
+  <text x="535" y="296" text-anchor="middle" fill="#4E5D6C" font-size="10">Persistent storage</text>
+  <text x="535" y="310" text-anchor="middle" fill="#4E5D6C" font-size="10">Survives restarts</text>
+
+  <!-- Pulsing state border -->
+  <rect x="470" y="252" width="130" height="80" rx="10" fill="none" stroke="#F59E0B" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
+  </rect>
+
+  <line x1="600" y1="292" x2="618" y2="292" stroke="#4E5D6C" stroke-width="1.2" marker-end="url(#arr)" />
+
+  <rect x="620" y="252" width="120" height="80" rx="10" fill="#0D1117" stroke="#0070F2" stroke-width="1" />
+  <text x="680" y="278" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Stream</text>
+  <text x="680" y="296" text-anchor="middle" fill="#0070F2" font-size="10">Server-Sent Events</text>
+  <text x="680" y="310" text-anchor="middle" fill="#4E5D6C" font-size="10">Real-time push</text>
+
+  <!-- SSE pulsing border -->
+  <rect x="620" y="252" width="120" height="80" rx="10" fill="none" stroke="#0070F2" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SSE FLOW DOWN TO DASHBOARD                             -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <text x="430" y="390" fill="#0070F2" font-size="11" font-weight="600">Live stream ▼</text>
+
+  <line x1="400" y1="365" x2="400" y2="420" stroke="url(#flowDown)" stroke-width="3" opacity="0.15" />
+
+  <!-- Animated SSE dots flowing down -->
+  <circle r="4" fill="#0070F2" filter="url(#glow-blue)">
+    <animateMotion dur="1.8s" repeatCount="indefinite" begin="0s" path="M400,365 L400,420" />
+    <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.8s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3.5" fill="#F59E0B" filter="url(#glow-amber)">
+    <animateMotion dur="1.8s" repeatCount="indefinite" begin="0.7s" path="M400,365 L400,420" />
+    <animate attributeName="opacity" values="0.85;0.3;0.85" dur="1.8s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- DASHBOARD: Operator View                               -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <rect x="40" y="420" width="720" height="155" rx="14"
+    fill="rgba(0,112,242,0.04)" stroke="#0070F2" stroke-width="1" opacity="0.8" />
+
+  <text x="70" y="444" fill="#0070F2" font-size="11" font-weight="700" letter-spacing="1.5">
+    OPERATOR · REAL-TIME DASHBOARD
+  </text>
+  <text x="720" y="444" text-anchor="end" fill="#4E5D6C" font-size="10">
+    What you just saw on screen
+  </text>
+
+  <rect x="70" y="460" width="155" height="95" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="147" y="486" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Event Counter</text>
+  <text x="147" y="504" text-anchor="middle" fill="#4E5D6C" font-size="10">Total events ingested</text>
+  <text x="147" y="518" text-anchor="middle" fill="#4E5D6C" font-size="10">Rate · Throughput</text>
+  <text x="147" y="542" text-anchor="middle" fill="#EE0000" font-size="18" font-weight="900" font-family="'Red Hat Mono', monospace">12,847</text>
+
+  <rect x="245" y="460" width="155" height="95" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="322" y="486" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Event Classes</text>
+  <text x="322" y="504" text-anchor="middle" fill="#4E5D6C" font-size="10">Badge · Door · HVAC</text>
+  <text x="322" y="518" text-anchor="middle" fill="#4E5D6C" font-size="10">Fire · Biometric · Air</text>
+  <text x="322" y="542" text-anchor="middle" fill="#4E5D6C" font-size="10">Classified in real time</text>
+
+  <rect x="420" y="460" width="155" height="95" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="497" y="486" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Activity Feed</text>
+  <text x="497" y="504" text-anchor="middle" fill="#4E5D6C" font-size="10">Every event, as it happens</text>
+  <text x="497" y="518" text-anchor="middle" fill="#4E5D6C" font-size="10">Scrolling log</text>
+  <text x="497" y="542" text-anchor="middle" fill="#4E5D6C" font-size="10">Human-readable summaries</text>
+
+  <rect x="595" y="460" width="150" height="95" rx="10" fill="#0D1117" stroke="#1C2333" stroke-width="1" />
+  <text x="670" y="486" text-anchor="middle" fill="#F0F4F8" font-size="13" font-weight="600">Device Map</text>
+  <text x="670" y="504" text-anchor="middle" fill="#4E5D6C" font-size="10">Active edge devices</text>
+  <text x="670" y="518" text-anchor="middle" fill="#4E5D6C" font-size="10">Network · Locale</text>
+  <text x="670" y="542" text-anchor="middle" fill="#4E5D6C" font-size="10">Status breakdown</text>
+
+</svg>
+
+<div class="caption">
+  <h2>Every event tells a story. The dashboard makes it visible.</h2>
+  <p>
+    In a physical building, hundreds of systems generate events every second — badge readers authenticate employees,
+    door sensors track movement, HVAC systems report conditions, safety systems watch for anomalies.
+    These events are <strong>structured as CloudEvents</strong> — an open, vendor-neutral standard — and streamed
+    to <span class="rh-red">Red Hat OpenShift</span> for processing.
+  </p>
+  <p>
+    The platform ingests, classifies, and persists each event, then pushes updates to the dashboard
+    in real time using <strong>Server-Sent Events (SSE)</strong> — no polling, no page refreshes.
+    What you see on screen is what's happening right now.
+  </p>
+  <p>
+    In the demo, your phone plays the role of an edge device — generating the same CloudEvent payloads
+    that a real badge reader or door sensor would produce. The dashboard doesn't know the difference.
+    <strong>That's the point.</strong> The same platform that runs a conference demo runs a production facility.
+  </p>
+  <p>
+    The integration path to <span class="sap-blue">SAP</span> is identical — CloudEvents flow north through
+    <strong>SAP Edge Integration Cell</strong> (deployed inside the same OpenShift cluster) into
+    <strong>SAP Integration Suite</strong>, <strong>S/4HANA</strong>, and <strong>Analytics Cloud</strong>.
+    Same events. Same platform. Different destination.
+  </p>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num" style="color:#00D26A">6</div>
+    <div class="stat-label">EVENT CLASSES</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#0070F2">SSE</div>
+    <div class="stat-label">REAL-TIME PUSH</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#EE0000">CloudEvents</div>
+    <div class="stat-label">OPEN STANDARD</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#F59E0B">Any</div>
+    <div class="stat-label">CLOUD</div>
+  </div>
+</div>
+
+<p class="hint">
+  Red Hat OpenShift · CloudEvents · SAP Edge Integration Cell · SAP Integration Suite<br>
+  Open standards. No vendor lock-in. The demo is the architecture.
+</p>
+
+</body>
+</html>
