@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chapeaux Rouge</title>
 <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js'></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&display=swap');
 
@@ -274,20 +275,29 @@
       REGISTER BELOW TO SECURE YOUR SPOT.
     </p>
 
-    <!-- BADGE SCAN -->
-    <div class="scan-area" id="scanArea" onclick="startCamera()">
-      <video id="video" playsinline autoplay></video>
-      <canvas id="canvas"></canvas>
-      <img id="preview">
-      <div class="scan-placeholder" id="scanPlaceholder">
-        <div class="icon">📛</div>
-        <p>Tap to photograph<br>your conference badge</p>
+    <!-- BADGE SCAN (mobile) -->
+    <div id="mobileCapture" style="display:none">
+      <div class="scan-area" id="scanArea" onclick="startCamera()">
+        <video id="video" playsinline autoplay></video>
+        <canvas id="canvas"></canvas>
+        <img id="preview">
+        <div class="scan-placeholder" id="scanPlaceholder">
+          <div class="icon">📛</div>
+          <p>Tap to photograph<br>your conference badge</p>
+        </div>
       </div>
+      <button class="scan-btn" id="scanBtn" onclick="capturePhoto()">Capture Badge</button>
+      <span class="skip-link" id="skipLink" onclick="skipScan()">Enter manually instead</span>
+      <div class="ocr-status" id="ocrStatus"></div>
     </div>
 
-    <button class="scan-btn" id="scanBtn" onclick="capturePhoto()">Capture Badge</button>
-    <span class="skip-link" id="skipLink" onclick="skipScan()">Enter manually instead</span>
-    <div class="ocr-status" id="ocrStatus"></div>
+    <!-- QR CODE (desktop) -->
+    <div id="desktopQR" style="display:none;margin-bottom:1.5rem;">
+      <p style="font-size:0.7rem;color:#666;letter-spacing:0.15em;margin-bottom:1rem;">SCAN TO REGISTER ON YOUR PHONE</p>
+      <canvas id="qrCanvas" style="margin:0 auto;display:block;"></canvas>
+      <div class="divider" style="margin-top:1.5rem;"></div>
+      <p style="font-size:0.7rem;color:#555;letter-spacing:0.1em;margin-top:0.5rem;">Or register here:</p>
+    </div>
 
     <!-- FORM FIELDS -->
     <div class="form-group">
@@ -337,8 +347,24 @@
 </div>
 
 <script>
+  // ── DESKTOP vs MOBILE ──
+  const isMobile = navigator.maxTouchPoints > 0 && window.innerWidth < 1024;
+
+  if (isMobile) {
+    document.getElementById('mobileCapture').style.display = 'block';
+  } else {
+    const qrBlock = document.getElementById('desktopQR');
+    qrBlock.style.display = 'block';
+    const pageUrl = window.location.href.split('?')[0] + '?src=qr-desktop';
+    QRCode.toCanvas(document.getElementById('qrCanvas'), pageUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#EE0000', light: '#0a0a0a' }
+    });
+  }
+
   let stream = null;
-  let badgeImageData = null; // base64 JPEG of the badge photo
+  let badgeImageData = null;
 
   // ── CAMERA ──
   async function startCamera() {
