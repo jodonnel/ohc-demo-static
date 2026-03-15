@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Hat at SAPinsider 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #06090F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px;
+    font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+    color: #F0F4F8;
+  }
+  @media (max-width: 768px) {
+    body { padding: 24px 16px; }
+    h1 { font-size: 24px !important; }
+    .session-card { padding: 20px !important; }
+  }
+  .header { text-align: center; margin-bottom: 40px; max-width: 640px; animation: fadeIn 0.8s ease-out; }
+  .badge { display: inline-block; font-size: 10px; color: #F0AB00; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(238,0,0,0.3); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  h1 { font-size: 28px; font-weight: 300; margin-bottom: 8px; }
+  .venue { color: #8B98A5; font-size: 13px; margin-bottom: 4px; }
+  .booth { color: #EE0000; font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+
+  .sessions { max-width: 640px; width: 100%; animation: fadeIn 1s ease-out 0.2s both; }
+  .section-label { font-size: 11px; color: #8B98A5; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; margin-top: 32px; }
+  .section-label:first-child { margin-top: 0; }
+
+  .session-card {
+    background: #0D1117;
+    border: 1px solid #3C3F42;
+    border-left: 3px solid #EE0000;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+  .session-card.other {
+    border-left-color: #F0AB00;
+  }
+  .session-meta {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .session-day {
+    font-size: 11px;
+    font-weight: 700;
+    color: #F0AB00;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .session-time {
+    font-size: 14px;
+    font-weight: 700;
+    color: #EE0000;
+    font-family: 'Red Hat Mono', monospace;
+  }
+  .session-duration {
+    font-size: 11px;
+    color: #8B98A5;
+    font-family: 'Red Hat Mono', monospace;
+  }
+  .session-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .session-speaker {
+    font-size: 13px;
+    color: #8B98A5;
+    margin-bottom: 12px;
+  }
+  .session-desc {
+    font-size: 12px;
+    color: #8B98A5;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .cal-btn {
+    display: inline-block;
+    background: #EE0000;
+    color: #fff;
+    font-family: 'Red Hat Text', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+  }
+  .cal-btn:hover { background: #CC0000; }
+  .cal-btn.gold { background: #F0AB00; color: #06090F; }
+  .cal-btn.gold:hover { background: #D99A00; }
+
+  .footer {
+    margin-top: 40px;
+    text-align: center;
+    animation: fadeIn 1s ease-out 0.4s both;
+  }
+  .footer .rh { color: #EE0000; font-size: 12px; font-weight: 700; letter-spacing: 2px; }
+  .footer p { color: #4E5D6C; font-size: 11px; margin-top: 6px; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">SAPinsider Las Vegas 2026</div>
+  <h1>Red Hat Sessions</h1>
+  <div class="venue">Bellagio Resort & Casino — March 17–19, 2026</div>
+  <div class="booth">BOOTH #405</div>
+</div>
+
+<div class="sessions">
+
+  <div class="section-label">Featured Session</div>
+
+  <div class="session-card">
+    <div class="session-meta">
+      <span class="session-day">Tuesday, March 17</span>
+      <span class="session-time">10:40 AM</span>
+      <span class="session-duration">20 min</span>
+    </div>
+    <div class="session-title">Run SAP Reliably with Red Hat</div>
+    <div class="session-speaker">Jim O'Donnell — Senior Specialist Solution Architect, Red Hat</div>
+    <div class="session-desc">
+      If your SAP core isn't steady, nothing else sticks. See how Red Hat Enterprise Linux provides
+      a consistent, disciplined foundation for running SAP systems reliably through change.
+    </div>
+    <button class="cal-btn" onclick="downloadICS('i20')">+ Add to Calendar</button>
+  </div>
+
+  <div class="section-label">Other Sessions</div>
+
+  <div class="session-card other">
+    <div class="session-meta">
+      <span class="session-day">Tuesday, March 17</span>
+      <span class="session-time">11:40 AM</span>
+      <span class="session-duration">40 min</span>
+    </div>
+    <div class="session-title">Stable SAP Operations Through Simplified and Scalable Integration</div>
+    <div class="session-speaker">Jim O'Donnell, Red Hat & Azizur Rahman, ZMAN Consulting</div>
+    <div class="session-desc">
+      How integration modernization and operational readiness can be sequenced using Red Hat
+      as a stable runtime foundation — moving away from legacy middleware without introducing risk.
+    </div>
+    <button class="cal-btn gold" onclick="downloadICS('i40')">+ Add to Calendar</button>
+  </div>
+
+  <div class="session-card other">
+    <div class="session-meta">
+      <span class="session-day">Wednesday, March 18</span>
+      <span class="session-time">2:30 PM</span>
+      <span class="session-duration">20 min</span>
+    </div>
+    <div class="session-title">Expanding AI-Driven Innovation with Red Hat and SAP's Side-by-Side Model</div>
+    <div class="session-speaker">Azizur Rahman — President, ZMAN Consulting</div>
+    <div class="session-desc">
+      A side-by-side architecture that allows AI capabilities to run alongside SAP — delivering
+      real-time, governed outcomes without modifying the ERP core.
+    </div>
+    <button class="cal-btn gold" onclick="downloadICS('i20z')">+ Add to Calendar</button>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="rh">RED HAT × SAP</div>
+  <p>Enterprise platforms powering SAP</p>
+</div>
+
+<script>
+function downloadICS(session) {
+  const sessions = {
+    i20: {
+      title: 'Run SAP Reliably with Red Hat — SAPinsider 2026',
+      start: '20260317T104000',
+      end:   '20260317T110000',
+      desc: 'impact20 Session with Jim O\\'Donnell. Booth #405.',
+      loc: 'Bellagio Resort & Casino, Las Vegas, NV'
+    },
+    i40: {
+      title: 'Stable SAP Operations Through Simplified and Scalable Integration — SAPinsider 2026',
+      start: '20260317T114000',
+      end:   '20260317T122000',
+      desc: 'Partner Spotlight with Jim O\\'Donnell (Red Hat) & Azizur Rahman (ZMAN Consulting). Booth #405.',
+      loc: 'Bellagio Resort & Casino, Las Vegas, NV'
+    },
+    i20z: {
+      title: 'Expanding AI-Driven Innovation with Red Hat and SAP — SAPinsider 2026',
+      start: '20260318T143000',
+      end:   '20260318T145000',
+      desc: 'impact20 Session with Azizur Rahman (ZMAN Consulting). Booth #405.',
+      loc: 'Bellagio Resort & Casino, Las Vegas, NV'
+    }
+  };
+  const s = sessions[session];
+  const now = new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Red Hat//SAPinsider 2026//EN',
+    'BEGIN:VEVENT',
+    'DTSTART;TZID=America/Los_Angeles:' + s.start,
+    'DTEND;TZID=America/Los_Angeles:' + s.end,
+    'SUMMARY:' + s.title,
+    'DESCRIPTION:' + s.desc,
+    'LOCATION:' + s.loc,
+    'DTSTAMP:' + now,
+    'UID:' + session + '-sapinsider2026@redhat.com',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = session + '-sapinsider2026.ics';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+
+</body>
+</html>
