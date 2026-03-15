@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OHC Demo — Technical Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #06090F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 32px;
+    font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+    color: #F0F4F8;
+  }
+  @media (max-width: 768px) {
+    body { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+  }
+  .header { text-align: center; margin-bottom: 36px; animation: fadeIn 0.8s ease-out; }
+  .badge { display: inline-block; font-size: 10px; color: #F97316; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(249,115,22,0.3); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .brands { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 14px; }
+  .brands span { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .brands .rh { color: #EE0000; }
+  .brands .sep { color: #4E5D6C; font-size: 18px; }
+  .brands .sap { color: #0070F2; }
+  h1 { font-size: 28px; font-weight: 300; margin-bottom: 10px; }
+  .subtitle { color: #8B98A5; font-size: 14px; line-height: 1.6; }
+  svg { max-width: 100%; height: auto; animation: fadeIn 1s ease-out 0.3s both; }
+  .section { max-width: 800px; width: 100%; margin-top: 32px; animation: fadeIn 1s ease-out 0.5s both; }
+  .section h2 { font-size: 14px; font-weight: 700; color: #F97316; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+  .section p { font-size: 13px; color: #8B98A5; line-height: 1.8; margin-bottom: 12px; }
+  .section strong { color: #F0F4F8; font-weight: 600; }
+  .section .rh-red { color: #EE0000; }
+  .section .sap-blue { color: #0070F2; }
+  .proto-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+  .proto-table th { text-align: left; padding: 8px 12px; color: #F97316; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid #1C2333; }
+  .proto-table td { padding: 8px 12px; border-bottom: 1px solid #0D1117; color: #8B98A5; }
+  .proto-table td:first-child { color: #F0F4F8; font-weight: 600; font-family: 'Red Hat Mono', monospace; }
+  .hint { color: #4E5D6C; font-size: 10px; margin-top: 24px; text-align: center; line-height: 1.8; animation: fadeIn 1s ease-out 0.7s both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Technical Brief</div>
+  <div class="brands">
+    <span class="rh">Red Hat OpenShift</span>
+    <span class="sep">×</span>
+    <span class="sap">SAP</span>
+  </div>
+  <h1>Edge-to-Core Event Architecture</h1>
+  <p class="subtitle">
+    How the demo captures, transports, processes, and visualizes<br>
+    real-time events from edge devices through Red Hat OpenShift.
+  </p>
+</div>
+
+<svg viewBox="0 0 800 540" style="width:100%;max-width:800px;height:auto" font-family="'Red Hat Display', 'Red Hat Text', sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4E5D6C" />
+    </marker>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#EE0000" />
+    </marker>
+    <marker id="arr-orange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F97316" />
+    </marker>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0070F2" />
+    </marker>
+    <filter id="glow-red"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-orange"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-blue"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="flowUp" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#EE0000" />
+    </linearGradient>
+    <linearGradient id="flowDown" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EE0000" />
+      <stop offset="100%" stop-color="#0070F2" />
+    </linearGradient>
+  </defs>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SOUTH: Edge Devices                                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <rect x="40" y="15" width="720" height="100" rx="14"
+    fill="rgba(249,115,22,0.04)" stroke="#F97316" stroke-width="1" opacity="0.8" />
+
+  <text x="70" y="38" fill="#F97316" font-size="11" font-weight="700" letter-spacing="1.5">
+    SOUTH · EDGE DEVICES
+  </text>
+  <text x="720" y="38" text-anchor="end" fill="#4E5D6C" font-size="10">
+    CloudEvents (CNCF spec)
+  </text>
+
+  <rect x="65" y="52" width="105" height="50" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="117" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Badge Reader</text>
+  <text x="117" y="88" text-anchor="middle" fill="#4E5D6C" font-size="9">access.badge.tap</text>
+
+  <rect x="185" y="52" width="105" height="50" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="237" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Door Sensor</text>
+  <text x="237" y="88" text-anchor="middle" fill="#4E5D6C" font-size="9">door.state.change</text>
+
+  <rect x="305" y="52" width="105" height="50" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="357" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">HVAC</text>
+  <text x="357" y="88" text-anchor="middle" fill="#4E5D6C" font-size="9">env.temperature</text>
+
+  <rect x="425" y="52" width="105" height="50" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="477" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Fire Safety</text>
+  <text x="477" y="88" text-anchor="middle" fill="#4E5D6C" font-size="9">safety.fire.alarm</text>
+
+  <rect x="545" y="52" width="105" height="50" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="597" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Biometric</text>
+  <text x="597" y="88" text-anchor="middle" fill="#4E5D6C" font-size="9">bio.scan.result</text>
+
+  <rect x="665" y="52" width="80" height="50" rx="8" fill="#0D1117" stroke="#F97316" stroke-width="1" />
+  <text x="705" y="72" text-anchor="middle" fill="#F97316" font-size="11" font-weight="600">Phone</text>
+  <text x="705" y="88" text-anchor="middle" fill="#4E5D6C" font-size="9">demo device</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- NORTHBOUND FLOW                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <line x1="400" y1="115" x2="400" y2="175" stroke="url(#flowUp)" stroke-width="3" opacity="0.12" />
+
+  <text x="370" y="150" fill="#F97316" font-size="10" font-weight="600" text-anchor="end">POST /ingest</text>
+  <text x="430" y="150" fill="#4E5D6C" font-size="10">TLS · JSON · CloudEvents</text>
+
+  <!-- Animated event dots -->
+  <circle r="4.5" fill="#EE0000" filter="url(#glow-red)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0s" path="M400,115 L400,175" />
+    <animate attributeName="opacity" values="1;0.4;1" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3.5" fill="#F97316" filter="url(#glow-orange)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.35s" path="M400,115 L400,175" />
+    <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="4" fill="#EE0000" filter="url(#glow-red)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.6s" path="M400,115 L400,175" />
+    <animate attributeName="opacity" values="0.95;0.4;0.95" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3" fill="#F97316">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.9s" path="M400,115 L400,175" />
+    <animate attributeName="opacity" values="0.85;0.3;0.85" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- NORTH: OpenShift Platform                              -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <rect x="40" y="175" width="720" height="145" rx="14"
+    fill="rgba(238,0,0,0.03)" stroke="#EE0000" stroke-width="1.2" opacity="0.8" />
+
+  <text x="70" y="198" fill="#EE0000" font-size="11" font-weight="700" letter-spacing="1.5">
+    NORTH · RED HAT OPENSHIFT CONTAINER PLATFORM
+  </text>
+  <text x="720" y="198" text-anchor="end" fill="#4E5D6C" font-size="10">
+    ROSA · ARO · Self-managed
+  </text>
+
+  <!-- Ingest -->
+  <rect x="65" y="212" width="145" height="85" rx="10" fill="#0D1117" stroke="#EE0000" stroke-width="1" />
+  <text x="137" y="234" text-anchor="middle" fill="#F0F4F8" font-size="12" font-weight="600">Ingest</text>
+  <text x="137" y="250" text-anchor="middle" fill="#4E5D6C" font-size="10">CloudEvents receiver</text>
+  <text x="137" y="266" text-anchor="middle" fill="#4E5D6C" font-size="10">Schema validation</text>
+  <text x="137" y="282" text-anchor="middle" fill="#4E5D6C" font-size="10">Event classification</text>
+
+  <line x1="210" y1="254" x2="238" y2="254" stroke="#4E5D6C" stroke-width="1.2" marker-end="url(#arr)" />
+
+  <!-- Process -->
+  <rect x="240" y="212" width="145" height="85" rx="10" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="312" y="234" text-anchor="middle" fill="#F0F4F8" font-size="12" font-weight="600">Process</text>
+  <text x="312" y="250" text-anchor="middle" fill="#4E5D6C" font-size="10">Correlation engine</text>
+  <text x="312" y="266" text-anchor="middle" fill="#4E5D6C" font-size="10">Aggregation</text>
+  <text x="312" y="282" text-anchor="middle" fill="#4E5D6C" font-size="10">Business rules</text>
+
+  <line x1="385" y1="254" x2="413" y2="254" stroke="#F97316" stroke-width="1.2" marker-end="url(#arr-orange)" />
+
+  <!-- State -->
+  <rect x="415" y="212" width="145" height="85" rx="10" fill="#0D1117" stroke="#F97316" stroke-width="1" />
+  <text x="487" y="234" text-anchor="middle" fill="#F97316" font-size="12" font-weight="600">State</text>
+  <text x="487" y="250" text-anchor="middle" fill="#4E5D6C" font-size="10">Persistent Volume</text>
+  <text x="487" y="266" text-anchor="middle" fill="#4E5D6C" font-size="10">Survives pod restart</text>
+  <text x="487" y="282" text-anchor="middle" fill="#4E5D6C" font-size="10">gp3-csi / managed-csi</text>
+
+  <!-- Pulsing state -->
+  <rect x="415" y="212" width="145" height="85" rx="10" fill="none" stroke="#F97316" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite" />
+  </rect>
+
+  <line x1="560" y1="254" x2="588" y2="254" stroke="#4E5D6C" stroke-width="1.2" marker-end="url(#arr)" />
+
+  <!-- Stream -->
+  <rect x="590" y="212" width="155" height="85" rx="10" fill="#0D1117" stroke="#EE0000" stroke-width="1" />
+  <text x="667" y="234" text-anchor="middle" fill="#F0F4F8" font-size="12" font-weight="600">Stream</text>
+  <text x="667" y="250" text-anchor="middle" fill="#EE0000" font-size="10">Server-Sent Events</text>
+  <text x="667" y="266" text-anchor="middle" fill="#4E5D6C" font-size="10">One-way push</text>
+  <text x="667" y="282" text-anchor="middle" fill="#4E5D6C" font-size="10">No polling</text>
+
+  <!-- SSE pulsing -->
+  <rect x="590" y="212" width="155" height="85" rx="10" fill="none" stroke="#EE0000" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SSE FLOW DOWN                                          -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <line x1="400" y1="320" x2="400" y2="380" stroke="url(#flowDown)" stroke-width="3" opacity="0.12" />
+
+  <text x="370" y="355" fill="#EE0000" font-size="10" font-weight="600" text-anchor="end">GET /events</text>
+  <text x="430" y="355" fill="#4E5D6C" font-size="10">SSE · text/event-stream</text>
+
+  <!-- Animated SSE dots -->
+  <circle r="4" fill="#EE0000" filter="url(#glow-red)">
+    <animateMotion dur="1.6s" repeatCount="indefinite" begin="0s" path="M400,320 L400,380" />
+    <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.6s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3.5" fill="#0070F2" filter="url(#glow-blue)">
+    <animateMotion dur="1.6s" repeatCount="indefinite" begin="0.6s" path="M400,320 L400,380" />
+    <animate attributeName="opacity" values="0.85;0.3;0.85" dur="1.6s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- DASHBOARD                                              -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <rect x="40" y="380" width="720" height="90" rx="14"
+    fill="rgba(238,0,0,0.03)" stroke="#3C3F42" stroke-width="1" opacity="0.8" />
+
+  <text x="70" y="403" fill="#EE0000" font-size="11" font-weight="700" letter-spacing="1.5">
+    OPERATOR DASHBOARD
+  </text>
+  <text x="720" y="403" text-anchor="end" fill="#4E5D6C" font-size="10">
+    Static HTML · GitHub Pages
+  </text>
+
+  <rect x="65" y="415" width="130" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="130" y="435" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Event Counter</text>
+  <text x="130" y="449" text-anchor="middle" fill="#EE0000" font-size="12" font-weight="900" font-family="'Red Hat Mono',monospace">12,847</text>
+
+  <rect x="210" y="415" width="130" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="275" y="435" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Class Breakdown</text>
+  <text x="275" y="449" text-anchor="middle" fill="#4E5D6C" font-size="9">6 event types · live bars</text>
+
+  <rect x="355" y="415" width="130" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="420" y="435" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Activity Feed</text>
+  <text x="420" y="449" text-anchor="middle" fill="#4E5D6C" font-size="9">Scrolling event log</text>
+
+  <rect x="500" y="415" width="130" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="565" y="435" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Device Map</text>
+  <text x="565" y="449" text-anchor="middle" fill="#4E5D6C" font-size="9">Active edge mosaic</text>
+
+  <rect x="645" y="415" width="100" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="695" y="435" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Network</text>
+  <text x="695" y="449" text-anchor="middle" fill="#4E5D6C" font-size="9">Locale · Carrier</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SAP INTEGRATION PATH (dashed — future/adjacent)        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <line x1="487" y1="297" x2="487" y2="490" stroke="#0070F2" stroke-width="1" stroke-dasharray="4,4" opacity="0.3" />
+  <line x1="487" y1="490" x2="720" y2="490" stroke="#0070F2" stroke-width="1" stroke-dasharray="4,4" opacity="0.3" marker-end="url(#arr-blue)" />
+
+  <rect x="555" y="495" width="195" height="35" rx="8" fill="#0D1117" stroke="#0070F2" stroke-width="1" stroke-dasharray="3,3" opacity="0.6" />
+  <text x="652" y="512" text-anchor="middle" fill="#0070F2" font-size="10" font-weight="600" opacity="0.7">SAP Edge Integration Cell</text>
+  <text x="652" y="524" text-anchor="middle" fill="#4E5D6C" font-size="9" opacity="0.6">→ Integration Suite → S/4HANA</text>
+
+</svg>
+
+<div class="section">
+  <h2>Event Protocol</h2>
+  <p>
+    Every device — physical or simulated — emits structured events conforming to the
+    <strong>CNCF CloudEvents</strong> specification. Each event carries a type, source, timestamp,
+    and domain-specific payload. The platform doesn't care where the event came from. It cares what it says.
+  </p>
+
+  <table class="proto-table">
+    <thead>
+      <tr><th>Event Type</th><th>Source</th><th>Payload</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>access.badge.tap</td><td>Badge reader</td><td>Person ID, access point, grant/deny</td></tr>
+      <tr><td>door.state.change</td><td>Door sensor</td><td>Door ID, open/close/alarm, zone</td></tr>
+      <tr><td>env.temperature</td><td>HVAC sensor</td><td>Zone, current temp, setpoint, delta</td></tr>
+      <tr><td>safety.fire.alarm</td><td>Fire panel</td><td>Zone, detector type, severity</td></tr>
+      <tr><td>bio.scan.result</td><td>Biometric reader</td><td>Scan type, match/no-match, confidence</td></tr>
+      <tr><td>env.air.quality</td><td>Air monitor</td><td>CO₂ ppm, particulate, zone</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Platform Flow</h2>
+  <p>
+    Events arrive at the <strong>ingest endpoint</strong> via HTTPS POST. The platform validates the CloudEvent
+    envelope, classifies the event by type, and routes it to the processing layer. Processed events are
+    persisted to a <strong>Persistent Volume</strong> (cloud-native block storage — gp3-csi on AWS, managed-csi on Azure)
+    so state survives pod restarts.
+  </p>
+  <p>
+    The dashboard connects via <strong>Server-Sent Events (SSE)</strong> — a one-way, persistent HTTP connection.
+    The platform pushes every processed event to all connected dashboards in real time. No polling. No WebSocket
+    complexity. The browser opens a connection and listens.
+  </p>
+</div>
+
+<div class="section">
+  <h2>SAP Integration Path</h2>
+  <p>
+    The same CloudEvents that power the dashboard can flow through
+    <strong class="sap-blue">SAP Edge Integration Cell</strong> — deployed inside the same OpenShift cluster —
+    into <strong class="sap-blue">SAP Integration Suite</strong> and from there to
+    <strong class="sap-blue">S/4HANA</strong> and <strong class="sap-blue">SAP Analytics Cloud</strong>.
+    The integration is architectural, not bolted on. Same events. Same platform.
+    EIC is validated on both <span class="rh-red">ROSA</span> and <span class="rh-red">ARO</span>.
+  </p>
+</div>
+
+<p class="hint">
+  Red Hat OpenShift Container Platform · CloudEvents (CNCF) · Server-Sent Events · SAP Edge Integration Cell<br>
+  Open standards · No vendor lock-in · The demo is the reference architecture.
+</p>
+
+</body>
+</html>
