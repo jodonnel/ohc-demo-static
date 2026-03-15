@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapeaux Rouge — Admin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #f0e6d0;
+    font-family: 'Courier New', monospace;
+    padding: 2rem;
+  }
+  h1 { color: #EE0000; font-size: 1.5rem; margin-bottom: 0.5rem; letter-spacing: 0.2em; }
+  .subtitle { color: #555; font-size: 0.75rem; margin-bottom: 2rem; letter-spacing: 0.2em; }
+  .token-bar { display: flex; gap: 1rem; margin-bottom: 2rem; }
+  input {
+    background: #111; border: 1px solid #333; color: #f0e6d0;
+    font-family: monospace; padding: 0.5rem 1rem; font-size: 0.9rem;
+    flex: 1; outline: none;
+  }
+  input:focus { border-color: #EE0000; }
+  button {
+    background: #EE0000; border: none; color: #fff;
+    font-family: monospace; padding: 0.5rem 1.5rem;
+    cursor: pointer; font-size: 0.9rem; letter-spacing: 0.1em;
+  }
+  button:hover { background: #cc0000; }
+  .stats {
+    display: flex; gap: 2rem; margin-bottom: 2rem;
+  }
+  .stat { border: 1px solid #333; padding: 1rem 1.5rem; }
+  .stat-num { font-size: 2rem; color: #EE0000; }
+  .stat-label { font-size: 0.65rem; color: #555; letter-spacing: 0.2em; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th {
+    text-align: left; padding: 0.5rem 1rem;
+    color: #EE0000; font-size: 0.65rem; letter-spacing: 0.2em;
+    border-bottom: 1px solid #333;
+  }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid #1a1a1a; }
+  tr:hover td { background: #111; }
+  .serial { color: #D4AF37; font-weight: bold; }
+  .empty { color: #555; text-align: center; padding: 3rem; }
+  .export-btn {
+    background: transparent; border: 1px solid #555; color: #888;
+    margin-left: 1rem; font-size: 0.75rem;
+  }
+  .export-btn:hover { border-color: #EE0000; color: #EE0000; background: transparent; }
+</style>
+</head>
+<body>
+
+<h1>🎩 CHAPEAUX ROUGE</h1>
+<p class="subtitle">REGISTRATION LIST · ADMIN</p>
+
+<div class="token-bar">
+  <input type="password" id="tokenInput" placeholder="Admin token" value="chapeaux2026">
+  <button onclick="loadList()">Load</button>
+  <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+</div>
+
+<div class="stats" id="stats" style="display:none">
+  <div class="stat">
+    <div class="stat-num" id="countNum">0</div>
+    <div class="stat-label">Registered</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" id="serialCount">0</div>
+    <div class="stat-label">With Chip Serial</div>
+  </div>
+</div>
+
+<table id="listTable" style="display:none">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Serial</th>
+      <th>Name</th>
+      <th>Company</th>
+      <th>Email</th>
+      <th>Registered</th>
+    </tr>
+  </thead>
+  <tbody id="listBody"></tbody>
+</table>
+
+<div class="empty" id="emptyMsg" style="display:none">No registrations yet.</div>
+
+<script>
+  let allEntries = [];
+
+  async function loadList() {
+    const token = document.getElementById('tokenInput').value;
+    try {
+      const res = await fetch(`https://north-qr-demo-qa.apps.rosa.rosa-rvdtn.ypet.p3.openshiftapps.com/api/speakeasy/list?token=${encodeURIComponent(token)}`);
+      if (!res.ok) { alert('Unauthorized or error'); return; }
+      const data = await res.json();
+      allEntries = data.entries || [];
+      render();
+    } catch(e) {
+      alert('Failed to load: ' + e.message);
+    }
+  }
+
+  function render() {
+    const tbody = document.getElementById('listBody');
+    tbody.innerHTML = '';
+
+    document.getElementById('stats').style.display = allEntries.length ? 'flex' : 'none';
+    document.getElementById('countNum').textContent = allEntries.length;
+    document.getElementById('serialCount').textContent = allEntries.filter(e => e.serial).length;
+
+    if (!allEntries.length) {
+      document.getElementById('emptyMsg').style.display = 'block';
+      document.getElementById('listTable').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('emptyMsg').style.display = 'none';
+    document.getElementById('listTable').style.display = 'table';
+
+    const sorted = [...allEntries].sort((a,b) => (a.serial||'').localeCompare(b.serial||''));
+    sorted.forEach((e, i) => {
+      const tr = document.createElement('tr');
+      const ts = e.ts ? new Date(e.ts).toLocaleString('en-US', {timeZone:'America/Los_Angeles', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td class="serial">${e.serial || '—'}</td>
+        <td>${e.name || ''}</td>
+        <td>${e.company || ''}</td>
+        <td>${e.email || ''}</td>
+        <td>${ts}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function exportCSV() {
+    if (!allEntries.length) return;
+    const headers = ['serial','name','company','email','ts'];
+    const rows = allEntries.map(e => headers.map(h => `"${(e[h]||'').replace(/"/g,'""')}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'chapeaux-rouge-registrations.csv';
+    a.click();
+  }
+
+  // Auto-load on enter
+  document.getElementById('tokenInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') loadList();
+  });
+</script>
+
+</body>
+</html>
