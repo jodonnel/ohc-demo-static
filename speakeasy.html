@@ -343,11 +343,32 @@
 </div>
 
 <script>
-  // ── QR CODE ──
-  QRCode.toCanvas(document.getElementById('regQR'),
-    'https://jodonnel.github.io/ohc-demo-static/speakeasy.html',
-    { width: 160, margin: 1, color: { dark: '#EE0000', light: '#0a0a0a' } }
-  );
+  // ── QR CODE WITH RED HAT LOGO ──
+  (async function() {
+    const qrCanvas = document.getElementById('regQR');
+    await QRCode.toCanvas(qrCanvas,
+      'https://jodonnel.github.io/ohc-demo-static/speakeasy.html',
+      { width: 180, margin: 1, errorCorrectionLevel: 'H',
+        color: { dark: '#EE0000', light: '#0a0a0a' } }
+    );
+    // Overlay Red Hat logo in center circle
+    const ctx = qrCanvas.getContext('2d');
+    const cx = qrCanvas.width / 2;
+    const cy = qrCanvas.height / 2;
+    const r = qrCanvas.width * 0.15;
+    // Draw black circle background
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fill();
+    // Load and draw the hat logo
+    const img = new Image();
+    img.onload = function() {
+      const s = r * 1.6;
+      ctx.drawImage(img, cx - s/2, cy - s/2, s, s);
+    };
+    img.src = 'assets/logos/Logo-Red_Hat-A-Reverse-RGB.svg';
+  })();
 
   let stream = null;
   let badgeImageData = null; // base64 JPEG of the badge photo
