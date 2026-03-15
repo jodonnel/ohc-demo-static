@@ -198,7 +198,7 @@
 
     <div class="form-group">
       <label>Email</label>
-      <input type="email" id="emailField" placeholder="Where we'll reach you" autocomplete="email">
+      <input type="email" id="emailField" placeholder="Optional" autocomplete="email">
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitRegistration()">Register</button>
@@ -240,7 +240,6 @@
     const btn = document.getElementById('submitBtn');
 
     if (!name) { document.getElementById('nameField').focus(); return; }
-    if (!email) { document.getElementById('emailField').focus(); return; }
 
     btn.disabled = true;
     btn.textContent = 'Registering...';
