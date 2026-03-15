@@ -67,21 +67,7 @@
     margin: 1.5rem 0;
   }
 
-  .serial-badge {
-    display: inline-block;
-    border: 1px solid #EE0000;
-    color: #EE0000;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    letter-spacing: 0.3em;
-    padding: 0.4rem 1.2rem;
-    margin-bottom: 1.5rem;
-    opacity: 0.8;
-  }
-
-  .serial-badge.empty { display: none; }
-
-  .scan-area {
+.scan-area {
     position: relative;
     width: 100%;
     background: #111;
@@ -283,8 +269,6 @@
   <!-- REGISTRATION FORM -->
   <div id="regForm">
 
-    <div class="serial-badge" id="serialDisplay"></div>
-
     <div class="divider"></div>
 
     <p style="font-size:0.75rem;color:#888;letter-spacing:0.15em;margin-bottom:1.5rem;line-height:1.8;">
@@ -322,12 +306,10 @@
       <input type="email" id="emailField" placeholder="Where we'll reach you" autocomplete="email">
     </div>
 
-    <input type="hidden" id="serialField">
-
     <button class="submit-btn" id="submitBtn" onclick="submitRegistration()">Claim My Entry</button>
 
     <p class="fine-print">
-      One entry per chip serial. Raffle drawn at the event.<br>
+      One entry per person. Raffle drawn at the event.<br>
       You must be present to win. No purchase necessary.
     </p>
   </div>
@@ -348,8 +330,8 @@
       <div class="detail-value">Find Jim. He'll tell you.</div>
       <div class="detail-label">The Prize</div>
       <div class="detail-value">Meta Ray-Ban Smart Glasses · Must be present to win</div>
-      <div class="detail-label">The Chip</div>
-      <div class="detail-value">Bring it. No chip, no entry.</div>
+      <div class="detail-label">Admission</div>
+      <div class="detail-value">Show your conference badge at the door.</div>
     </div>
 
     <p style="margin-top:1.5rem;">
@@ -361,17 +343,6 @@
 </div>
 
 <script>
-  // ── SERIAL FROM URL PARAM ──
-  const params = new URLSearchParams(window.location.search);
-  const serial = params.get('s') || params.get('serial') || '';
-  if (serial) {
-    document.getElementById('serialDisplay').textContent = '#' + serial;
-    document.getElementById('serialDisplay').classList.remove('empty');
-    document.getElementById('serialField').value = serial;
-  } else {
-    document.getElementById('serialDisplay').classList.add('empty');
-  }
-
   // ── CAMERA / OCR ──
   let stream = null;
   let scanning = false;
@@ -470,7 +441,6 @@
     const name = document.getElementById('nameField').value.trim();
     const company = document.getElementById('companyField').value.trim();
     const email = document.getElementById('emailField').value.trim();
-    const serial = document.getElementById('serialField').value.trim();
     const btn = document.getElementById('submitBtn');
 
     if (!name) { document.getElementById('nameField').focus(); return; }
@@ -483,20 +453,20 @@
       const res = await fetch('https://north-qr-demo-qa.apps.rosa.rosa-rvdtn.ypet.p3.openshiftapps.com/api/speakeasy/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, company, email, serial, ts: new Date().toISOString() })
+        body: JSON.stringify({ name, company, email, ts: new Date().toISOString() })
       });
 
       const data = await res.json();
 
       document.getElementById('regForm').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
-      document.getElementById('raffleNumber').textContent = data.raffle_id || serial || '???';
+      document.getElementById('raffleNumber').textContent = data.raffle_id || Math.floor(Math.random()*90000+10000).toString();
 
     } catch(e) {
       // Offline fallback — still show success
       document.getElementById('regForm').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
-      document.getElementById('raffleNumber').textContent = serial || Math.floor(Math.random()*90000+10000).toString();
+      document.getElementById('raffleNumber').textContent = Math.floor(Math.random()*90000+10000).toString();
     }
   }
 </script>
