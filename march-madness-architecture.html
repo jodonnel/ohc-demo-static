@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How This Demo Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #06090F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px;
+    font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+    color: #F0F4F8;
+  }
+  @media (max-width: 768px) {
+    body { padding: 24px 16px; }
+    h1 { font-size: 24px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+  .header { text-align: center; margin-bottom: 40px; max-width: 600px; animation: fadeIn 0.8s ease-out; }
+  .badge { display: inline-block; font-size: 10px; color: #F0AB00; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(238,0,0,0.3); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  h1 { font-size: 28px; font-weight: 300; margin-bottom: 12px; }
+  .subtitle { color: #8B98A5; font-size: 14px; line-height: 1.7; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 640px;
+    width: 100%;
+    animation: fadeIn 1s ease-out 0.2s both;
+  }
+  .card {
+    background: #0D1117;
+    border: 1px solid #3C3F42; box-shadow: 0 0 8px rgba(238,0,0,0.15);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card-icon { font-size: 24px; margin-bottom: 10px; }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .card p { font-size: 12px; color: #8B98A5; line-height: 1.6; }
+  .card.safe { border-color: rgba(238,0,0,0.3); }
+  .card.safe h3 { color: #F0AB00; }
+  .full { grid-column: 1 / -1; }
+  .how-it-works {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 32px;
+    animation: fadeIn 1s ease-out 0.4s both;
+  }
+  .how-it-works h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #8B98A5;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0D1117;
+    border: 1px solid #EE0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #EE0000;
+    flex-shrink: 0;
+  }
+  .step-body h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .step-body p { font-size: 12px; color: #8B98A5; line-height: 1.6; }
+  .powered-by {
+    margin-top: 40px;
+    text-align: center;
+    animation: fadeIn 1s ease-out 0.6s both;
+  }
+  .powered-by .rh { color: #EE0000; font-size: 12px; font-weight: 700; letter-spacing: 2px; }
+  .powered-by p { color: #4E5D6C; font-size: 11px; margin-top: 6px; line-height: 1.6; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Executive Brief</div>
+  <h1>How This Demo Works</h1>
+  <p class="subtitle">
+    You scanned a QR code on one of our demo pages.
+    Here's exactly what it does — and what it doesn't.
+  </p>
+</div>
+
+<div class="grid">
+
+  <div class="card safe">
+    <div class="card-icon">🍪</div>
+    <h3>No Cookies</h3>
+    <p>This page drops zero cookies. Nothing is stored on your device. Close the tab and it's gone.</p>
+  </div>
+
+  <div class="card safe">
+    <div class="card-icon">👁️</div>
+    <h3>No Tracking</h3>
+    <p>No analytics. No tracking pixels. No fingerprinting. We don't know who you are and we don't want to.</p>
+  </div>
+
+  <div class="card safe">
+    <div class="card-icon">📡</div>
+    <h3>No Third-Party Scripts</h3>
+    <p>No Google Analytics, no Facebook pixel, no ad networks. The only scripts are ours and they're open source.</p>
+  </div>
+
+  <div class="card safe">
+    <div class="card-icon">🔒</div>
+    <h3>Read-Only</h3>
+    <p>The dashboard you're looking at is display-only. It shows events happening on our demo platform in real time. It can't access anything on your device.</p>
+  </div>
+
+  <div class="card full">
+    <div class="card-icon">📋</div>
+    <h3>What data does this page collect?</h3>
+    <p>None. The demo pages are static HTML served from GitHub Pages. They connect to our Red Hat OpenShift cluster to display live event data using a one-way stream. Your browser receives data. It never sends any.</p>
+  </div>
+
+</div>
+
+<div class="how-it-works">
+  <h2>How it works</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>Edge devices generate events</h4>
+      <p>In the demo, simulated sensors — badge readers, door contacts, HVAC, fire safety — produce structured events called CloudEvents. In production, these would be real building systems.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Events flow to Red Hat OpenShift</h4>
+      <p>Each event is sent over an encrypted connection to a managed Kubernetes cluster. The platform classifies, validates, and stores every event.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>The dashboard shows what's happening now</h4>
+      <p>Your browser opens a one-way connection (Server-Sent Events) and receives a live stream of processed events. That's the counter ticking up, the feed scrolling, and the device map populating — all in real time.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h4>The same path leads to SAP</h4>
+      <p>These CloudEvents can flow through SAP Edge Integration Cell into SAP Integration Suite, S/4HANA, and Analytics Cloud. Same events, same platform — the integration is the architecture, not an add-on.</p>
+    </div>
+  </div>
+</div>
+
+<div class="powered-by">
+  <div class="rh">POWERED BY RED HAT OPENSHIFT</div>
+  <p>
+    This demo runs on the same platform that powers production workloads<br>
+    for the world's largest banks, airlines, and manufacturers.
+  </p>
+</div>
+
+</body>
+</html>
