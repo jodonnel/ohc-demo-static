@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>March Madness Bracket — Technical Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #06090F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 32px;
+    font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+    color: #F0F4F8;
+  }
+  @media (max-width: 768px) {
+    body { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+  }
+  .header { text-align: center; margin-bottom: 36px; animation: fadeIn 0.8s ease-out; }
+  .badge { display: inline-block; font-size: 10px; color: #F97316; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(249,115,22,0.3); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .brands { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 14px; }
+  .brands span { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .brands .rh { color: #EE0000; }
+  .brands .sep { color: #4E5D6C; font-size: 18px; }
+  .brands .sap { color: #0070F2; }
+  h1 { font-size: 28px; font-weight: 300; margin-bottom: 10px; }
+  .subtitle { color: #8B98A5; font-size: 14px; line-height: 1.6; }
+  svg { max-width: 100%; height: auto; animation: fadeIn 1s ease-out 0.3s both; }
+  .section { max-width: 800px; width: 100%; margin-top: 32px; animation: fadeIn 1s ease-out 0.5s both; }
+  .section h2 { font-size: 14px; font-weight: 700; color: #F97316; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+  .section p { font-size: 13px; color: #8B98A5; line-height: 1.8; margin-bottom: 12px; }
+  .section strong { color: #F0F4F8; font-weight: 600; }
+  .section .rh-red { color: #EE0000; }
+  .section .sap-blue { color: #0070F2; }
+  .proto-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+  .proto-table th { text-align: left; padding: 8px 12px; color: #F97316; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid #1C2333; }
+  .proto-table td { padding: 8px 12px; border-bottom: 1px solid #0D1117; color: #8B98A5; }
+  .proto-table td:first-child { color: #F0F4F8; font-weight: 600; font-family: 'Red Hat Mono', monospace; }
+  .tier-nav {
+    max-width: 800px;
+    width: 100%;
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    animation: fadeIn 1s ease-out 0.7s both;
+  }
+  .tier-nav a {
+    flex: 1;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: #0D1117;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 0.2s;
+  }
+  .tier-nav a:hover { transform: translateY(-2px); }
+  .tier-nav .eb { border: 1px solid rgba(240,171,0,0.4); color: #F0AB00; }
+  .tier-nav .current { border: 1px solid #F97316; color: #F97316; }
+  .tier-nav .arch { border: 1px solid rgba(238,0,0,0.4); color: #EE0000; }
+  .hint { color: #4E5D6C; font-size: 10px; margin-top: 24px; text-align: center; line-height: 1.8; animation: fadeIn 1s ease-out 0.7s both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Technical Brief</div>
+  <div class="brands">
+    <span class="rh">Red Hat OpenShift</span>
+    <span class="sep">×</span>
+    <span class="sap">SAP</span>
+  </div>
+  <h1>March Madness Bracket Architecture</h1>
+  <p class="subtitle">
+    How live ESPN and NCAA.com data flows through Red Hat OpenShift<br>
+    to power a real-time tournament bracket on GitHub Pages.
+  </p>
+</div>
+
+<svg viewBox="0 0 800 500" style="width:100%;max-width:800px;height:auto" font-family="'Red Hat Display', 'Red Hat Text', sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4E5D6C" />
+    </marker>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#EE0000" />
+    </marker>
+    <marker id="arr-orange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F97316" />
+    </marker>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0070F2" />
+    </marker>
+    <filter id="glow-red"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-orange"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="flowUp" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#EE0000" />
+    </linearGradient>
+    <linearGradient id="flowDown" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EE0000" />
+      <stop offset="100%" stop-color="#F0AB00" />
+    </linearGradient>
+  </defs>
+
+  <!-- SOUTH: Data Sources -->
+  <rect x="40" y="15" width="720" height="90" rx="14"
+    fill="rgba(249,115,22,0.04)" stroke="#F97316" stroke-width="1" opacity="0.8" />
+  <text x="70" y="38" fill="#F97316" font-size="11" font-weight="700" letter-spacing="1.5">
+    SOUTH · EXTERNAL DATA SOURCES
+  </text>
+  <text x="720" y="38" text-anchor="end" fill="#4E5D6C" font-size="10">
+    Public REST APIs
+  </text>
+
+  <rect x="65" y="52" width="200" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="165" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">ESPN Scoreboard API</text>
+  <text x="165" y="85" text-anchor="middle" fill="#4E5D6C" font-size="9">scores, game summaries, news</text>
+
+  <rect x="285" y="52" width="200" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="385" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">NCAA.com Bracket API</text>
+  <text x="385" y="85" text-anchor="middle" fill="#4E5D6C" font-size="9">seeds, regions, bracket structure</text>
+
+  <rect x="505" y="52" width="200" height="40" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="605" y="72" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">ESPN News API</text>
+  <text x="605" y="85" text-anchor="middle" fill="#4E5D6C" font-size="9">headlines, articles, links</text>
+
+  <!-- Northbound flow -->
+  <line x1="400" y1="105" x2="400" y2="165" stroke="url(#flowUp)" stroke-width="3" opacity="0.12" />
+  <text x="370" y="140" fill="#F97316" font-size="10" font-weight="600" text-anchor="end">GET (polling)</text>
+  <text x="430" y="140" fill="#4E5D6C" font-size="10">HTTPS · JSON · 30s interval</text>
+
+  <circle r="4.5" fill="#EE0000" filter="url(#glow-red)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0s" path="M400,105 L400,165" />
+    <animate attributeName="opacity" values="1;0.4;1" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+  <circle r="3.5" fill="#F97316" filter="url(#glow-orange)">
+    <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.5s" path="M400,105 L400,165" />
+    <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.4s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- NORTH: OpenShift -->
+  <rect x="40" y="165" width="720" height="135" rx="14"
+    fill="rgba(238,0,0,0.03)" stroke="#EE0000" stroke-width="1.2" opacity="0.8" />
+  <text x="70" y="188" fill="#EE0000" font-size="11" font-weight="700" letter-spacing="1.5">
+    NORTH · RED HAT OPENSHIFT (ROSA)
+  </text>
+  <text x="720" y="188" text-anchor="end" fill="#4E5D6C" font-size="10">
+    Managed Kubernetes · AWS
+  </text>
+
+  <!-- Fetch -->
+  <rect x="65" y="202" width="155" height="80" rx="10" fill="#0D1117" stroke="#EE0000" stroke-width="1" />
+  <text x="142" y="224" text-anchor="middle" fill="#F0F4F8" font-size="12" font-weight="600">Fetch &amp; Cache</text>
+  <text x="142" y="240" text-anchor="middle" fill="#4E5D6C" font-size="10">Poll ESPN + NCAA</text>
+  <text x="142" y="256" text-anchor="middle" fill="#4E5D6C" font-size="10">TTL-based caching</text>
+  <text x="142" y="272" text-anchor="middle" fill="#4E5D6C" font-size="10">Rate-limit protection</text>
+
+  <line x1="220" y1="242" x2="248" y2="242" stroke="#4E5D6C" stroke-width="1.2" marker-end="url(#arr)" />
+
+  <!-- Normalize -->
+  <rect x="250" y="202" width="155" height="80" rx="10" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="327" y="224" text-anchor="middle" fill="#F0F4F8" font-size="12" font-weight="600">Normalize</text>
+  <text x="327" y="240" text-anchor="middle" fill="#4E5D6C" font-size="10">Merge ESPN + NCAA</text>
+  <text x="327" y="256" text-anchor="middle" fill="#4E5D6C" font-size="10">Deduplicate games</text>
+  <text x="327" y="272" text-anchor="middle" fill="#4E5D6C" font-size="10">Unified JSON schema</text>
+
+  <line x1="405" y1="242" x2="433" y2="242" stroke="#F97316" stroke-width="1.2" marker-end="url(#arr-orange)" />
+
+  <!-- API -->
+  <rect x="435" y="202" width="155" height="80" rx="10" fill="#0D1117" stroke="#F97316" stroke-width="1" />
+  <text x="512" y="224" text-anchor="middle" fill="#F97316" font-size="12" font-weight="600">REST API</text>
+  <text x="512" y="240" text-anchor="middle" fill="#4E5D6C" font-size="10">/api/bracket</text>
+  <text x="512" y="256" text-anchor="middle" fill="#4E5D6C" font-size="10">/api/scores</text>
+  <text x="512" y="272" text-anchor="middle" fill="#4E5D6C" font-size="10">/api/news · /api/game/:id</text>
+
+  <line x1="590" y1="242" x2="618" y2="242" stroke="#EE0000" stroke-width="1.2" marker-end="url(#arr-red)" />
+
+  <!-- SSE -->
+  <rect x="620" y="202" width="125" height="80" rx="10" fill="#0D1117" stroke="#EE0000" stroke-width="1" />
+  <text x="682" y="224" text-anchor="middle" fill="#F0F4F8" font-size="12" font-weight="600">SSE Push</text>
+  <text x="682" y="240" text-anchor="middle" fill="#EE0000" font-size="10">/api/events</text>
+  <text x="682" y="256" text-anchor="middle" fill="#4E5D6C" font-size="10">Real-time stream</text>
+  <text x="682" y="272" text-anchor="middle" fill="#4E5D6C" font-size="10">Score change alerts</text>
+
+  <rect x="620" y="202" width="125" height="80" rx="10" fill="none" stroke="#EE0000" stroke-width="1" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- SSE flow down -->
+  <line x1="400" y1="300" x2="400" y2="360" stroke="url(#flowDown)" stroke-width="3" opacity="0.12" />
+  <text x="370" y="335" fill="#EE0000" font-size="10" font-weight="600" text-anchor="end">SSE stream</text>
+  <text x="430" y="335" fill="#4E5D6C" font-size="10">text/event-stream · one-way push</text>
+
+  <circle r="4" fill="#EE0000" filter="url(#glow-red)">
+    <animateMotion dur="1.6s" repeatCount="indefinite" begin="0s" path="M400,300 L400,360" />
+    <animate attributeName="opacity" values="0.9;0.35;0.9" dur="1.6s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- BRACKET APP -->
+  <rect x="40" y="360" width="720" height="80" rx="14"
+    fill="rgba(238,0,0,0.03)" stroke="#3C3F42" stroke-width="1" opacity="0.8" />
+  <text x="70" y="383" fill="#F0AB00" font-size="11" font-weight="700" letter-spacing="1.5">
+    BRACKET APP · GITHUB PAGES
+  </text>
+  <text x="720" y="383" text-anchor="end" fill="#4E5D6C" font-size="10">
+    Static HTML · No server required
+  </text>
+
+  <rect x="65" y="395" width="130" height="35" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="130" y="415" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">64-Team Bracket</text>
+
+  <rect x="210" y="395" width="130" height="35" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="275" y="415" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Live Scores</text>
+
+  <rect x="355" y="395" width="130" height="35" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="420" y="415" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">News Ticker</text>
+
+  <rect x="500" y="395" width="130" height="35" rx="8" fill="#0D1117" stroke="#3C3F42" stroke-width="1" />
+  <text x="565" y="415" text-anchor="middle" fill="#F0F4F8" font-size="11" font-weight="600">Game Detail</text>
+
+  <!-- SAP path -->
+  <line x1="512" y1="282" x2="512" y2="460" stroke="#0070F2" stroke-width="1" stroke-dasharray="4,4" opacity="0.3" />
+  <line x1="512" y1="460" x2="720" y2="460" stroke="#0070F2" stroke-width="1" stroke-dasharray="4,4" opacity="0.3" marker-end="url(#arr-blue)" />
+
+  <rect x="555" y="465" width="195" height="30" rx="8" fill="#0D1117" stroke="#0070F2" stroke-width="1" stroke-dasharray="3,3" opacity="0.6" />
+  <text x="652" y="482" text-anchor="middle" fill="#0070F2" font-size="10" font-weight="600" opacity="0.7">SAP Edge Integration Cell</text>
+
+</svg>
+
+<div class="section">
+  <h2>API Endpoints</h2>
+  <p>
+    The backend proxy running on <strong class="rh-red">Red Hat OpenShift</strong> exposes a clean REST API
+    that the bracket app consumes. Each endpoint caches upstream data to protect against rate limits
+    and provide consistent low-latency responses.
+  </p>
+
+  <table class="proto-table">
+    <thead>
+      <tr><th>Endpoint</th><th>Source</th><th>Cache TTL</th><th>Returns</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>/api/bracket</td><td>NCAA.com</td><td>120s</td><td>Seeds, regions, game results by round</td></tr>
+      <tr><td>/api/scores</td><td>ESPN</td><td>30s</td><td>Live scores, game state, broadcast info</td></tr>
+      <tr><td>/api/news</td><td>ESPN</td><td>300s</td><td>Headlines, descriptions, article links</td></tr>
+      <tr><td>/api/game/:id</td><td>ESPN</td><td>—</td><td>Box scores, leaders, team stats, venue</td></tr>
+      <tr><td>/api/events</td><td>Internal</td><td>—</td><td>SSE stream: score changes pushed in real time</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Data Flow</h2>
+  <p>
+    A background thread polls ESPN and NCAA.com every <strong>30 seconds</strong>. When scores change,
+    the platform pushes updates to all connected browsers via <strong>Server-Sent Events (SSE)</strong> —
+    a one-way, persistent HTTP connection. No polling from the browser. No WebSocket complexity.
+    The bracket app opens a connection and listens.
+  </p>
+  <p>
+    The frontend works fully standalone on GitHub Pages — bracket picks, team selection, and navigation
+    all function without the backend. Live scores and news are progressive enhancements that activate
+    when the OpenShift backend is available.
+  </p>
+</div>
+
+<div class="section">
+  <h2>SAP Integration Path</h2>
+  <p>
+    The same event-driven pattern powers enterprise integrations. Replace ESPN scores with
+    IoT sensor data, badge taps, or supply chain events — the architecture is identical.
+    <strong class="sap-blue">SAP Edge Integration Cell</strong>, deployed inside the same OpenShift cluster,
+    routes events to <strong class="sap-blue">SAP Integration Suite</strong>,
+    <strong class="sap-blue">S/4HANA</strong>, and <strong class="sap-blue">SAP Analytics Cloud</strong>.
+  </p>
+</div>
+
+<div class="tier-nav">
+  <a href="march-madness-eb.html" class="eb">Executive Brief</a>
+  <a href="march-madness-tb.html" class="current">Technical Brief</a>
+  <a href="march-madness-architecture.html" class="arch">Architecture</a>
+</div>
+
+<p class="hint">
+  Red Hat OpenShift · Flask · Server-Sent Events · ESPN API · NCAA.com · GitHub Pages<br>
+  Data powered by ESPN and NCAA.com · Not affiliated with or endorsed by the NCAA or ESPN
+</p>
+
+</body>
+</html>

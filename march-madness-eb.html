@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>March Madness Bracket Demo — How It Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;700;900&family=Red+Hat+Text:wght@400;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #06090F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px;
+    font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+    color: #F0F4F8;
+  }
+  @media (max-width: 768px) {
+    body { padding: 24px 16px; }
+    h1 { font-size: 24px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+  .header { text-align: center; margin-bottom: 40px; max-width: 600px; animation: fadeIn 0.8s ease-out; }
+  .badge { display: inline-block; font-size: 10px; color: #F0AB00; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(240,171,0,0.4); padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  h1 { font-size: 28px; font-weight: 300; margin-bottom: 12px; }
+  .subtitle { color: #8B98A5; font-size: 14px; line-height: 1.7; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 640px;
+    width: 100%;
+    animation: fadeIn 1s ease-out 0.2s both;
+  }
+  .card {
+    background: #0D1117;
+    border: 1px solid #3C3F42; box-shadow: 0 0 8px rgba(238,0,0,0.15);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card-icon { font-size: 24px; margin-bottom: 10px; }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .card p { font-size: 12px; color: #8B98A5; line-height: 1.6; }
+  .card.safe { border-color: rgba(240,171,0,0.3); }
+  .card.safe h3 { color: #F0AB00; }
+  .full { grid-column: 1 / -1; }
+  .how-it-works {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 32px;
+    animation: fadeIn 1s ease-out 0.4s both;
+  }
+  .how-it-works h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #8B98A5;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0D1117;
+    border: 1px solid #EE0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #EE0000;
+    flex-shrink: 0;
+  }
+  .step-body h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .step-body p { font-size: 12px; color: #8B98A5; line-height: 1.6; }
+  .tier-nav {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    animation: fadeIn 1s ease-out 0.5s both;
+  }
+  .tier-nav a {
+    flex: 1;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: #0D1117;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 0.2s;
+  }
+  .tier-nav a:hover { transform: translateY(-2px); }
+  .tier-nav .current { border: 1px solid #F0AB00; color: #F0AB00; }
+  .tier-nav .tb { border: 1px solid rgba(249,115,22,0.4); color: #F97316; }
+  .tier-nav .arch { border: 1px solid rgba(238,0,0,0.4); color: #EE0000; }
+  .powered-by {
+    margin-top: 40px;
+    text-align: center;
+    animation: fadeIn 1s ease-out 0.6s both;
+  }
+  .powered-by .rh { color: #EE0000; font-size: 12px; font-weight: 700; letter-spacing: 2px; }
+  .powered-by p { color: #4E5D6C; font-size: 11px; margin-top: 6px; line-height: 1.6; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Executive Brief</div>
+  <h1>How This Bracket Demo Works</h1>
+  <p class="subtitle">
+    You scanned a QR code on a March Madness bracket demo
+    running on Red Hat OpenShift. Here's exactly what it does — and what it doesn't.
+  </p>
+</div>
+
+<div class="grid">
+
+  <div class="card safe">
+    <div class="card-icon">🍪</div>
+    <h3>No Cookies</h3>
+    <p>This page drops zero cookies. Your bracket picks stay in your browser tab. Close it and they're gone.</p>
+  </div>
+
+  <div class="card safe">
+    <div class="card-icon">👁️</div>
+    <h3>No Tracking</h3>
+    <p>No analytics. No tracking pixels. No fingerprinting. We don't know who you are and we don't want to.</p>
+  </div>
+
+  <div class="card safe">
+    <div class="card-icon">📡</div>
+    <h3>No Third-Party Scripts</h3>
+    <p>No Google Analytics, no Facebook pixel, no ad networks. The only external data comes from ESPN and NCAA.com public APIs — through our backend, not your browser.</p>
+  </div>
+
+  <div class="card safe">
+    <div class="card-icon">🔒</div>
+    <h3>Read-Only</h3>
+    <p>The bracket page is display-only. It shows live tournament scores and news from a one-way stream. It can't access anything on your device.</p>
+  </div>
+
+  <div class="card full">
+    <div class="card-icon">🏀</div>
+    <h3>What does the bracket demo actually do?</h3>
+    <p>It's a live March Madness bracket that pulls real-time scores and headlines from ESPN and NCAA.com through a backend proxy running on Red Hat OpenShift. You can click teams, view game details, and watch scores update — all powered by the same enterprise platform that runs production workloads for the world's largest organizations.</p>
+  </div>
+
+</div>
+
+<div class="how-it-works">
+  <h2>How it works</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>Live data flows from ESPN and NCAA.com</h4>
+      <p>Public APIs from ESPN and NCAA.com provide real-time scores, headlines, game summaries, and bracket structure. These are the same feeds that power sports apps on your phone.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Red Hat OpenShift aggregates and caches</h4>
+      <p>A backend proxy on our managed Kubernetes cluster fetches, caches, and normalizes the data. It polls every 30 seconds for scores and pushes updates to all connected browsers via Server-Sent Events — no refreshing required.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>Your browser shows the bracket in real time</h4>
+      <p>The bracket page is static HTML hosted on GitHub Pages. It opens a one-way connection to our OpenShift cluster and receives score updates as they happen. The ticker scrolls, the scores change, the bracket fills in — all live.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h4>Same architecture, different events</h4>
+      <p>Replace "ESPN scores" with "factory sensors" or "building access events" and the architecture is identical. CloudEvents in, processing in the middle, real-time visualization out. The demo is the reference architecture.</p>
+    </div>
+  </div>
+</div>
+
+<div class="tier-nav">
+  <a href="march-madness-eb.html" class="current">Executive Brief</a>
+  <a href="march-madness-tb.html" class="tb">Technical Brief</a>
+  <a href="march-madness-architecture.html" class="arch">Architecture</a>
+</div>
+
+<div class="powered-by">
+  <div class="rh">POWERED BY RED HAT OPENSHIFT</div>
+  <p>
+    Live scores via ESPN and NCAA.com · Static frontend on GitHub Pages<br>
+    Backend proxy on Red Hat OpenShift Service on AWS (ROSA)
+  </p>
+</div>
+
+</body>
+</html>
