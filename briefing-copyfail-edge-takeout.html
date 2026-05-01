@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Copy Fail at the Edge — Ubuntu/Jetson Exposure &amp; Red Hat Alternative</title>
+<style>
+  :root {
+    --bg: #CC0000;
+    --surface: rgba(0,0,0,0.2);
+    --surface-hi: rgba(0,0,0,0.3);
+    --border: rgba(255,255,255,0.2);
+    --accent: #ffffff;
+    --accent-dim: rgba(255,255,255,0.9);
+    --text: rgba(255,255,255,0.92);
+    --text-dim: rgba(255,255,255,0.6);
+    --text-bright: #ffffff;
+    --warning: #ffcc00;
+    --green: #88ff88;
+    --code-bg: rgba(0,0,0,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Red Hat Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .doc-label {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: "Red Hat Display", "Segoe UI", system-ui, sans-serif;
+    font-size: 2.2rem;
+    color: #000;
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 1rem;
+  }
+  h2 {
+    font-family: "Red Hat Display", "Segoe UI", system-ui, sans-serif;
+    font-size: 1.4rem;
+    color: var(--warning);
+    margin-top: 2.5rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    margin-top: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  p { margin-bottom: 1rem; }
+  strong { color: var(--text-bright); font-size: 19px; }
+  a { color: var(--accent); text-decoration: none; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  th {
+    background: var(--surface-hi);
+    color: var(--text-bright);
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 2px solid var(--accent-dim);
+    font-weight: 600;
+  }
+  td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--surface); }
+
+  .exposed { color: var(--accent); font-weight: 600; }
+  .mitigated { color: var(--green); font-weight: 600; }
+
+  .callout {
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout.key {
+    border-left-color: var(--warning);
+    background: rgba(0,0,0,0.3);
+  }
+  .callout .label {
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--accent);
+  }
+  .callout.key .label { color: var(--warning); }
+
+  code {
+    font-family: "Red Hat Mono", "Cascadia Code", monospace;
+    background: var(--code-bg);
+    padding: 0.12rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--text-bright);
+  }
+
+  ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+
+  .vs-table td:nth-child(2) { color: var(--accent); }
+  .vs-table td:nth-child(3) { color: var(--green); }
+
+  .section-break {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  @page {
+    size: letter;
+    margin: 0.5in 0.5in 0.6in 0.5in;
+    background: #CC0000;
+    @bottom-center {
+      content: "CVE-2026-31431 — Edge Exposure Briefing — Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: rgba(255,255,255,0.5);
+    }
+  }
+  @media print {
+    body { background: var(--bg); color: var(--text); padding: 0; max-width: none; }
+    h1, h2, h3 { page-break-after: avoid; }
+    table, .callout, pre, ul, ol { page-break-inside: avoid; }
+    .section-break { page-break-before: always; }
+    li { page-break-inside: avoid; }
+    p { orphans: 3; widows: 3; }
+  }
+</style>
+</head>
+<body>
+
+<span class="doc-label">Internal Positioning &mdash; Edge AI Security</span>
+
+<h1>Copy Fail at the Edge</h1>
+<p class="subtitle">CVE-2026-31431 exposure on NVIDIA Jetson / Ubuntu L4T &bull; The case for Red Hat Device Edge</p>
+
+<!-- ============================================================ -->
+<h2>The Vulnerability in 30 Seconds</h2>
+
+<p><strong>CVE-2026-31431 ("Copy Fail")</strong> is a Linux kernel local privilege escalation disclosed April 29, 2026. Any unprivileged local user can gain root in under one second. The exploit is deterministic, 732 bytes of Python, and <strong>leaves zero forensic trace</strong> &mdash; no disk modification, no audit log entry, no file integrity alert. Evidence is destroyed automatically on reboot.</p>
+
+<p>It has existed in every mainstream Linux distribution since <strong>2017</strong>. CVSS 7.8 HIGH. Red Hat Bugzilla 2460538 (no errata yet).</p>
+
+<!-- ============================================================ -->
+<h2>Why This Matters at the Edge</h2>
+
+<p>The CVSS score says &ldquo;local only.&rdquo; At the edge, &ldquo;local&rdquo; is not a meaningful barrier:</p>
+
+<ul>
+  <li>Compromised container on the device &rarr; local access</li>
+  <li>Vulnerable inference API or exposed SSH &rarr; local access</li>
+  <li>Physical access to field-deployed hardware &rarr; local access</li>
+  <li>Supply chain compromise of a model or runtime dependency &rarr; local access</li>
+</ul>
+
+<p>Once any of these footholds exists, Copy Fail converts it to root in under one second with no evidence.</p>
+
+<!-- ============================================================ -->
+<h2>NVIDIA Jetson Is Directly Exposed</h2>
+
+<p>NVIDIA Jetson platforms run <strong>L4T (Linux for Tegra)</strong> &mdash; a full Ubuntu kernel with NVIDIA GPU drivers. The kernel is not stripped down. <code>CONFIG_CRYPTO_USER_API_AEAD</code> is enabled in the default config.</p>
+
+<table>
+  <thead>
+    <tr><th>JetPack</th><th>Kernel</th><th>Base OS</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>JetPack 6.x (Orin)</td><td>5.15 / 6.1</td><td>Ubuntu 22.04</td><td class="exposed">Vulnerable</td></tr>
+    <tr><td>JetPack 5.x (Xavier / Orin)</td><td>5.10</td><td>Ubuntu 20.04</td><td class="exposed">Vulnerable</td></tr>
+    <tr><td>JetPack 4.x (Nano / TX2)</td><td>4.9</td><td>Ubuntu 18.04</td><td>Below vulnerable range</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>The Compounding Problem at the Edge</h2>
+
+<table>
+  <thead>
+    <tr><th>Factor</th><th>Data Center</th><th>Edge (Jetson / Ubuntu L4T)</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Patch delivery</td>
+      <td>Vendor errata &rarr; <code>dnf update</code> &rarr; hours</td>
+      <td>NVIDIA must ship new JetPack BSP &rarr; requalify &rarr; field rollout &rarr; <strong>weeks to months</strong></td>
+    </tr>
+    <tr>
+      <td>Runtime detection</td>
+      <td>SIEM, Falco, RHACS, auditd</td>
+      <td><strong>None.</strong> No security runtime on wayside/field devices</td>
+    </tr>
+    <tr>
+      <td>MAC enforcement</td>
+      <td>SELinux (RHEL) &mdash; custom policy can deny <code>AF_ALG</code> sockets</td>
+      <td>AppArmor (Ubuntu) &mdash; per-profile <code>deny network alg,</code> but must update every profile individually</td>
+    </tr>
+    <tr>
+      <td>Update mechanism</td>
+      <td>Atomic, rollback-capable</td>
+      <td><code>apt upgrade</code> &mdash; mutable filesystem, no atomic rollback</td>
+    </tr>
+    <tr>
+      <td>Container isolation</td>
+      <td>seccomp + SELinux + namespace</td>
+      <td>Docker default &mdash; <strong>no seccomp filter for <code>AF_ALG</code></strong></td>
+    </tr>
+    <tr>
+      <td>Forensic capability</td>
+      <td>Central logging, memory forensics team</td>
+      <td><strong>Zero.</strong> Exploit leaves no trace. Reboot destroys evidence.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <span class="label">The core problem</span>
+  When the OS kernel comes from the hardware vendor, your security posture is gated by their release schedule. NVIDIA controls the L4T kernel. Customers cannot independently patch it. Every day between disclosure and the next JetPack BSP is a day every Jetson device in the field is exploitable with a publicly available script.
+</div>
+
+<!-- ============================================================ -->
+<h2>What These Devices Are Doing</h2>
+
+<p>NVIDIA Jetson is deployed across critical infrastructure for edge AI inference. These are not lab experiments &mdash; they are production systems on OT networks:</p>
+
+<table>
+  <thead>
+    <tr><th>Sector</th><th>Edge AI Workloads</th><th>Consequence of Root Compromise</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Transportation</td>
+      <td>Defect detection, wayside monitoring, predictive maintenance, safety systems</td>
+      <td>Safety system manipulation, operational visibility loss, regulatory exposure</td>
+    </tr>
+    <tr>
+      <td>Utilities / Energy</td>
+      <td>Substation monitoring, grid edge analytics, predictive maintenance</td>
+      <td>SCADA/ICS lateral movement, grid reliability risk, NERC CIP violations</td>
+    </tr>
+    <tr>
+      <td>Manufacturing</td>
+      <td>Quality inspection, robotic guidance, process optimization</td>
+      <td>Production sabotage, IP exfiltration, safety bypass</td>
+    </tr>
+    <tr>
+      <td>Healthcare</td>
+      <td>Medical imaging, patient monitoring, pharmacy automation</td>
+      <td>HIPAA breach, patient safety risk, operational disruption</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout key">
+  <span class="label">The IT/OT convergence risk</span>
+  Edge AI devices sit at the convergence point between IT and OT networks. They pull model updates and report telemetry over IP (IT side) while running inference that feeds into operational decisions (OT side). Copy Fail turns any IT-side foothold into OT-side root access with no forensic trail. This is the lateral movement path from IT into OT that every framework warns about.
+</div>
+
+<!-- ============================================================ -->
+<h2>Container Escape at the Edge</h2>
+
+<p>NVIDIA recommends containerized inference on Jetson &mdash; DeepStream, Triton Inference Server, and custom models all run in containers. This is the standard deployment pattern.</p>
+
+<p><strong>Copy Fail breaks container isolation.</strong> The Linux page cache is a host-level resource shared across all namespaces. An attacker inside a container can corrupt the page-cached copy of a setuid binary on the host, then trigger its execution.</p>
+
+<p>On a Jetson running containerized inference with Docker defaults (no seccomp filter for <code>AF_ALG</code>, no SELinux, no Falco): a compromised model-serving container owns the host.</p>
+
+<hr class="section-break">
+
+<!-- ============================================================ -->
+<h2>The Red Hat Alternative</h2>
+
+<p>Red Hat Device Edge on the same hardware provides defense in depth that the Ubuntu/L4T stack cannot match for this class of vulnerability:</p>
+
+<table class="vs-table">
+  <thead>
+    <tr><th>Capability</th><th>Ubuntu L4T (Current)</th><th>Red Hat Device Edge</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Kernel patch cadence</td>
+      <td>Gated by NVIDIA JetPack BSP releases</td>
+      <td>Red Hat errata on Red Hat&rsquo;s cadence, independent of hardware vendor</td>
+    </tr>
+    <tr>
+      <td>Update mechanism</td>
+      <td><code>apt upgrade</code> &mdash; mutable, no rollback</td>
+      <td><code>bootc</code> image-based &mdash; atomic, rollback-capable, testable</td>
+    </tr>
+    <tr>
+      <td>Mandatory Access Control</td>
+      <td>AppArmor &mdash; per-profile <code>deny network alg,</code> (no system-wide deny)</td>
+      <td>SELinux &mdash; custom policy module can deny <code>AF_ALG</code> socket creation per domain</td>
+    </tr>
+    <tr>
+      <td>Container runtime</td>
+      <td>Docker &mdash; default seccomp allows <code>AF_ALG</code></td>
+      <td>Podman + custom seccomp &mdash; <code>AF_ALG</code> blocked at container boundary</td>
+    </tr>
+    <tr>
+      <td>Runtime security</td>
+      <td>None at the edge</td>
+      <td>Red Hat Advanced Cluster Security (RHACS) with runtime detection</td>
+    </tr>
+    <tr>
+      <td>Fleet management</td>
+      <td>Manual or NVIDIA Fleet Command</td>
+      <td>Red Hat Satellite + Ansible Automation Platform &mdash; patch verification at scale</td>
+    </tr>
+    <tr>
+      <td>Compliance</td>
+      <td>No FIPS, no STIG, no CC</td>
+      <td>FIPS 140-3 validated, STIG content, Common Criteria evaluated</td>
+    </tr>
+    <tr>
+      <td>Vulnerability scanning</td>
+      <td>Manual / third-party</td>
+      <td>Red Hat Lightspeed CVE advisory &mdash; automated assessment and remediation guidance</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout key">
+  <span class="label">The SELinux story for this CVE</span>
+  RHEL&rsquo;s default SELinux targeted policy allows <code>alg_socket</code> creation &mdash; the exploit works out of the box. But SELinux provides the <strong>mechanism</strong> to block it: a single custom policy module denying <code>alg_socket { create }</code> for <code>container_t</code>, <code>user_t</code>, and other confined domains &mdash; applied system-wide in one operation. Ubuntu&rsquo;s AppArmor can also deny <code>AF_ALG</code> sockets via <code>deny network alg,</code> rules, but each application profile must be updated individually. There is no system-wide equivalent to a single SELinux module. At fleet scale with hundreds of confined applications, the operational difference is significant: one policy load vs. editing every profile.
+</div>
+
+<!-- ============================================================ -->
+<h2>The Ask</h2>
+
+<ol>
+  <li><strong>Inventory all NVIDIA Jetson deployments and their JetPack versions.</strong> Any device on JetPack 5.x or 6.x is vulnerable.</li>
+  <li><strong>Apply the module blacklist where possible.</strong> If the Jetson kernel has <code>algif_aead</code> as a module (not built-in), blacklist it today.</li>
+  <li><strong>Assess the containerized inference stack.</strong> Docker on Jetson with default seccomp provides no protection against this vulnerability. Every container is a potential escape vector.</li>
+  <li><strong>Evaluate Red Hat Device Edge for edge AI workloads.</strong> The combination of SELinux, <code>bootc</code> image mode, Podman with custom seccomp, and independent kernel patching addresses this class of vulnerability at every layer.</li>
+  <li><strong>Plan for the next one.</strong> Copy Fail was in the kernel for nine years. The question is not whether there are more page-cache or crypto subsystem vulnerabilities &mdash; it&rsquo;s whether your edge devices can respond when they&rsquo;re found.</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2>Talking Points</h2>
+
+<ul>
+  <li><strong>&ldquo;Local only&rdquo; is not a shield at the edge.</strong> Any exposed service, any container vulnerability, any physical access to field hardware satisfies the local vector requirement.</li>
+  <li><strong>You cannot patch what you do not control.</strong> When the kernel comes from the hardware vendor, your security posture is their release schedule.</li>
+  <li><strong>Container isolation is not a security boundary here.</strong> The page cache is host-wide. Namespace isolation provides zero protection against page-cache corruption.</li>
+  <li><strong>No forensic trail means no incident response.</strong> If you cannot detect the exploit at runtime, you will never know it happened. How many devices have already been compromised?</li>
+  <li><strong>SELinux deploys the fix system-wide; AppArmor requires per-profile changes.</strong> Both MAC frameworks <em>can</em> block <code>AF_ALG</code> sockets. SELinux does it with a single custom module applied to all confined domains at once. AppArmor requires adding <code>deny network alg,</code> to every individual application profile. The default RHEL policy allows it &mdash; but one <code>semodule -i</code> command locks down every confined process on the system in seconds.</li>
+</ul>
+
+<div class="footer">
+  <p>Prepared 2026-04-30 &bull; CVE-2026-31431 &bull; Red Hat Bugzilla 2460538 &bull; CERT-EU 2026-005</p>
+  <p>Red Hat Enterprise Linux &bull; Red Hat Device Edge &bull; Red Hat OpenShift &bull; Red Hat Advanced Cluster Security &bull; Red Hat Satellite &bull; Ansible Automation Platform</p>
+</div>
+
+</body>
+</html>
