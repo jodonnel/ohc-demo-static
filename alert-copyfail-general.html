@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Security Alert — CVE-2026-31431 (Copy Fail)</title>
+<meta property="og:title" content="CVE-2026-31431 — Copy Fail: 732 Bytes to Root on Every Linux Box Running Kernel 4.14 or Later">
+<meta property="og:description" content="A nine-year-old Linux kernel vulnerability gives any local user deterministic root access with zero forensic trace. Patch now.">
+<meta property="og:type" content="article">
+<style>
+  :root {
+    --bg: #CC0000;
+    --surface: rgba(0,0,0,0.2);
+    --surface-hi: rgba(0,0,0,0.3);
+    --border: rgba(255,255,255,0.2);
+    --accent: #ffffff;
+    --accent-dim: rgba(255,255,255,0.9);
+    --text: rgba(255,255,255,0.92);
+    --text-dim: rgba(255,255,255,0.6);
+    --text-bright: #fff;
+    --warning: #ffcc00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .alert-banner {
+    background: rgba(0,0,0,0.35);
+    color: var(--text-bright);
+    padding: 0.6rem 1.2rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+  h1 {
+    font-size: 2rem;
+    color: #000;
+    margin-bottom: 0.3rem;
+    line-height: 1.25;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  h2 {
+    font-size: 1.3rem;
+    color: var(--warning);
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+  }
+  p { margin-bottom: 1rem; }
+  strong { color: var(--text-bright); font-size: 19px; }
+  a { color: var(--accent); }
+
+  .stat-row {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+  }
+  .stat {
+    flex: 1;
+    min-width: 140px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.8rem;
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--warning);
+    display: block;
+  }
+  .stat .lbl {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .box {
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .box.warning {
+    border-left-color: var(--warning);
+    background: rgba(0,0,0,0.25);
+  }
+
+  ul { margin: 0.5rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+
+  code {
+    font-family: "Cascadia Code", "Fira Code", monospace;
+    background: rgba(0,0,0,0.25);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: #fff;
+  }
+  pre {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0.8rem 0 1.2rem 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; }
+
+  .footer {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  @page {
+    size: letter;
+    margin: 0.5in 0.5in 0.6in 0.5in;
+    background: #CC0000;
+    @bottom-center {
+      content: "CVE-2026-31431 — Security Alert — Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: rgba(255,255,255,0.5);
+    }
+  }
+  @media print {
+    body { background: var(--bg); color: var(--text); padding: 0; max-width: none; }
+    h1, h2 { page-break-after: avoid; }
+    h2 { page-break-before: auto; }
+    table, .box, pre, .stat-row, ul, ol { page-break-inside: avoid; }
+    li { page-break-inside: avoid; }
+    p { orphans: 3; widows: 3; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 1rem; font-size: 15px; }
+    h1 { font-size: 1.5rem; }
+    .stat { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="alert-banner">Security Alert &mdash; 2026-04-30</div>
+
+<h1>CVE-2026-31431 &mdash; Copy Fail</h1>
+<p class="subtitle">Linux kernel local privilege escalation &bull; Disclosed April 29, 2026 &bull; CVSS 7.8 HIGH</p>
+
+<div class="stat-row">
+  <div class="stat"><span class="num">9 yr</span><span class="lbl">Exposure window</span></div>
+  <div class="stat"><span class="num">732 B</span><span class="lbl">Exploit size</span></div>
+  <div class="stat"><span class="num">&lt;1s</span><span class="lbl">Time to root</span></div>
+  <div class="stat"><span class="num">0</span><span class="lbl">Forensic traces</span></div>
+</div>
+
+<h2>What happened</h2>
+
+<p>A nine-year-old logic bug in the Linux kernel's cryptographic subsystem (<code>algif_aead</code>) allows <strong>any unprivileged local user to gain root access</strong> on affected systems. The exploit is deterministic &mdash; no race condition, no memory layout guessing, no kernel address leak. It works in under one second and <strong>leaves no trace on disk, in audit logs, or in file integrity scans.</strong></p>
+
+<p>The vulnerability was discovered by Theori's Xint Code AI security research platform in approximately one hour of automated scanning. It had existed in every major Linux distribution since 2017.</p>
+
+<h2>Who is affected</h2>
+
+<p><strong>Every Linux system running kernel 4.14 <em>or later</em></strong> with <code>CONFIG_CRYPTO_USER_API_AEAD</code> enabled. This includes:</p>
+
+<ul>
+  <li>Red Hat Enterprise Linux 8, 9, and 10</li>
+  <li>Ubuntu 20.04, 22.04, 24.04</li>
+  <li>Amazon Linux 2023</li>
+  <li>SUSE Linux Enterprise</li>
+  <li>Any container or Kubernetes workload (page cache is shared with the host)</li>
+  <li>NVIDIA Jetson and other edge AI platforms running full-stack Linux</li>
+</ul>
+
+<h2>Why this one matters</h2>
+
+<p>Most privilege escalation bugs require timing, configuration mistakes, or complex chains. This one does not. It is a straight-line logic flaw: open a socket, splice a file, trigger a crypto operation, 4 bytes land in the page cache of any readable file. Iterate to build arbitrary corruption. Execute the corrupted setuid binary. Root.</p>
+
+<div class="box">
+  <strong>The page cache angle is what makes this different.</strong> The corruption lives in volatile memory. The kernel never marks the page as modified. A reboot destroys all evidence. File integrity tools (AIDE, Tripwire, <code>rpm -Va</code>) see a clean file because the on-disk copy was never changed. <code>auditd</code> doesn't fire because there is no <code>write()</code> syscall to log.
+</div>
+
+<h2>What to do now</h2>
+
+<p><strong>1. Check if the module is loadable or compiled in:</strong></p>
+<pre><code>modinfo algif_aead 2>&1 | head -3
+grep CONFIG_CRYPTO_USER_API_AEAD /boot/config-$(uname -r)</code></pre>
+
+<p><strong>2. If it's a loadable module, blacklist it immediately:</strong></p>
+<pre><code>echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif-aead.conf
+rmmod algif_aead 2>/dev/null
+dracut -f   # RHEL/Fedora — rebuild initramfs</code></pre>
+
+<p><strong>3. If it's compiled in (<code>=y</code>), you need the kernel patch.</strong> In the meantime:</p>
+<ul>
+  <li><strong>MAC policy:</strong> SELinux (RHEL) can block <code>AF_ALG</code> socket creation system-wide with a single custom module. AppArmor (Ubuntu/SUSE) can deny it per-profile via <code>deny network alg,</code> but requires updating each application profile individually.</li>
+  <li><strong>seccomp policies</strong> in container runtimes can block <code>AF_ALG</code> socket creation</li>
+  <li>Monitor Red Hat errata, Ubuntu USN, or your vendor's security channel for the kernel update</li>
+</ul>
+
+<div class="box warning">
+  <strong>The blacklist does NOT break:</strong> dm-crypt/LUKS, SSH, OpenSSL, kTLS, IPsec, or any standard crypto operation. Only <code>iwd</code> (Intel wireless daemon) and <code>cryptsetup</code> with non-default algorithms are known to use the <code>AF_ALG</code> AEAD interface.
+</div>
+
+<h2>Containers and Kubernetes</h2>
+
+<p>Container boundaries do not protect against this vulnerability. The Linux page cache is a host-level resource shared across all namespaces. An attacker inside a container can corrupt the page-cached copy of a setuid binary on the host, then trigger its execution. <strong>This is a container escape.</strong></p>
+
+<p>If you run multi-tenant Kubernetes, CI/CD runners, or any system where untrusted code executes in containers: treat this as critical regardless of the &ldquo;local only&rdquo; CVSS vector.</p>
+
+<h2>Edge and IoT</h2>
+
+<p>Edge devices running mainstream Linux kernels (NVIDIA Jetson, industrial gateways, AI inference appliances) are exposed and face compounding risk factors: slow vendor patch cycles, no runtime security monitoring, and the &ldquo;local&rdquo; attack vector is more achievable when devices are physically accessible or running exposed services.</p>
+
+<h2>Home Users and Consumer Linux Appliances</h2>
+
+<p>This is not just a server problem. If you run Linux at home, you may be affected:</p>
+
+<ul>
+  <li><strong>NAS devices</strong> (Synology, QNAP, TrueNAS) &mdash; full Linux kernels, often unpatched for months after disclosure</li>
+  <li><strong>Home routers</strong> running OpenWrt, DD-WRT, or vendor Linux &mdash; depends on whether <code>CONFIG_CRYPTO_USER_API_AEAD</code> is enabled in the build</li>
+  <li><strong>Raspberry Pi</strong> and single-board computers &mdash; Raspberry Pi OS ships mainstream kernels in the vulnerable range</li>
+  <li><strong>Smart home hubs</strong> and media servers running full Linux distributions</li>
+  <li><strong>Steam Deck</strong> and other Linux-based gaming/consumer devices</li>
+</ul>
+
+<div class="box warning">
+  <strong>The home user problem:</strong> There is no SELinux, no seccomp policy, no fleet management, and no security team. Home users depend entirely on their vendor shipping a firmware or kernel update &mdash; and for many consumer Linux appliances, that update may never come. If your device runs kernel 4.14 <em>or later</em> and has the crypto API enabled, the only real mitigation is the vendor patch. <strong>Check your vendor&rsquo;s security advisories and update as soon as a fix is available.</strong>
+</div>
+
+<h2>References</h2>
+
+<ul>
+  <li>Disclosure: copy.fail</li>
+  <li>NVD: CVE-2026-31431</li>
+  <li>CERT-EU Advisory: 2026-005</li>
+  <li>Red Hat: Bugzilla 2460538, access.redhat.com/security/cve/cve-2026-31431</li>
+  <li>Upstream fix: kernel commit <code>a664bf3d603d</code> &mdash; available in 7.0, 6.19.12, 6.18.22</li>
+</ul>
+
+<div class="footer">
+  <p>Jim O'Donnell &bull; Red Hat &bull; RHEL Specialist Solutions Architect</p>
+</div>
+
+</body>
+</html>

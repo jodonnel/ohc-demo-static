@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>CVE-2026-31431 — Remediation Comparison Across Linux Distributions</title>
+<style>
+  :root {
+    --bg: #CC0000;
+    --surface: rgba(0,0,0,0.2);
+    --surface-hi: rgba(0,0,0,0.3);
+    --border: rgba(255,255,255,0.2);
+    --text: rgba(255,255,255,0.92);
+    --text-dim: rgba(255,255,255,0.6);
+    --text-bright: #fff;
+    --warning: #ffcc00;
+    --good: #88ff88;
+    --bad: #ffaaaa;
+    --pending: #ffdd88;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Red Hat Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .doc-label {
+    display: inline-block;
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: "Red Hat Display", "Segoe UI", system-ui, sans-serif;
+    font-size: 2.2rem;
+    color: #000;
+    margin-bottom: 0.3rem;
+    line-height: 1.2;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding-bottom: 1rem;
+  }
+  h2 {
+    font-family: "Red Hat Display", "Segoe UI", system-ui, sans-serif;
+    font-size: 1.4rem;
+    color: var(--warning);
+    margin-top: 2.5rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+  h3 {
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    margin-top: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  p { margin-bottom: 1rem; }
+  strong { color: var(--text-bright); font-size: 19px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  th {
+    background: rgba(0,0,0,0.35);
+    color: var(--text-bright);
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    font-weight: 600;
+  }
+  td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(0,0,0,0.1); }
+
+  .fixed { color: var(--good); font-weight: 600; }
+  .pending { color: var(--pending); font-weight: 600; }
+  .vulnerable { color: var(--bad); font-weight: 600; }
+
+  .callout {
+    background: rgba(0,0,0,0.2);
+    border-left: 4px solid rgba(255,255,255,0.5);
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout.key {
+    border-left-color: var(--warning);
+    background: rgba(0,0,0,0.3);
+  }
+  .callout .label {
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--text-bright);
+  }
+  .callout.key .label { color: var(--warning); }
+
+  code {
+    font-family: "Red Hat Mono", "Cascadia Code", monospace;
+    background: rgba(0,0,0,0.25);
+    padding: 0.12rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--text-bright);
+  }
+  pre {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0.8rem 0 1.2rem 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; }
+
+  ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+
+  .step-num {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+    color: var(--warning);
+  }
+
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  @page {
+    size: letter;
+    margin: 0.5in 0.5in 0.6in 0.5in;
+    background: #CC0000;
+    @bottom-center {
+      content: "CVE-2026-31431 — Remediation Comparison — Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: rgba(255,255,255,0.5);
+    }
+  }
+  @media print {
+    body { padding: 0; max-width: none; }
+    h1, h2, h3 { page-break-after: avoid; }
+    table, .callout, pre, ul, ol, .box { page-break-inside: avoid; }
+    li { page-break-inside: avoid; }
+    p { orphans: 3; widows: 3; }
+  }
+</style>
+</head>
+<body>
+
+<span class="doc-label">CVE-2026-31431 &mdash; Remediation Comparison &mdash; 2026-04-30</span>
+
+<h1>Who Can Fix Copy Fail &mdash; and How Fast</h1>
+<p class="subtitle">Kernel patch status, pre-patch mitigations, and fleet deployment across every major Linux distribution</p>
+
+<div class="callout key">
+  <span class="label">The bottom line</span>
+  As of April 30, 2026 &mdash; one day after disclosure &mdash; <strong>no enterprise distribution has shipped a kernel patch.</strong> Every production RHEL, Ubuntu, SUSE, and Amazon Linux system is unpatched. The differentiator is not who patches first. It is: <strong>what can you do right now before the patch ships, and how fast can you deploy it when it does?</strong>
+</div>
+
+<!-- ============================================================ -->
+<h2>Kernel Patch Status (as of 2026-04-30)</h2>
+
+<table>
+  <thead>
+    <tr><th>Distribution</th><th>Patch Status</th><th>Fixed Kernel</th><th>Source</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Red Hat Enterprise Linux 10</strong></td>
+      <td class="pending">Pending</td>
+      <td>&mdash;</td>
+      <td>Bugzilla 2460538 (Status: NEW)</td>
+    </tr>
+    <tr>
+      <td><strong>Red Hat Enterprise Linux 9</strong></td>
+      <td class="pending">Pending</td>
+      <td>&mdash;</td>
+      <td>Bugzilla 2460538</td>
+    </tr>
+    <tr>
+      <td><strong>Red Hat Enterprise Linux 8</strong></td>
+      <td class="pending">Pending</td>
+      <td>&mdash;</td>
+      <td>Bugzilla 2460538</td>
+    </tr>
+    <tr>
+      <td><strong>Ubuntu 24.04 / 22.04 / 20.04</strong></td>
+      <td class="pending">Pending</td>
+      <td>&mdash;</td>
+      <td>USN tracker</td>
+    </tr>
+    <tr>
+      <td><strong>SUSE 15 SP7 / 16.0 / 16.1</strong></td>
+      <td class="pending">Pending</td>
+      <td>&mdash;</td>
+      <td>SUSE CVE page (CVSS 7.8)</td>
+    </tr>
+    <tr>
+      <td><strong>Amazon Linux 2 / 2023</strong></td>
+      <td class="pending">Pending Fix</td>
+      <td>&mdash;</td>
+      <td>ALAS tracker</td>
+    </tr>
+    <tr>
+      <td><strong>Debian Bullseye (11)</strong></td>
+      <td class="vulnerable">Vulnerable</td>
+      <td>&mdash;</td>
+      <td>DSA tracker</td>
+    </tr>
+    <tr>
+      <td><strong>Debian Bookworm (12)</strong></td>
+      <td class="vulnerable">Vulnerable</td>
+      <td>&mdash;</td>
+      <td>DSA tracker</td>
+    </tr>
+    <tr>
+      <td><strong>Debian Trixie (13)</strong></td>
+      <td class="fixed">Fixed</td>
+      <td>6.12.85-1</td>
+      <td>DSA-6238-1</td>
+    </tr>
+    <tr>
+      <td><strong>Fedora (current)</strong></td>
+      <td class="fixed">Fixed</td>
+      <td>6.19.12+</td>
+      <td>Upstream merge</td>
+    </tr>
+    <tr>
+      <td><strong>Android</strong></td>
+      <td class="pending">No bulletin yet</td>
+      <td>&mdash;</td>
+      <td>Monthly security bulletin process</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>SUSE policy note:</strong> SUSE has declared that they &ldquo;will no longer fix all CVEs in the Linux Kernel&rdquo; (TID 21496). While this CVE is marked Important/7.8, SUSE&rsquo;s selective patching policy introduces uncertainty about timeline.</p>
+
+<!-- ============================================================ -->
+<h2>Pre-Patch Mitigations: Who Has What</h2>
+
+<table>
+  <thead>
+    <tr><th>Mitigation</th><th>RHEL</th><th>Ubuntu</th><th>SUSE</th><th>Amazon Linux</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Module blacklist (<code>algif_aead</code>)</td>
+      <td class="vulnerable">No &mdash; compiled in (<code>=y</code>)</td>
+      <td class="pending">Depends on build</td>
+      <td class="pending">Depends on build</td>
+      <td class="pending">Depends on build</td>
+    </tr>
+    <tr>
+      <td>Custom MAC policy for <code>AF_ALG</code> sockets</td>
+      <td class="fixed">Yes &mdash; SELinux custom module</td>
+      <td class="pending">Per-profile only &mdash; <code>deny network alg,</code> in each AppArmor profile</td>
+      <td class="pending">Per-profile only &mdash; <code>deny network alg,</code> in each AppArmor profile</td>
+      <td class="pending">SELinux available but not default</td>
+    </tr>
+    <tr>
+      <td>Container seccomp for <code>AF_ALG</code></td>
+      <td class="fixed">Yes &mdash; Podman custom seccomp</td>
+      <td class="pending">Docker custom seccomp (manual)</td>
+      <td class="pending">Docker custom seccomp (manual)</td>
+      <td class="pending">ECS/EKS seccomp (complex)</td>
+    </tr>
+    <tr>
+      <td>systemd <code>RestrictAddressFamilies</code></td>
+      <td class="fixed">Yes &mdash; per-service override</td>
+      <td class="fixed">Yes &mdash; per-service override</td>
+      <td class="fixed">Yes &mdash; per-service override</td>
+      <td class="fixed">Yes &mdash; per-service override</td>
+    </tr>
+    <tr>
+      <td>Fleet deployment of mitigation</td>
+      <td class="fixed">Ansible + Satellite &mdash; minutes</td>
+      <td class="vulnerable">Manual or ad-hoc tooling</td>
+      <td class="pending">SUSE Manager (if deployed)</td>
+      <td class="pending">SSM (AWS-managed only)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>RHEL Remediation: Three Layers, All Available Today</h2>
+
+<h3><span class="step-num">1</span> Containers: Block <code>AF_ALG</code> at the seccomp layer (5 minutes)</h3>
+
+<p>Create a custom seccomp profile that blocks <code>AF_ALG</code> socket creation. Apply to all Podman containers.</p>
+
+<pre><code>{
+  "defaultAction": "SCMP_ACT_ALLOW",
+  "syscalls": [
+    {
+      "names": ["socket"],
+      "action": "SCMP_ACT_ERRNO",
+      "errnoRet": 93,
+      "args": [
+        {
+          "index": 0,
+          "value": 38,
+          "op": "SCMP_CMP_EQ"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+<pre><code># Save as /etc/containers/seccomp-no-af-alg.json
+# Apply to containers:
+podman run --security-opt seccomp=/etc/containers/seccomp-no-af-alg.json ...
+
+# Or set as default in /etc/containers/containers.conf:
+# [containers]
+# seccomp_profile = "/etc/containers/seccomp-no-af-alg.json"</code></pre>
+
+<h3><span class="step-num">2</span> Services: <code>RestrictAddressFamilies</code> via systemd (5 minutes per service)</h3>
+
+<p>For any systemd-managed service, restrict socket creation to only the families it needs.</p>
+
+<pre><code># /etc/systemd/system/myservice.service.d/no-af-alg.conf
+[Service]
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK</code></pre>
+
+<pre><code># Deploy fleet-wide via Ansible:
+- name: Block AF_ALG for critical services
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ item }}.service.d/cve-2026-31431.conf"
+    content: |
+      [Service]
+      RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+  loop:
+    - httpd
+    - postgresql
+    - nginx
+  notify: reload systemd
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  listen: reload systemd</code></pre>
+
+<h3><span class="step-num">3</span> Fleet Deployment: Ansible Automation Platform + Red Hat Satellite</h3>
+
+<p>This is where RHEL pulls ahead of every other distribution. The mitigation above &mdash; seccomp profiles and systemd overrides &mdash; can be pushed to <strong>every managed host in minutes</strong> using infrastructure that RHEL customers already have deployed.</p>
+
+<pre><code># Full CVE-2026-31431 mitigation playbook
+# Push via Ansible Automation Platform or run ad-hoc against Satellite inventory
+
+- name: CVE-2026-31431 pre-patch mitigation
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Deploy seccomp profile blocking AF_ALG
+      ansible.builtin.copy:
+        dest: /etc/containers/seccomp-no-af-alg.json
+        mode: '0644'
+        content: |
+          {
+            "defaultAction": "SCMP_ACT_ALLOW",
+            "syscalls": [
+              {
+                "names": ["socket"],
+                "action": "SCMP_ACT_ERRNO",
+                "errnoRet": 93,
+                "args": [
+                  { "index": 0, "value": 38, "op": "SCMP_CMP_EQ" }
+                ]
+              }
+            ]
+          }
+      when: ansible_facts.packages['podman'] is defined
+
+    - name: Set seccomp default in containers.conf
+      community.general.ini_file:
+        path: /etc/containers/containers.conf
+        section: containers
+        option: seccomp_profile
+        value: '"/etc/containers/seccomp-no-af-alg.json"'
+      when: ansible_facts.packages['podman'] is defined
+
+    - name: Deploy systemd overrides for exposed services
+      ansible.builtin.copy:
+        dest: "/etc/systemd/system/{{ item }}.service.d/cve-2026-31431.conf"
+        mode: '0644'
+        content: |
+          [Service]
+          RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+      loop: "{{ cve_31431_services | default(['httpd', 'nginx', 'postgresql', 'mariadb', 'tomcat']) }}"
+      when: ansible_facts.services[item + '.service'] is defined
+      notify: reload systemd
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      listen: reload systemd</code></pre>
+
+<div class="callout">
+  <span class="label">Deployment comparison</span>
+  <strong>RHEL + Ansible + Satellite:</strong> Write the playbook once. Push to thousands of hosts via Ansible Automation Platform job template. Satellite inventory ensures you hit every registered system. Total time: minutes.<br><br>
+  <strong>Ubuntu:</strong> No equivalent fleet orchestration included. Landscape exists but is separately licensed and less common. Most shops use ad-hoc SSH loops or Ansible without a centralized inventory.<br><br>
+  <strong>SUSE:</strong> SUSE Manager can push Salt states, but adoption is lower and SUSE&rsquo;s selective CVE patching policy means the kernel fix itself may never ship.<br><br>
+  <strong>Amazon Linux:</strong> AWS Systems Manager (SSM) works for EC2/ECS, but only for AWS-managed instances. Hybrid and on-prem Amazon Linux systems require separate tooling.
+</div>
+
+<!-- ============================================================ -->
+<h2>When the Kernel Patch Ships</h2>
+
+<p>Pre-patch mitigations buy time. The real question is: <strong>when the vendor ships the fixed kernel, how fast can you deploy it across your entire fleet?</strong></p>
+
+<h3>RHEL: Satellite Content View Workflow</h3>
+
+<ol>
+  <li><strong>Errata arrives</strong> &mdash; Red Hat publishes the kernel advisory (RHSA) with the fix</li>
+  <li><strong>Satellite syncs</strong> &mdash; Your Satellite server automatically pulls the new packages</li>
+  <li><strong>Content view promotion</strong> &mdash; Stage &rarr; Test &rarr; Production lifecycle environments</li>
+  <li><strong>Ansible job template</strong> &mdash; Push <code>dnf update kernel</code> to all hosts matching the CVE filter</li>
+  <li><strong>Reboot orchestration</strong> &mdash; Rolling reboots via Ansible with health checks between batches</li>
+</ol>
+
+<pre><code># Satellite: filter errata by CVE and promote
+hammer content-view filter create \
+  --name "CVE-2026-31431" \
+  --type erratum \
+  --content-view "RHEL-Production" \
+  --organization "MyOrg"
+
+hammer content-view filter rule create \
+  --content-view-filter "CVE-2026-31431" \
+  --content-view "RHEL-Production" \
+  --errata-id "RHSA-2026:XXXX" \
+  --organization "MyOrg"
+
+hammer content-view publish \
+  --name "RHEL-Production" \
+  --organization "MyOrg"
+
+hammer content-view version promote \
+  --content-view "RHEL-Production" \
+  --to-lifecycle-environment "Production" \
+  --organization "MyOrg"</code></pre>
+
+<h3>RHEL Image Mode: Atomic Update with Rollback</h3>
+
+<p>For RHEL systems deployed via <strong>bootc image mode</strong>, the kernel update is an atomic image swap with automatic rollback if the new image fails to boot.</p>
+
+<pre><code># Build updated image with patched kernel
+podman build -t registry.internal/rhel10-patched:cve-31431 .
+
+# Push to registry
+podman push registry.internal/rhel10-patched:cve-31431
+
+# On each host (or via Ansible):
+bootc upgrade
+systemctl reboot
+
+# If boot fails, GRUB automatically rolls back to previous image</code></pre>
+
+<div class="callout key">
+  <span class="label">Why this matters</span>
+  On Ubuntu or SUSE, a failed kernel update means manual GRUB recovery or booting from rescue media. On RHEL image mode, it&rsquo;s automatic. At fleet scale, the difference between &ldquo;one bad kernel bricks 200 servers&rdquo; and &ldquo;200 servers automatically roll back and page the admin&rdquo; is measured in downtime hours and incident severity.
+</div>
+
+<h3>Post-Patch Deployment Speed Comparison</h3>
+
+<table>
+  <thead>
+    <tr><th>Capability</th><th>RHEL</th><th>Ubuntu</th><th>SUSE</th><th>Amazon Linux</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centralized patch management</td>
+      <td class="fixed">Satellite (included)</td>
+      <td class="pending">Landscape (separate license)</td>
+      <td class="pending">SUSE Manager</td>
+      <td class="pending">SSM (AWS only)</td>
+    </tr>
+    <tr>
+      <td>Errata-level targeting</td>
+      <td class="fixed">Yes &mdash; filter by CVE ID</td>
+      <td class="vulnerable">No &mdash; package-level only</td>
+      <td class="pending">Yes (if SUSE patches it)</td>
+      <td class="pending">ALAS advisory</td>
+    </tr>
+    <tr>
+      <td>Lifecycle environments</td>
+      <td class="fixed">Stage &rarr; Test &rarr; Prod</td>
+      <td class="vulnerable">Manual repo management</td>
+      <td class="pending">Channel-based</td>
+      <td class="vulnerable">N/A</td>
+    </tr>
+    <tr>
+      <td>Orchestrated fleet reboot</td>
+      <td class="fixed">Ansible rolling reboot</td>
+      <td class="pending">Manual or ad-hoc</td>
+      <td class="pending">Salt-based</td>
+      <td class="pending">SSM maintenance windows</td>
+    </tr>
+    <tr>
+      <td>Atomic rollback on failed boot</td>
+      <td class="fixed">bootc image mode</td>
+      <td class="vulnerable">No</td>
+      <td class="pending">Btrfs snapshots (manual)</td>
+      <td class="vulnerable">No</td>
+    </tr>
+    <tr>
+      <td>CVE assessment automation</td>
+      <td class="fixed">Red Hat Insights + Lightspeed</td>
+      <td class="vulnerable">No equivalent</td>
+      <td class="vulnerable">No equivalent</td>
+      <td class="pending">Inspector (limited)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Red Hat Insights: Know Before You Patch</h2>
+
+<p>Red Hat Insights &mdash; included with every RHEL subscription &mdash; provides CVE assessment across your entire fleet <em>before</em> the patch ships. For CVE-2026-31431:</p>
+
+<ul>
+  <li><strong>Vulnerability dashboard:</strong> Shows which systems are affected based on kernel version and config</li>
+  <li><strong>Advisor recommendations:</strong> Pre-built remediation playbooks downloadable directly into Ansible Automation Platform</li>
+  <li><strong>Compliance reporting:</strong> Demonstrate to auditors which systems have mitigations applied and which are pending kernel update</li>
+</ul>
+
+<p>No other distribution provides a comparable integrated vulnerability assessment and remediation pipeline at zero additional cost.</p>
+
+<!-- ============================================================ -->
+<h2>Summary: The RHEL Advantage</h2>
+
+<div class="callout key">
+  <span class="label">Three things RHEL can do today that no one else can match</span>
+  <ol>
+    <li><strong>SELinux custom module</strong> &mdash; Block <code>AF_ALG</code> socket creation system-wide with a single policy module. AppArmor (Ubuntu, SUSE) can deny <code>AF_ALG</code> per-profile (<code>deny network alg,</code>) but requires updating every confined application&rsquo;s profile individually &mdash; no system-wide equivalent.</li>
+    <li><strong>Ansible + Satellite fleet deployment</strong> &mdash; Push the seccomp and systemd mitigations to every managed host in minutes, with inventory-driven targeting and compliance reporting. No other distro bundles equivalent orchestration.</li>
+    <li><strong>bootc atomic rollback</strong> &mdash; When the kernel patch ships, deploy it as an atomic image update. Failed boot = automatic rollback. At scale, this eliminates the &ldquo;bad kernel, 200 servers down&rdquo; scenario entirely.</li>
+  </ol>
+</div>
+
+<p>The kernel patch race is a wash &mdash; every enterprise vendor is pending. What separates RHEL is the operational machinery around the patch: <strong>the ability to mitigate now, deploy safely when the fix ships, and prove compliance throughout.</strong></p>
+
+<div class="footer">
+  <p>Jim O'Donnell &bull; Red Hat &bull; RHEL Specialist Solutions Architect &bull; 2026-04-30</p>
+</div>
+
+</body>
+</html>
