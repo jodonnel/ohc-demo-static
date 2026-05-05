@@ -187,18 +187,18 @@
 </head>
 <body>
 
-<span class="doc-label">CVE-2026-31431 &mdash; Remediation Comparison &mdash; 2026-04-30</span>
+<span class="doc-label">CVE-2026-31431 &mdash; Remediation Comparison &mdash; 2026-05-05</span>
 
 <h1>Who Can Fix Copy Fail &mdash; and How Fast</h1>
 <p class="subtitle">Kernel patch status, pre-patch mitigations, and fleet deployment across every major Linux distribution</p>
 
 <div class="callout key">
   <span class="label">The bottom line</span>
-  As of April 30, 2026 &mdash; one day after disclosure &mdash; <strong>no enterprise distribution has shipped a kernel patch.</strong> Every production RHEL, Ubuntu, SUSE, and Amazon Linux system is unpatched. The differentiator is not who patches first. It is: <strong>what can you do right now before the patch ships, and how fast can you deploy it when it does?</strong>
+  As of May 5, 2026 &mdash; <strong>Red Hat has shipped kernel patches for RHEL 8, 9, and 10.</strong> The differentiator is now clear: <strong>RHEL customers who had Satellite and Ansible in place deployed the fix across their fleet in minutes. Everyone else is still catching up.</strong>
 </div>
 
 <!-- ============================================================ -->
-<h2>Kernel Patch Status (as of 2026-04-30)</h2>
+<h2>Kernel Patch Status (as of 2026-05-05)</h2>
 
 <table>
   <thead>
@@ -207,21 +207,21 @@
   <tbody>
     <tr>
       <td><strong>Red Hat Enterprise Linux 10</strong></td>
-      <td class="pending">Pending</td>
-      <td>&mdash;</td>
-      <td>Bugzilla 2460538 (Status: NEW)</td>
+      <td class="fixed">Fixed</td>
+      <td>See RHSA errata</td>
+      <td>Bugzilla 2460538 &mdash; patch shipped</td>
     </tr>
     <tr>
       <td><strong>Red Hat Enterprise Linux 9</strong></td>
-      <td class="pending">Pending</td>
-      <td>&mdash;</td>
-      <td>Bugzilla 2460538</td>
+      <td class="fixed">Fixed</td>
+      <td>See RHSA errata</td>
+      <td>Bugzilla 2460538 &mdash; patch shipped</td>
     </tr>
     <tr>
       <td><strong>Red Hat Enterprise Linux 8</strong></td>
-      <td class="pending">Pending</td>
-      <td>&mdash;</td>
-      <td>Bugzilla 2460538</td>
+      <td class="fixed">Fixed</td>
+      <td>See RHSA errata</td>
+      <td>Bugzilla 2460538 &mdash; patch shipped</td>
     </tr>
     <tr>
       <td><strong>Ubuntu 24.04 / 22.04 / 20.04</strong></td>
