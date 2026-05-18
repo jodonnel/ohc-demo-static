@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Hat Satellite — Capsule Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Red Hat Text', system-ui, sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    width: 100vw;
+    padding: 6vh 8vw 10vh;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .slide.active { display: flex; }
+  .slide.center { align-items: center; text-align: center; }
+
+  h1 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    color: #1a1a1a;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: #1a1a1a;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    color: #666;
+    margin-top: 0.5rem;
+  }
+
+  .red-bar {
+    width: 80px;
+    height: 4px;
+    background: #cc0000;
+    margin-bottom: 2rem;
+  }
+
+  ul { list-style: none; padding: 0; max-width: 70vw; }
+
+  li {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    line-height: 1.5;
+    padding: 0.6rem 0 0.6rem 2rem;
+    position: relative;
+    color: #333;
+  }
+
+  li::before {
+    content: "\25b8";
+    position: absolute;
+    left: 0;
+    color: #cc0000;
+    font-weight: bold;
+  }
+
+  li strong { color: #000; }
+
+  li code {
+    background: #f0f0f0;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: #333;
+  }
+
+  .callout {
+    background: #f5f5f5;
+    border-left: 4px solid #cc0000;
+    padding: 1.5rem 2rem;
+    margin-top: 1.5rem;
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    color: #333;
+    max-width: 70vw;
+    line-height: 1.6;
+  }
+
+  .callout strong { color: #000; }
+
+  .diagram-svg {
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 75vw;
+  }
+
+  .diagram-svg svg { width: 100%; height: auto; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 80vw;
+    margin-top: 1rem;
+  }
+
+  .col h3 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: #0066cc;
+    margin-bottom: 0.8rem;
+  }
+
+  .col ul li { font-size: clamp(0.95rem, 1.6vw, 1.2rem); }
+
+  .product-row {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .product-row img { height: 28px; opacity: 0.8; }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+  }
+
+  .pipeline .step {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    color: #1a1a1a;
+    font-weight: 500;
+  }
+
+  .pipeline .step.red { border-color: #cc0000; color: #cc0000; background: #fff5f5; }
+  .pipeline .step.blue { border-color: #0066cc; color: #0066cc; background: #f0f5ff; }
+
+  .pipeline .chevron { color: #999; font-size: 1.4rem; }
+
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .tag-new { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+
+  /* persistent footer with logos */
+  .logo-footer {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    background: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    z-index: 100;
+  }
+
+  .logo-footer img { height: 24px; }
+  .logo-footer .logo-right { display: flex; align-items: center; gap: 1.5rem; }
+
+  /* slide counter */
+  .counter {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: #999;
+    font-family: 'Red Hat Text', monospace;
+    z-index: 101;
+  }
+
+  /* Red Hat bar top */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 4px;
+    background: #cc0000;
+    z-index: 100;
+  }
+
+  .notes { display: none; }
+
+  @media print {
+    .slide { display: flex !important; position: relative; page-break-after: always; height: 100vh; }
+    .counter, .topbar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="logo-footer">
+  <img src="assets/logos/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat">
+  <div class="logo-right">
+    <img src="assets/logos/Logo-Red_Hat-Satellite-A-Standard-RGB.svg" alt="Red Hat Satellite">
+  </div>
+</div>
+
+<div class="counter"><span id="current">1</span> / <span id="total"></span></div>
+
+<!-- SLIDE 1: Title -->
+<div class="slide center active" id="s1">
+  <img src="assets/logos/Logo-Red_Hat-Satellite-A-Standard-RGB.svg" alt="Red Hat Satellite" style="height:40px; margin-bottom:2rem;">
+  <div class="red-bar" style="margin-left:auto;margin-right:auto;"></div>
+  <h1>Red Hat Satellite<br>Capsule Architecture</h1>
+  <div class="subtitle">What Capsules are, why you need them, and how content flows</div>
+  <div class="notes">Opening context: "This is a practical walkthrough — not a deep-dive admin session. We want you to understand the architecture so you can make good decisions about where to put Capsules and why."</div>
+</div>
+
+<!-- SLIDE 2: The Problem -->
+<div class="slide" id="s2">
+  <h2>The Problem</h2>
+  <div class="red-bar"></div>
+  <ul>
+    <li><strong>One Satellite server</strong> manages content, subscriptions, and policies centrally</li>
+    <li><strong>Multiple locations</strong> — different sites, different networks, different countries</li>
+    <li><strong>Bandwidth is expensive</strong> — every host pulling RPMs across the WAN doesn't scale</li>
+  </ul>
+  <div class="callout">
+    If you have hosts in more than one location, or hosts in networks that can't reach your Satellite directly — you need Capsules.
+  </div>
+  <div class="notes">Keep this conversational. "Has anyone here had the experience of 500 hosts all trying to pull a RHEL update across the WAN at the same time?"</div>
+</div>
+
+<!-- SLIDE 3: What Is a Capsule -->
+<div class="slide" id="s3">
+  <h2>What Is a Capsule?</h2>
+  <div class="red-bar"></div>
+  <ul>
+    <li><strong>Regional mirror + proxy</strong> — brings Satellite services to your hosts' location</li>
+    <li><strong>Hosts register to the Capsule</strong>, not to the Satellite</li>
+    <li><strong>Satellite stays the single authority</strong> — Capsules don't make policy decisions</li>
+  </ul>
+  <div class="callout">
+    Think of it this way: <strong>Satellite is the library catalog. Capsules are the branch libraries.</strong> The catalog decides what's on the shelves. The branches serve the local readers.
+  </div>
+  <div class="notes">The branch library analogy works well with non-technical stakeholders. Satellite = central catalog, Capsule = local branch.</div>
+</div>
+
+<!-- SLIDE 4: Hub and Spoke diagram -->
+<div class="slide" id="s4">
+  <h2>Hub and Spoke</h2>
+  <div class="red-bar"></div>
+  <div class="diagram-svg">
+  <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <!-- Satellite Server -->
+    <rect x="310" y="20" width="280" height="80" rx="8" fill="#fff5f5" stroke="#cc0000" stroke-width="2"/>
+    <text x="450" y="50" text-anchor="middle" fill="#cc0000" font-family="Red Hat Display,sans-serif" font-weight="700" font-size="18">Satellite Server</text>
+    <text x="450" y="76" text-anchor="middle" fill="#666" font-family="Red Hat Text,sans-serif" font-size="13">content · policy · subscriptions</text>
+
+    <!-- Trunk line -->
+    <line x1="450" y1="100" x2="450" y2="150" stroke="#ccc" stroke-width="2"/>
+    <line x1="130" y1="150" x2="770" y2="150" stroke="#ccc" stroke-width="2"/>
+
+    <!-- Drop lines -->
+    <line x1="150" y1="150" x2="150" y2="190" stroke="#ccc" stroke-width="2"/>
+    <line x1="450" y1="150" x2="450" y2="190" stroke="#ccc" stroke-width="2"/>
+    <line x1="750" y1="150" x2="750" y2="190" stroke="#ccc" stroke-width="2"/>
+
+    <!-- Sync arrows -->
+    <polygon points="150,186 145,176 155,176" fill="#0066cc"/>
+    <polygon points="450,186 445,176 455,176" fill="#0066cc"/>
+    <polygon points="750,186 745,176 755,176" fill="#0066cc"/>
+
+    <!-- Capsule East -->
+    <rect x="50" y="190" width="200" height="70" rx="8" fill="#f0f5ff" stroke="#0066cc" stroke-width="2"/>
+    <text x="150" y="220" text-anchor="middle" fill="#0066cc" font-family="Red Hat Display,sans-serif" font-weight="700" font-size="16">Capsule East</text>
+    <text x="150" y="244" text-anchor="middle" fill="#666" font-family="Red Hat Text,sans-serif" font-size="13">Virginia</text>
+
+    <!-- Capsule West -->
+    <rect x="350" y="190" width="200" height="70" rx="8" fill="#f0f5ff" stroke="#0066cc" stroke-width="2"/>
+    <text x="450" y="220" text-anchor="middle" fill="#0066cc" font-family="Red Hat Display,sans-serif" font-weight="700" font-size="16">Capsule West</text>
+    <text x="450" y="244" text-anchor="middle" fill="#666" font-family="Red Hat Text,sans-serif" font-size="13">Oregon</text>
+
+    <!-- Capsule EU -->
+    <rect x="650" y="190" width="200" height="70" rx="8" fill="#f0f5ff" stroke="#0066cc" stroke-width="2"/>
+    <text x="750" y="220" text-anchor="middle" fill="#0066cc" font-family="Red Hat Display,sans-serif" font-weight="700" font-size="16">Capsule EU</text>
+    <text x="750" y="244" text-anchor="middle" fill="#666" font-family="Red Hat Text,sans-serif" font-size="13">Belgium</text>
+
+    <!-- Connection lines to hosts -->
+    <line x1="110" y1="260" x2="110" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="150" y1="260" x2="150" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="190" y1="260" x2="190" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="410" y1="260" x2="410" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="450" y1="260" x2="450" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="490" y1="260" x2="490" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="710" y1="260" x2="710" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="750" y1="260" x2="750" y2="310" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="790" y1="260" x2="790" y2="310" stroke="#ddd" stroke-width="1.5"/>
+
+    <!-- Host icons -->
+    <rect x="98" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="138" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="178" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="398" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="438" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="478" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="698" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="738" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="778" y="310" width="24" height="30" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+
+    <!-- RHEL labels on hosts -->
+    <text x="110" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="150" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="190" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="410" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="450" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="490" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="710" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="750" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+    <text x="790" y="330" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="8" font-weight="700">RHEL</text>
+
+    <!-- Host group labels -->
+    <text x="150" y="370" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="12">managed hosts</text>
+    <text x="450" y="370" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="12">managed hosts</text>
+    <text x="750" y="370" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="12">managed hosts</text>
+
+    <!-- Bottom note -->
+    <text x="450" y="410" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="11" font-style="italic">each Capsule syncs content from Satellite on a schedule you control</text>
+  </svg>
+  </div>
+  <div class="notes">Draw their attention to the fact that the EU Capsule is the same architecture — geography doesn't change the pattern. Each Capsule syncs from Satellite on a schedule you control.</div>
+</div>
+
+<!-- SLIDE 5: What Flows Through a Capsule -->
+<div class="slide" id="s5">
+  <h2>What Flows Through a Capsule</h2>
+  <div class="red-bar"></div>
+  <div class="two-col">
+    <div class="col">
+      <h3>Content</h3>
+      <ul>
+        <li>RPM repositories (RHEL, custom)</li>
+        <li>Errata (security, bugfix, enhancement)</li>
+        <li>Kickstart trees for provisioning</li>
+        <li>Container images (if configured)</li>
+      </ul>
+      <div class="product-row">
+        <img src="assets/logos/Logo-Red_Hat-Enterprise_Linux-A-Standard-RGB.svg" alt="RHEL">
+      </div>
+    </div>
+    <div class="col">
+      <h3>Services</h3>
+      <ul>
+        <li>DHCP, DNS, TFTP (bare-metal provisioning)</li>
+        <li>Ansible / Puppet configuration</li>
+        <li>OpenSCAP compliance scanning</li>
+        <li>Host registration + subscription</li>
+      </ul>
+      <div class="product-row">
+        <img src="assets/logos/Logo-Red_Hat-Ansible_Automation_Platform-A-Standard-RGB.svg" alt="Ansible Automation Platform">
+      </div>
+    </div>
+  </div>
+  <div class="callout">
+    A Capsule can run <strong>all</strong> of these services or <strong>just content mirroring</strong> — you decide per site.
+  </div>
+  <div class="notes">This is where you gauge the room. If they only care about content mirroring, don't spend time on DHCP/TFTP. If they're doing bare-metal provisioning, that's a different conversation.</div>
+</div>
+
+<!-- SLIDE 6: Content Lifecycle Pipeline -->
+<div class="slide" id="s6">
+  <h2>Content Lifecycle — The Pipeline</h2>
+  <div class="red-bar"></div>
+  <div class="pipeline">
+    <div class="step red">Content View</div>
+    <div class="chevron">&rarr;</div>
+    <div class="step">Publish</div>
+    <div class="chevron">&rarr;</div>
+    <div class="step">Dev</div>
+    <div class="chevron">&rarr;</div>
+    <div class="step">Test</div>
+    <div class="chevron">&rarr;</div>
+    <div class="step">Production</div>
+    <div class="chevron">&rarr;</div>
+    <div class="step blue">Capsule Sync</div>
+  </div>
+  <ul style="margin-top:2rem;">
+    <li><strong>Content View</strong> = curated subset of all available repos and errata</li>
+    <li><strong>Lifecycle Environments</strong> = promotion path (Dev &rarr; Test &rarr; Prod)</li>
+    <li><strong>Capsules sync only what's promoted</strong> to the environment they serve</li>
+  </ul>
+  <div class="callout">
+    This is how you do <strong>controlled rollouts</strong>. A patch doesn't reach production hosts until it's been promoted through every gate — and the Capsule only gets what its environment allows.
+  </div>
+  <div class="notes">This is the money slide for governance people. The pipeline means no patch reaches production without deliberate promotion. For a regulated org, this IS the compliance story.</div>
+</div>
+
+<!-- SLIDE 7: DMZ / Segregated Networks -->
+<div class="slide" id="s7">
+  <h2>Capsules in Segregated Networks</h2>
+  <div class="red-bar"></div>
+  <div class="diagram-svg">
+  <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <!-- Zone backgrounds -->
+    <rect x="20" y="20" width="360" height="260" rx="12" fill="#fafafa" stroke="#ccc" stroke-width="1" stroke-dasharray="6,4"/>
+    <rect x="420" y="20" width="460" height="260" rx="12" fill="#f0f5ff" stroke="#0066cc" stroke-width="1" stroke-dasharray="6,4"/>
+
+    <!-- Zone labels -->
+    <text x="200" y="48" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="12" letter-spacing="2">TRUSTED NETWORK</text>
+    <text x="650" y="48" text-anchor="middle" fill="#0066cc" font-family="Red Hat Text,sans-serif" font-size="12" letter-spacing="2" opacity="0.7">DMZ / RESTRICTED ZONE</text>
+
+    <!-- Firewall line -->
+    <line x1="400" y1="30" x2="400" y2="270" stroke="#cc0000" stroke-width="2" stroke-dasharray="3,6"/>
+    <rect x="388" y="138" width="24" height="30" rx="3" fill="#ffffff" stroke="#cc0000" stroke-width="1.5"/>
+    <text x="400" y="157" text-anchor="middle" fill="#cc0000" font-family="Red Hat Text,sans-serif" font-size="14" font-weight="700">FW</text>
+
+    <!-- Satellite -->
+    <rect x="80" y="100" width="240" height="80" rx="8" fill="#fff5f5" stroke="#cc0000" stroke-width="2"/>
+    <text x="200" y="135" text-anchor="middle" fill="#cc0000" font-family="Red Hat Display,sans-serif" font-weight="700" font-size="17">Satellite Server</text>
+    <text x="200" y="162" text-anchor="middle" fill="#666" font-family="Red Hat Text,sans-serif" font-size="12">never exposed to DMZ</text>
+
+    <!-- Arrow Satellite to Capsule -->
+    <line x1="320" y1="140" x2="500" y2="140" stroke="#0066cc" stroke-width="2"/>
+    <polygon points="500,140 490,135 490,145" fill="#0066cc"/>
+    <text x="418" y="128" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="11">port 443</text>
+
+    <!-- DMZ Capsule -->
+    <rect x="500" y="90" width="240" height="80" rx="8" fill="#f0f5ff" stroke="#0066cc" stroke-width="2"/>
+    <text x="620" y="123" text-anchor="middle" fill="#0066cc" font-family="Red Hat Display,sans-serif" font-weight="700" font-size="17">DMZ Capsule</text>
+    <text x="620" y="150" text-anchor="middle" fill="#666" font-family="Red Hat Text,sans-serif" font-size="12">content + registration</text>
+
+    <!-- Lines to hosts -->
+    <line x1="560" y1="170" x2="560" y2="210" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="600" y1="170" x2="600" y2="210" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="640" y1="170" x2="640" y2="210" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="680" y1="170" x2="680" y2="210" stroke="#ddd" stroke-width="1.5"/>
+    <line x1="720" y1="170" x2="720" y2="210" stroke="#ddd" stroke-width="1.5"/>
+
+    <!-- Host icons -->
+    <rect x="548" y="210" width="24" height="28" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="588" y="210" width="24" height="28" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="628" y="210" width="24" height="28" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="668" y="210" width="24" height="28" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+    <rect x="708" y="210" width="24" height="28" rx="3" fill="#f0fff0" stroke="#2e7d32" stroke-width="1.5"/>
+
+    <!-- RHEL labels -->
+    <text x="560" y="228" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="7" font-weight="700">RHEL</text>
+    <text x="600" y="228" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="7" font-weight="700">RHEL</text>
+    <text x="640" y="228" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="7" font-weight="700">RHEL</text>
+    <text x="680" y="228" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="7" font-weight="700">RHEL</text>
+    <text x="720" y="228" text-anchor="middle" fill="#2e7d32" font-family="Red Hat Text,sans-serif" font-size="7" font-weight="700">RHEL</text>
+
+    <!-- Host label -->
+    <text x="640" y="265" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="12">hosts that cannot reach the trusted network</text>
+
+    <!-- Bottom note -->
+    <text x="450" y="320" text-anchor="middle" fill="#999" font-family="Red Hat Text,sans-serif" font-size="11" font-style="italic">Satellite initiates the sync outbound. DMZ hosts never need inbound access to the trusted zone.</text>
+  </svg>
+  </div>
+  <ul style="margin-top:1.5rem;">
+    <li><strong>Satellite never directly exposed</strong> to untrusted networks</li>
+    <li>Capsule sits where the hosts are — <strong>firewall rules stay clean</strong></li>
+    <li>Common in <strong>financial services, healthcare, defense</strong></li>
+  </ul>
+  <div class="notes">This is the slide that matters most for a regulated financial org. Their security team will care that Satellite itself never needs to be reachable from restricted zones. The Capsule is the only thing exposed.</div>
+</div>
+
+<!-- SLIDE 8: Capsule Sizing -->
+<div class="slide" id="s8">
+  <h2>Capsule Sizing — Rules of Thumb</h2>
+  <div class="red-bar"></div>
+  <ul>
+    <li><strong>One Capsule per ~3,000 hosts</strong> (content-only; fewer if running provisioning services)</li>
+    <li><strong>Storage scales with Content Views</strong> — more repos synced = more disk</li>
+    <li><strong>Minimum:</strong> 4 cores, 20 GB RAM, 300+ GB disk (content dependent)</li>
+    <li><strong>Sync schedule matters</strong> — stagger Capsule syncs to avoid saturating WAN links</li>
+  </ul>
+  <div class="callout">
+    Don't over-consolidate. <strong>One Capsule per site</strong> is the default assumption. If a site has 200 hosts or 2,000 — it still gets a Capsule. The cost is one VM. The risk of not having one is a site that goes dark during a WAN outage.
+  </div>
+  <div class="notes">The "one Capsule per site" framing cuts through overthinking. It's a VM. It's cheap insurance. The alternative is hosts that can't get patches when the WAN flaps.</div>
+</div>
+
+<!-- SLIDE 9: Capsule Backups -->
+<div class="slide" id="s9">
+  <h2>Capsule Backups — Regional Resilience</h2>
+  <div class="red-bar"></div>
+  <ul>
+    <li><strong>Each Capsule should be independently recoverable</strong></li>
+    <li><code>satellite-maintain backup</code> works on Capsules — same tooling as Satellite</li>
+    <li><strong>If a Capsule dies:</strong> hosts keep running on cached content, but can't get new updates or register new hosts</li>
+  </ul>
+  <div class="callout">
+    <strong>Recovery options — fastest to slowest:</strong><br><br>
+    1. Restore from backup &rarr; minutes to hours<br>
+    2. Re-register a fresh Capsule + sync &rarr; hours (depends on content volume)<br>
+    3. Point hosts at another Capsule or Satellite directly &rarr; immediate but architectural debt
+  </div>
+  <div class="notes">This was the specific topic their contact asked about. Regional backup = regional resilience. If Belgium loses their Capsule, they recover from a local backup — they don't wait for Virginia to ship them content across the Atlantic.</div>
+</div>
+
+<!-- SLIDE 10: What's Coming — Satellite 7 -->
+<div class="slide" id="s10">
+  <h2>What's Coming — Satellite 7</h2>
+  <div class="red-bar"></div>
+  <ul>
+    <li><span class="tag tag-new">new</span> <strong>No Satellite 6.20</strong> — jumping straight to Satellite 7.0</li>
+    <li><span class="tag tag-new">new</span> <strong>Containerized deployment</strong> — Satellite and Capsule run as containers</li>
+    <li><strong>Architecture patterns stay the same</strong> — hub-and-spoke, DMZ, regional</li>
+    <li><strong>Deployment gets simpler</strong> — container image, not a full installer</li>
+  </ul>
+  <div class="product-row" style="margin-top:2rem;">
+    <img src="assets/logos/Logo-Red_Hat-OpenShift-A-Standard-RGB.svg" alt="Red Hat OpenShift" style="height:24px;">
+    <img src="assets/logos/Logo-Red_Hat-Ansible_Automation_Platform-A-Standard-RGB.svg" alt="AAP" style="height:24px;">
+    <img src="assets/logos/Logo-Red_Hat-Enterprise_Linux-A-Standard-RGB.svg" alt="RHEL" style="height:24px;">
+  </div>
+  <div class="callout">
+    Rich Jerrido (PM) is joining at 2:30 to walk through the roadmap. <strong>Invest in your Capsule architecture now</strong> — the topology you build today carries directly into Satellite 7.
+  </div>
+  <div class="notes">Keep this brief — Rich has the roadmap. The key message: nothing you build today is throwaway. Capsule architecture is topology, and that topology persists into Sat 7.</div>
+</div>
+
+<!-- SLIDE 11: Takeaway -->
+<div class="slide center" id="s11">
+  <div class="red-bar" style="margin-left:auto;margin-right:auto;"></div>
+  <h2>Capsules are how Satellite scales<br>across geography and network boundaries.</h2>
+  <div class="subtitle" style="margin-top:1.5rem; max-width:60vw; margin-left:auto; margin-right:auto;">
+    Every site with managed hosts should have one.<br>
+    The Capsule is the last mile.
+  </div>
+  <div class="notes">Land the plane. "Every site gets a Capsule. It's a VM. It's cheap insurance. And the architecture you build today carries into Satellite 7."</div>
+</div>
+
+<script>
+(function(){
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let idx = 0;
+  document.getElementById('total').textContent = total;
+
+  function show(n) {
+    slides[idx].classList.remove('active');
+    idx = (n + total) % total;
+    slides[idx].classList.add('active');
+    document.getElementById('current').textContent = idx + 1;
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(idx + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); show(idx - 1); }
+    if (e.key === 'Home') { e.preventDefault(); show(0); }
+    if (e.key === 'End') { e.preventDefault(); show(total - 1); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  let touchX = 0;
+  document.addEventListener('touchstart', function(e) { touchX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].screenX - touchX;
+    if (dx < -50) show(idx + 1);
+    if (dx > 50) show(idx - 1);
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.clientX > window.innerWidth * 0.5) show(idx + 1);
+    else show(idx - 1);
+  });
+})();
+</script>
+</body>
+</html>
