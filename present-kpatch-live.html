@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>your organization — Kernel Live Patching (kpatch)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Red Hat Display", "Segoe UI", system-ui, sans-serif; background: #151515; color: #fff; overflow: hidden; }
+
+  .slide {
+    width: 100vw; height: 100vh;
+    display: none; flex-direction: column; justify-content: center;
+    padding: 6vh 8vw;
+    position: relative;
+    transition: padding-right 0.25s ease-out;
+  }
+  .slide.active { display: flex; }
+  .slide::after {
+    content: attr(data-footer);
+    position: absolute; bottom: 3vh; left: 8vw; right: 8vw;
+    font-size: 1.1vw; color: #6a6a6a; border-top: 1px solid #333; padding-top: 1vh;
+  }
+  body.term-open .slide { padding-right: 52vw; }
+
+  h1 { font-size: 4.2vw; font-weight: 700; color: #fff; margin-bottom: 3vh; line-height: 1.1; }
+  h1 span { color: #ee0000; }
+  h2 { font-size: 3vw; font-weight: 700; color: #fff; margin-bottom: 3vh; line-height: 1.15; }
+  h2 span { color: #ee0000; }
+  h3 { font-size: 2vw; font-weight: 600; color: #ccc; margin-bottom: 2vh; }
+
+  .subtitle { font-size: 1.8vw; color: #aaa; margin-bottom: 4vh; }
+  p { font-size: 2vw; color: #ddd; line-height: 1.6; margin-bottom: 2vh; }
+  .accent { color: #ee0000; font-weight: 700; }
+  .muted { color: #888; }
+
+  ul { list-style: none; margin: 0; padding: 0; }
+  ul li { font-size: 2vw; color: #ddd; padding: 1.2vh 0; padding-left: 2vw; position: relative; line-height: 1.4; }
+  ul li::before { content: ""; position: absolute; left: 0; top: 1.8vh; width: 0.8vw; height: 0.8vw; background: #ee0000; border-radius: 50%; }
+
+  .demo-label {
+    display: inline-block; font-size: 1.2vw; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.15em; padding: 0.8vh 1.5vw; border: 2px solid #ee0000; color: #ee0000;
+    border-radius: 4px; margin-bottom: 3vh;
+  }
+
+  .takeaway {
+    background: rgba(238, 0, 0, 0.08); border-left: 4px solid #ee0000;
+    padding: 2vh 2.5vw; margin-top: 3vh; font-size: 1.8vw; color: #fff; line-height: 1.5;
+  }
+  .takeaway strong { color: #ee0000; }
+
+  .agenda-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3vh 4vw; margin-top: 2vh;
+  }
+  .agenda-card {
+    background: rgba(255,255,255,0.04); border: 1px solid #333; border-radius: 8px;
+    padding: 3vh 2.5vw; position: relative;
+  }
+  .agenda-card .num {
+    font-size: 3.5vw; font-weight: 800; color: rgba(238,0,0,0.25); position: absolute;
+    top: 1vh; right: 1.5vw;
+  }
+  .agenda-card h3 { font-size: 1.8vw; color: #fff; margin-bottom: 1vh; }
+  .agenda-card p { font-size: 1.4vw; color: #aaa; margin: 0; }
+
+  .leave-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2.5vh 3vw; margin-top: 2vh;
+  }
+  .leave-item {
+    background: rgba(255,255,255,0.04); border: 1px solid #333; border-radius: 8px;
+    padding: 2.5vh 2vw;
+  }
+  .leave-item h3 { font-size: 1.6vw; color: #ee0000; margin-bottom: 0.8vh; }
+  .leave-item p { font-size: 1.3vw; color: #bbb; margin: 0; }
+
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3vh 4vw; margin-top: 3vh;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.04); border: 1px solid #333; border-radius: 8px;
+    padding: 3vh 2.5vw; text-align: center;
+  }
+  .stat-card .big { font-size: 3vw; font-weight: 800; color: #ee0000; }
+  .stat-card p { font-size: 1.3vw; color: #aaa; margin: 0; margin-top: 1vh; }
+
+  .cmd-list { list-style: none; margin: 2vh 0; padding: 0; }
+  .cmd-list li {
+    font-family: "Red Hat Mono", "Fira Code", monospace;
+    font-size: 2.4vw; color: #fff; padding: 1.5vh 2vw; margin-bottom: 1.2vh;
+    background: rgba(238,0,0,0.06); border: 1px solid #333; border-radius: 6px;
+    cursor: pointer; position: relative; transition: border-color 0.15s;
+  }
+  .cmd-list li::before { display: none; }
+  .cmd-list li:hover { border-color: #ee0000; }
+  .cmd-list li::after {
+    content: "click to copy"; position: absolute; right: 2vw; top: 50%; transform: translateY(-50%);
+    font-family: "Red Hat Text", sans-serif; font-size: 1vw; color: #555;
+  }
+  .cmd-list li.copied::after { content: "copied"; color: #ee0000; }
+
+  .progress {
+    position: fixed; bottom: 0; left: 0; height: 3px; background: #ee0000;
+    transition: width 0.3s ease; z-index: 100;
+  }
+
+  .slide-num {
+    position: fixed; bottom: 3.5vh; right: 3vw; font-size: 1vw; color: #555; z-index: 100;
+  }
+  body.term-open .slide-num { right: 52vw; }
+
+  #term-panel {
+    position: fixed; top: 0; right: 0; width: 50%; height: 100vh;
+    background: #0d0d0d; border-left: 3px solid #ee0000;
+    transform: translateX(100%);
+    transition: transform 0.25s ease-out;
+    z-index: 50; display: flex; flex-direction: column;
+  }
+  #term-panel.open { transform: translateX(0); }
+
+  #term-panel .term-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 14px;
+    background: #111; border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+  #term-panel .term-header .term-tag {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #ee0000;
+  }
+  #term-panel .term-header .term-host {
+    font-size: 11px; color: #555; font-family: "Red Hat Mono", monospace;
+  }
+  #term-panel .term-header .term-close {
+    background: none; border: 1px solid #444; color: #888; border-radius: 3px;
+    padding: 2px 10px; font-size: 11px; cursor: pointer;
+  }
+  #term-panel .term-header .term-close:hover { color: #fff; border-color: #888; }
+
+  #term-panel iframe {
+    flex: 1; width: 100%; border: none; background: #000;
+  }
+
+  #term-btn { display: none; }
+
+  .notes { display: none; }
+  .show-notes .notes {
+    display: block; position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.92); border-top: 2px solid #ee0000;
+    padding: 1.5vh 4vw; font-size: 1.43vw; color: #ccc; max-height: 22vh; overflow-y: auto;
+    font-family: "Red Hat Text", sans-serif; line-height: 1.6; z-index: 40;
+  }
+  body.term-open .show-notes .notes { right: 50%; }
+  .notes .say { color: #fff; font-weight: 700; }
+  .notes .do { color: #f0ab00; font-family: "Red Hat Mono", monospace; font-size: 1.2vw; }
+  .notes .cue { color: #666; font-style: italic; }
+
+  body.presenter-child #term-panel,
+  body.presenter-child #term-btn { display: none !important; }
+
+  .rh-logo {
+    position: fixed; bottom: 2.5vh; right: 3vw; width: 90px; opacity: 0.7; z-index: 90;
+    pointer-events: none;
+  }
+  body.term-open .rh-logo { right: 52vw; }
+</style>
+</head>
+<body>
+
+<img class="rh-logo" src="https://jodonnel.github.io/ohc-demo-static/assets/logos/Logo-Red_Hat-A-Reverse-RGB.svg" alt="Red Hat">
+
+<div id="term-panel">
+  <div class="term-header">
+    <span class="term-tag" id="term-tag">terminal</span>
+    <span class="term-host" id="term-host"></span>
+    <button class="term-close" onclick="closeTerm()">close · T</button>
+  </div>
+  <iframe id="term-frame" src="about:blank"></iframe>
+</div>
+
+<button id="term-btn" onclick="openTerm()">terminal · T</button>
+
+<!-- SLIDE 1: Cover -->
+<div class="slide active" data-footer="Red Hat">
+  <h1>Kernel Live Patching — <span>kpatch</span></h1>
+  <p class="subtitle">Zero-Reboot Security for Critical Infrastructure</p>
+  <p class="muted" style="font-size:1.3vw; margin-top:4vh;">Jim O'Donnell · Solutions Architect · jodonnel@redhat.com</p>
+  <div class="notes"><span class="say">"Thanks for making time. Today I want to show you a capability that's already in your Red Hat Enterprise Linux subscription — one that eliminates reboots for critical kernel security fixes."</span></div>
+</div>
+
+<!-- SLIDE 2: Why Now — Active Exploitation -->
+<div class="slide" data-footer="Red Hat">
+  <h2>Kernel CVEs being exploited <span>right now</span></h2>
+  <ul>
+    <li><strong style="color:#ee0000;">Dirty Frag</strong> — CVSS 8.8 — local privilege escalation via IPsec ESP. Confirmed in-the-wild exploitation.</li>
+    <li><strong style="color:#ee0000;">Copy Fail</strong> — on CISA KEV — heap overflow in NFSv4.0. Added to Known Exploited Vulnerabilities catalog.</li>
+    <li><strong style="color:#ee0000;">Fragnesia</strong> — CVSS 7.8 — introduced by the Dirty Frag patch itself. The fix broke it worse.</li>
+  </ul>
+  <div class="takeaway">Traditional remediation = kernel update + reboot. On utility infrastructure running 24/7, that's a maintenance window you may not have.</div>
+  <div class="notes"><span class="say">"Two kernel CVEs are being actively exploited right now. One is on the CISA KEV list. And the third one — Fragnesia — was actually introduced by the patch for the first one. The fix broke it worse. Traditional remediation means reboot. On utility infrastructure, that's a maintenance window you may not have."</span><br><span class="cue">Don't dwell on fear. This slide earns the right to show the solution. Move briskly.</span></div>
+</div>
+
+<!-- SLIDE 3: Overview — What Is kpatch -->
+<div class="slide" data-footer="Red Hat">
+  <h3>Overview</h3>
+  <h2>Live kernel patching — <span>included in RHEL</span></h2>
+  <ul>
+    <li>kpatch applies critical kernel security fixes without rebooting the system</li>
+    <li>Ships with every Red Hat Enterprise Linux subscription — no additional purchase</li>
+    <li>Patches are applied in running kernel memory using ftrace-based function replacement</li>
+    <li>When you eventually reboot on your normal schedule, the permanent fix is in the updated kernel package</li>
+  </ul>
+  <div class="takeaway">This is not a workaround. It is a supported, production-grade remediation path for kernel CVEs.</div>
+  <div class="notes"><span class="say">"kpatch is live kernel patching. It's included in your RHEL subscription. It applies kernel security fixes in memory — no reboot required. When you do reboot on your normal schedule, the permanent fix is waiting in the updated kernel package."</span><br><span class="cue">Emphasize: included in subscription. Not an add-on. Not a third-party tool.</span></div>
+</div>
+
+<!-- SLIDE 4: Pros and Cons -->
+<div class="slide" data-footer="Red Hat">
+  <h3>Honest assessment</h3>
+  <h2>Pros and <span>limitations</span></h2>
+  <div class="agenda-grid">
+    <div class="agenda-card">
+      <h3>Advantages</h3>
+      <ul>
+        <li style="font-size:1.4vw;">Zero downtime for critical kernel CVE remediation</li>
+        <li style="font-size:1.4vw;">Compliance continuity — meet patch SLAs without maintenance windows</li>
+        <li style="font-size:1.4vw;">Immediate response to actively exploited vulnerabilities</li>
+        <li style="font-size:1.4vw;">No application restart — only the kernel is patched</li>
+        <li style="font-size:1.4vw;">Included in RHEL subscription</li>
+      </ul>
+    </div>
+    <div class="agenda-card">
+      <h3>Limitations</h3>
+      <ul>
+        <li style="font-size:1.4vw;">Not all kernel patches qualify — only security-critical fixes</li>
+        <li style="font-size:1.4vw;">Cumulative: each live patch builds on the last. Eventually, a planned reboot consolidates them</li>
+        <li style="font-size:1.4vw;">Supported on RHEL 7.7+, 8, 9 — specific kernel versions only</li>
+        <li style="font-size:1.4vw;">Does not replace a reboot strategy — it extends the window between reboots</li>
+        <li style="font-size:1.4vw;">Cannot patch data structure changes — only function-level fixes</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notes"><span class="say">"I want to be honest about what kpatch does and doesn't do. It's not a replacement for rebooting — it's a way to extend the window between reboots. The patches are cumulative, so eventually you consolidate with a planned reboot on your schedule. But for critical CVEs — the ones being actively exploited — it gives you immediate protection without downtime."</span><br><span class="cue">LANDMINE: Don't oversell. If someone asks 'can we never reboot?' the answer is no. kpatch buys you time. It does not eliminate reboots.</span></div>
+</div>
+
+<!-- SLIDE 5: Real Use Cases -->
+<div class="slide" data-footer="Red Hat">
+  <h3>Real use cases</h3>
+  <h2>Where kpatch <span>matters most</span></h2>
+  <ul>
+    <li>Dirty Frag (CVE-2026-43284) — actively exploited privilege escalation. kpatch fixes it in minutes, not maintenance windows</li>
+    <li>NERC CIP compliance — patch critical infrastructure systems within mandated timelines without scheduling downtime across substations</li>
+    <li>24/7 utility operations — SCADA hosts, OT monitoring platforms, grid management systems that cannot afford unplanned reboots</li>
+    <li>Data center load management — utility-scale systems tracking, billing, and forecasting load cannot afford unplanned downtime</li>
+  </ul>
+  <div class="notes"><span class="say">"Three real scenarios. First: Dirty Frag is being exploited right now. kpatch lets you fix it today without a maintenance window. Second: NERC CIP requires patching within mandated timelines. kpatch lets you meet those timelines without scheduling downtime across substations. Third: your 70 gigawatt data center pipeline means the systems managing that load — tracking, billing, forecasting — need to stay up."</span><br><span class="cue">The data center load reference connects to the customer's data center infrastructure investment. The systems managing that load are Red Hat's opportunity.</span></div>
+</div>
+
+<!-- SLIDE 6: Requirements -->
+<div class="slide" data-footer="Red Hat">
+  <h3>Requirements</h3>
+  <h2>What you need to <span>get started</span></h2>
+  <ul>
+    <li>Red Hat Enterprise Linux subscription (Standard or Premium) — you may already have this</li>
+    <li>RHEL 7.7+, RHEL 8, or RHEL 9 with a supported kernel version</li>
+    <li>kpatch-dnf plugin — one-time install, enables automatic live patching during dnf updates</li>
+    <li>Red Hat Satellite (optional) — manages kpatch deployment across fleets via content views</li>
+    <li>Red Hat Ansible Automation Platform (optional) — automates kpatch enablement and verification at scale</li>
+  </ul>
+  <div class="takeaway"><strong>Base requirement:</strong> a RHEL subscription. Everything else is scale tooling you may already own.</div>
+  <div class="notes"><span class="say">"The base requirement is a RHEL subscription. That's it. The kpatch-dnf plugin is a one-time install. Satellite and Ansible are the scale tools — if you're managing hundreds of hosts, they make this automatic. But a single host can be live-patched in three commands."</span></div>
+</div>
+
+<!-- SLIDE 7: DEMO — Implementation -->
+<div class="slide" data-footer="Red Hat" data-term="kpatch">
+  <div class="demo-label">LIVE DEMO</div>
+  <h2>Three commands. <span>No reboot.</span></h2>
+  <ul class="cmd-list">
+    <li onclick="copyCmd(this)">sudo dnf install kpatch-dnf</li>
+    <li onclick="copyCmd(this)">sudo dnf kpatch auto</li>
+    <li onclick="copyCmd(this)">sudo kpatch list</li>
+  </ul>
+  <p>That's it. The kernel is patched in memory. When you reboot on your normal schedule, the permanent fix is in the updated kernel package.</p>
+  <div class="notes"><span class="say">"Three commands. First: install the kpatch-dnf plugin. One time. Second: enable automatic live patching. Third: verify what's applied. No reboot. No maintenance window. The kernel is patched in memory right now."</span><br><span class="do">Press T to open terminal. Run commands in order. Show kpatch list output. Close terminal with T.</span><br><span class="cue">Let the commands breathe. Don't rush. The simplicity IS the demo.</span></div>
+</div>
+
+<!-- SLIDE 8: Fleet Deployment -->
+<div class="slide" data-footer="Red Hat">
+  <h3>Scaling kpatch</h3>
+  <h2>From one host to <span>every host</span></h2>
+  <ul>
+    <li>Red Hat Satellite — Content Views include kpatch packages. Promote to production when validated. Every host in the content view gets live patching automatically on next dnf update.</li>
+    <li>Red Hat Ansible Automation Platform — Playbook enables kpatch-dnf across the fleet in minutes. Workflow template: enable, verify, report. Audit trail built in.</li>
+    <li>Red Hat Insights — Vulnerability dashboard shows which hosts are exposed to which kernel CVEs. Prioritize patching by exposure, not guesswork.</li>
+    <li>Combined: Insights tells you where you're exposed. Ansible deploys the fix. Satellite manages the content. No manual host-by-host work.</li>
+  </ul>
+  <div class="notes"><span class="say">"On a single host, kpatch is three commands. Across a fleet, you use the tools you probably already have. Satellite manages the content — kpatch packages flow through your content views like any other update. Ansible automates the enablement. Insights tells you which hosts are exposed so you know where to prioritize."</span><br><span class="cue">If they ask about Ansible: this is where the CVE scanner work connects. We have Ansible playbooks that scan for specific CVEs and report exposure. That's a natural extension.</span></div>
+</div>
+
+<!-- SLIDE 9: What You're Taking Home -->
+<div class="slide" data-footer="Red Hat">
+  <h2>What you're <span>taking home</span></h2>
+  <div class="leave-grid">
+    <div class="leave-item">
+      <h3>CVE Early Warning Briefing</h3>
+      <p>Current kernel CVEs affecting your infrastructure — Dirty Frag, Copy Fail, Fragnesia, Process Exit Race.</p>
+    </div>
+    <div class="leave-item">
+      <h3>kpatch Activation Guide</h3>
+      <p>Three commands to enable live kernel patching on any RHEL host. No additional purchase required.</p>
+    </div>
+    <div class="leave-item">
+      <h3>Fleet Deployment Playbook</h3>
+      <p>Ansible playbook to enable kpatch-dnf across your RHEL fleet with verification and reporting.</p>
+    </div>
+    <div class="leave-item">
+      <h3>Kernel CVE Scanner</h3>
+      <p>Ansible-based read-only scanner that checks your hosts for exposure to current kernel CVEs and generates an HTML report.</p>
+    </div>
+  </div>
+  <div class="notes"><span class="say">"Four things you're walking away with. A CVE briefing on current kernel threats. A step-by-step kpatch activation guide. An Ansible playbook that deploys kpatch across your fleet. And a CVE scanner that tells you which hosts are exposed."</span><br><span class="cue">These are real artifacts, not promises. The CVE briefing is already built. The playbooks exist.</span></div>
+</div>
+
+<!-- SLIDE 10: Thank You -->
+<div class="slide" data-footer="Red Hat">
+  <h1>Thank <span>you</span></h1>
+  <p class="subtitle" style="margin-top:2vh;">Jim O'Donnell · Solutions Architect · jodonnel@redhat.com</p>
+  <p class="muted" style="font-size:1.3vw; margin-top:4vh;">Red Hat Enterprise Linux · kpatch · Red Hat Satellite · Red Hat Ansible Automation Platform · Red Hat Insights</p>
+  <div class="notes"><span class="cue">Hold for questions. If they ask about NERC CIP specifics, offer a follow-up with the utilities vertical team. If they ask about the CVE scanner, that's a separate deep-dive — offer it.</span></div>
+</div>
+
+<div class="progress" id="progress"></div>
+<div class="slide-num" id="slideNum"></div>
+
+<script>
+const DEMO_HOSTS = {
+  kpatch: { url: 'http://localhost:7681/', label: 'rhel-kpatch-demo' },
+};
+
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+const total = slides.length;
+const channel = new BroadcastChannel('dominion-kpatch-sync');
+
+const termPanel = document.getElementById('term-panel');
+const termFrame = document.getElementById('term-frame');
+const termTag = document.getElementById('term-tag');
+const termHost = document.getElementById('term-host');
+let termLoaded = null;
+
+function copyCmd(el) {
+  navigator.clipboard.writeText(el.textContent.replace('click to copy', '').trim());
+  el.classList.add('copied');
+  setTimeout(() => el.classList.remove('copied'), 1500);
+}
+
+function openTerm(demoKey) {
+  if (!demoKey) {
+    const s = slides[current];
+    demoKey = s.getAttribute('data-term') || 'kpatch';
+  }
+  const host = DEMO_HOSTS[demoKey];
+  if (!host) return;
+
+  if (termLoaded !== demoKey) {
+    termFrame.src = host.url;
+    termLoaded = demoKey;
+  }
+  termTag.textContent = demoKey;
+  termHost.textContent = host.label;
+  termPanel.classList.add('open');
+  document.body.classList.add('term-open');
+}
+
+function closeTerm() {
+  termPanel.classList.remove('open');
+  document.body.classList.remove('term-open');
+}
+
+function toggleTerm(fromRemote) {
+  if (termPanel.classList.contains('open')) { closeTerm(); } else { openTerm(); }
+  if (!fromRemote) channel.postMessage({ term: termPanel.classList.contains('open') });
+}
+
+function show(n, fromRemote) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(n, total - 1));
+  slides[current].classList.add('active');
+  document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+  document.getElementById('slideNum').textContent = (current + 1) + ' / ' + total;
+  if (!fromRemote) channel.postMessage({ slide: current });
+}
+
+channel.onmessage = e => {
+  if (typeof e.data.slide === 'number') show(e.data.slide, true);
+  if (typeof e.data.term === 'boolean') e.data.term ? openTerm() : closeTerm();
+};
+
+document.addEventListener('keydown', e => {
+  if ((e.key === 't' || e.key === 'T') && !e.ctrlKey && !e.metaKey) {
+    if (document.activeElement && document.activeElement.tagName === 'IFRAME') return;
+    e.preventDefault();
+    toggleTerm();
+    return;
+  }
+  if (e.key === 'Escape') {
+    if (termPanel.classList.contains('open')) { closeTerm(); return; }
+    if (document.activeElement) document.activeElement.blur();
+    return;
+  }
+  if (document.activeElement && document.activeElement.tagName === 'IFRAME') return;
+
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); show(current + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); show(current - 1); }
+  if (e.key === 'Home') { e.preventDefault(); show(0); }
+  if (e.key === 'End') { e.preventDefault(); show(total - 1); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  if (dx < -50) show(current + 1);
+  if (dx > 50) show(current - 1);
+});
+
+const params = new URLSearchParams(window.location.search);
+if (params.get('notes') === '1') document.body.classList.add('show-notes');
+
+const isChild = params.get('presenter') === 'child';
+if (isChild) {
+  document.body.classList.add('presenter-child');
+  window.addEventListener('message', e => {
+    if (e.data && typeof e.data.showSlide === 'number') show(e.data.showSlide, true);
+  });
+}
+
+show(0);
+</script>
+
+</body>
+</html>
