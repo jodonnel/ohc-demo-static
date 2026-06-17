@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kernel Live Patching — Red Hat Solution Brief</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;600&family=Red+Hat+Mono&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Red Hat Text', Arial, sans-serif;
+    background: #fff;
+    color: #151515;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: #ee0000;
+    padding: 20px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-badge {
+    font-family: 'Red Hat Text', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 56px 56px 48px;
+    border-bottom: 1px solid #e8e8e8;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Red Hat Text', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ee0000;
+    margin-bottom: 14px;
+  }
+
+  .hero-headline {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 2.75rem;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #151515;
+    max-width: 640px;
+  }
+
+  .hero-headline em {
+    font-style: normal;
+    color: #ee0000;
+  }
+
+  .hero-sub {
+    margin-top: 16px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #3c3f42;
+    max-width: 580px;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .stat-pill {
+    background: #151515;
+    border-radius: 10px;
+    padding: 18px 28px;
+    text-align: center;
+    min-width: 160px;
+  }
+
+  .stat-pill .num {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .stat-pill .label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.65);
+    margin-top: 5px;
+  }
+
+  /* ── Value props ── */
+  .value-section {
+    padding: 44px 56px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  .section-label {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6a6e73;
+    margin-bottom: 28px;
+  }
+
+  .props-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .prop {
+    padding: 0 32px 0 0;
+    border-right: 1px solid #e8e8e8;
+    margin-right: 32px;
+  }
+
+  .prop:last-child {
+    border-right: none;
+    margin-right: 0;
+    padding-right: 0;
+  }
+
+  .prop-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 16px;
+  }
+
+  .prop-title {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #151515;
+    margin-bottom: 8px;
+  }
+
+  .prop-body {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #4f5255;
+  }
+
+  /* ── How it works ── */
+  .how-section {
+    background: #f5f5f5;
+    padding: 44px 56px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    margin-top: 28px;
+    position: relative;
+  }
+
+  .steps-row::before {
+    content: '';
+    position: absolute;
+    top: 22px;
+    left: calc(10% + 4px);
+    right: calc(10% + 4px);
+    height: 2px;
+    background: #d2d2d2;
+    z-index: 0;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-dot {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #d2d2d2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #6a6e73;
+    flex-shrink: 0;
+  }
+
+  .step.active .step-dot {
+    background: #ee0000;
+    border-color: #ee0000;
+    color: #fff;
+  }
+
+  .step-title {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #151515;
+    margin-bottom: 6px;
+  }
+
+  .step-body {
+    font-size: 0.78rem;
+    color: #6a6e73;
+    line-height: 1.45;
+  }
+
+  /* ── Command callout ── */
+  .cmd-callout {
+    margin-top: 28px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .cmd-callout-header {
+    background: #1b1d21;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cmd-callout-header span {
+    font-family: 'Red Hat Mono', monospace;
+    font-size: 0.72rem;
+    color: #8b949e;
+    letter-spacing: 0.05em;
+  }
+
+  .cmd-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .cmd-body {
+    background: #1b1d21;
+    padding: 16px 18px;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .cmd-body code {
+    font-family: 'Red Hat Mono', 'Courier New', monospace;
+    font-size: 0.79rem;
+    line-height: 1.8;
+    white-space: pre;
+    display: block;
+  }
+
+  .c { color: #6e7681; }
+  .k { color: #79c0ff; }
+  .g { color: #56d364; }
+
+  /* ── At scale ── */
+  .scale-section {
+    padding: 44px 56px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  .scale-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 28px;
+  }
+
+  .scale-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 28px;
+  }
+
+  .scale-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .scale-card-header img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .scale-card-header .prod-name {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #151515;
+    line-height: 1.3;
+  }
+
+  .scale-card-header .prod-name-only {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #151515;
+    line-height: 1.3;
+  }
+
+  .scale-card p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #4f5255;
+  }
+
+  .scale-card p + p {
+    margin-top: 10px;
+  }
+
+  /* ── Before/after table ── */
+  .compare-section {
+    padding: 44px 56px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 28px;
+    font-size: 0.88rem;
+  }
+
+  .compare-table th {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: left;
+  }
+
+  .compare-table th:first-child { color: #6a6e73; }
+  .compare-table th.col-before {
+    background: #f5f5f5;
+    color: #6a6e73;
+    border-radius: 6px 6px 0 0;
+  }
+  .compare-table th.col-after {
+    background: #151515;
+    color: #fff;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .compare-table td {
+    padding: 12px 20px;
+    border-top: 1px solid #e8e8e8;
+    vertical-align: top;
+    color: #3c3f42;
+    line-height: 1.5;
+  }
+
+  .compare-table td:first-child {
+    font-weight: 600;
+    color: #151515;
+  }
+
+  .compare-table td.col-before {
+    background: #fafafa;
+    color: #6a6e73;
+  }
+
+  .compare-table td.col-after {
+    background: #f0f4ff;
+    color: #1a2a4a;
+    font-weight: 500;
+  }
+
+  .compare-table tr:last-child td.col-before { border-radius: 0 0 0 6px; }
+  .compare-table tr:last-child td.col-after  { border-radius: 0 0 6px 0; }
+
+  /* ── Footer ── */
+  footer {
+    padding: 20px 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f5f5;
+    border-top: 1px solid #e8e8e8;
+  }
+
+  footer .copy {
+    font-size: 0.75rem;
+    color: #8a8d90;
+  }
+
+  footer .links {
+    display: flex;
+    gap: 24px;
+  }
+
+  footer a {
+    font-size: 0.75rem;
+    color: #0066cc;
+    text-decoration: none;
+  }
+
+  footer a:hover { text-decoration: underline; }
+
+  /* ── Print ── */
+  @media print {
+    body { max-width: 100%; }
+    .hero, .value-section, .how-section, .scale-section, .compare-section,
+    .prop, .step, .scale-card, .compare-table tr { page-break-inside: avoid; }
+    .cmd-callout, .steps-row { page-break-inside: avoid; }
+    .header, .hero, .how-section, .cmd-body, .cmd-callout-header,
+    .stat-pill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <!-- All-white logo: correct treatment for red background -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" height="36" aria-label="Red Hat">
+    <path fill="#fff" d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78"/>
+    <path fill="#fff" opacity="0.3" d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/>
+    <path fill="#fff" d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z"/>
+  </svg>
+  <div class="header-badge">Solution Brief</div>
+</header>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">Reduce patching cycle time</div>
+    <h1 class="hero-headline">Patch critical CVEs<br><em>without rebooting.</em></h1>
+    <p class="hero-sub">
+      Red Hat Kernel Live Patching (kpatch) applies kernel security fixes directly into a running system —
+      no maintenance window, no SAP downtime, no coordination across sites and time zones.
+      Ships inside every Red Hat Enterprise Linux subscription. No add-on required.
+    </p>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-pill">
+      <div class="num">0</div>
+      <div class="label">Reboots Required</div>
+    </div>
+    <div class="stat-pill">
+      <div class="num">0</div>
+      <div class="label">Maintenance Windows</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Value props ── -->
+<section class="value-section">
+  <div class="section-label">Why kpatch</div>
+  <div class="props-grid">
+
+    <div class="prop">
+      
+      <div class="prop-title">Live. Always live.</div>
+      <p class="prop-body">
+        Patches apply in-memory to the running kernel. SAP HANA, SAP NetWeaver, Oracle, and every other
+        workload stays up through CVE remediation. No coordination with application teams. No rolling restart.
+      </p>
+    </div>
+
+    <div class="prop">
+      
+      <div class="prop-title">Patch on day one.</div>
+      <p class="prop-body">
+        Traditional patching waits for the next scheduled maintenance window — weeks or months away.
+        kpatch closes the CVE exposure gap on the same day Red Hat publishes the advisory.
+        Critical severity patches often ship same day as the CVE.
+      </p>
+    </div>
+
+    <div class="prop">
+      
+      <div class="prop-title">Auditable by design.</div>
+      <p class="prop-body">
+        <code style="font-family:'Red Hat Mono',monospace;font-size:0.85em;background:#f0f0f0;padding:1px 5px;border-radius:3px">kpatch list</code>
+        shows every active CVE fix and load status in real time.
+        Patches are cumulative — each new release supersedes the last. Clean audit trail, always current.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section class="how-section">
+  <div class="section-label">How it works</div>
+
+  <div class="steps-row">
+    <div class="step active">
+      <div class="step-dot">1</div>
+      <div class="step-title">Identify</div>
+      <div class="step-body">Red Hat Insights or <code style="font-family:monospace;font-size:0.75em">uname -r</code> reveals your running kernel version. Insights flags exposed CVEs automatically.</div>
+    </div>
+    <div class="step active">
+      <div class="step-dot">2</div>
+      <div class="step-title">Find the patch</div>
+      <div class="step-body">kpatch-patch packages ship via Red Hat CDN or Red Hat Satellite — same delivery channel as all your existing RHEL content.</div>
+    </div>
+    <div class="step active">
+      <div class="step-dot">3</div>
+      <div class="step-title">Install</div>
+      <div class="step-body">One <code style="font-family:monospace;font-size:0.75em">dnf install</code> command. The patch loads into kernel memory on install — instantly. No reboot.</div>
+    </div>
+    <div class="step active">
+      <div class="step-dot">4</div>
+      <div class="step-title">Verify</div>
+      <div class="step-body"><code style="font-family:monospace;font-size:0.75em">kpatch list</code> confirms each CVE fix is active and loaded. Real-time status, no guessing.</div>
+    </div>
+    <div class="step active">
+      <div class="step-dot">5</div>
+      <div class="step-title">Persist</div>
+      <div class="step-body">kpatch.service re-applies all patches at next boot. Nothing to re-run manually after any future system restart.</div>
+    </div>
+  </div>
+
+  <div class="cmd-callout">
+    <div class="cmd-callout-header">
+      <div class="cmd-dot" style="background:#ff5f57"></div>
+      <div class="cmd-dot" style="background:#febc2e"></div>
+      <div class="cmd-dot" style="background:#28c840"></div>
+      <span style="margin-left:6px">kpatch — install sequence</span>
+    </div>
+    <div class="cmd-body"><code><span class="c"># Match the patch package to your running kernel</span>
+<span class="k">uname -r</span>
+<span class="c">  → 4.18.0-477.27.1.el8_8.x86_64</span>
+
+<span class="k">dnf install kpatch</span>
+<span class="k">dnf install kpatch-patch-4_18_0-477_27_1_el8_8</span>   <span class="c"># loads immediately — no reboot</span>
+<span class="k">systemctl enable --now kpatch</span>                       <span class="c"># persist across future reboots</span>
+<span class="g">kpatch list</span>                                          <span class="c"># verify CVEs are active</span></code></div>
+  </div>
+</section>
+
+<!-- ── At Scale ── -->
+<section class="scale-section">
+  <div class="section-label">At scale — delivering to your entire fleet</div>
+  <div class="scale-grid">
+
+    <div class="scale-card">
+      <div class="scale-card-header">
+        
+        <div class="prod-name">Red Hat Satellite</div>
+      </div>
+      <p>
+        Satellite syncs kpatch-patch RPMs from the Red Hat CDN and organizes them into content views
+        by environment — Dev, Stage, Production, SAP — so the right patch version reaches the right host group.
+      </p>
+      <p>
+        Patch applicability is tracked per host. Compliance gaps surface in the host dashboard.
+        No manual repository management across distributed sites.
+      </p>
+    </div>
+
+    <div class="scale-card">
+      <div class="scale-card-header">
+        
+        <div class="prod-name">Red Hat Ansible Automation Platform</div>
+      </div>
+      <p>
+        A single playbook using <code style="font-family:'Red Hat Mono',monospace;font-size:0.82em;background:#f0f0f0;padding:1px 4px;border-radius:3px">ansible.builtin.dnf</code>
+        pushes kpatch-patch RPMs to all nodes in parallel — targeted by host group, region, or workload type.
+      </p>
+      <p>
+        No SSH logins, full job history, zero manual intervention per host.
+        Schedule execution for the same day Red Hat publishes a CVE fix.
+      </p>
+    </div>
+
+    <div class="scale-card">
+      <div class="scale-card-header">
+        <div class="prod-name-only">Red Hat Insights</div>
+      </div>
+      <p>
+        Insights continuously monitors CVE exposure across the fleet. When a critical CVE drops,
+        Insights flags affected hosts immediately and identifies which kpatch-patch RPM closes the gap.
+      </p>
+      <p>
+        With Satellite and AAP in the pipeline, that remediation runs the same day —
+        collapsing the exposure window from weeks to hours, with per-host proof of coverage.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Before / After ── -->
+<section class="compare-section">
+  <div class="section-label">Before and after</div>
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="col-before">Traditional kernel patching</th>
+        <th class="col-after">With kpatch</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Time to patch</td>
+        <td class="col-before">Weeks — next scheduled maintenance window</td>
+        <td class="col-after">Hours — patch on day of CVE publication</td>
+      </tr>
+      <tr>
+        <td>Reboot required</td>
+        <td class="col-before">Yes — coordinated downtime across all teams</td>
+        <td class="col-after">No — kernel patched in running memory</td>
+      </tr>
+      <tr>
+        <td>SAP impact</td>
+        <td class="col-before">SAP maintenance window required</td>
+        <td class="col-after">Zero SAP impact — SAP-certified since 2017</td>
+      </tr>
+      <tr>
+        <td>Global coordination</td>
+        <td class="col-before">Per-site change management overhead</td>
+        <td class="col-after">Ansible pushes to all sites in one job run</td>
+      </tr>
+      <tr>
+        <td>Compliance posture</td>
+        <td class="col-before">Gap between publication and patch close</td>
+        <td class="col-after">CVE exposure window closes same day</td>
+      </tr>
+      <tr>
+        <td>Cost</td>
+        <td class="col-before">Included in RHEL subscription</td>
+        <td class="col-after">Included in RHEL subscription</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="copy">© 2026 Red Hat, Inc. All rights reserved. Red Hat Enterprise Linux is included in all Red Hat subscription plans.</div>
+  <div class="links">
+    <a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html/managing_and_monitoring_security_updates/applying-patches-with-kernel-live-patching_managing-and-monitoring-security-updates" target="_blank">RHEL 8 kpatch docs</a>
+    <a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_and_monitoring_security_updates/applying-patches-with-kernel-live-patching_managing-and-monitoring-security-updates" target="_blank">RHEL 9 kpatch docs</a>
+    <a href="https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux" target="_blank">redhat.com/rhel</a>
+  </div>
+</footer>
+
+</body>
+</html>
