@@ -6,155 +6,161 @@
 <title>kpatch Notes · Dominion</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; background: #0d0d0d; color: #e8e8e8; font-family: -apple-system, Helvetica Neue, system-ui, sans-serif; overflow: hidden; }
+html, body { width: 100%; height: 100%; background: #0d0d0d; color: #e8e8e8;
+  font-family: -apple-system, "Helvetica Neue", system-ui, sans-serif; overflow: hidden; }
 #deck { width: 100%; height: 100%; position: relative; }
-.card { position: absolute; inset: 0; padding: 20px 24px 70px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+.card {
+  position: absolute; inset: 0; padding: 16px 20px 68px;
+  display: flex; flex-direction: column; gap: 12px;
+  overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.12s;
+}
 .card.active { opacity: 1; pointer-events: auto; }
-.label { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: #555; }
-h2 { font-size: 24px; font-weight: 700; color: #fff; line-height: 1.2; }
-.say { font-size: 20px; line-height: 1.6; color: #ddd; }
+.card-num { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #444; }
+h2 { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.2; border-bottom: 1px solid #1e1e1e; padding-bottom: 10px; }
+.say { font-size: 20px; line-height: 1.65; color: #ddd; }
 .cue { font-size: 16px; color: #777; font-style: italic; line-height: 1.5; }
-.warn { background: rgba(238,0,0,.08); border-left: 3px solid #ee0000; padding: 10px 14px; font-size: 16px; color: #cc6060; border-radius: 0 5px 5px 0; line-height: 1.5; }
+.warn {
+  background: rgba(238,0,0,.08); border-left: 3px solid #ee0000;
+  padding: 10px 14px; font-size: 16px; color: #cc6060;
+  border-radius: 0 5px 5px 0; line-height: 1.5;
+}
 .warn::before { content: "WARNING: "; font-weight: 700; color: #ee0000; }
-.do { background: rgba(212,168,0,.10); border-left: 3px solid #d4a800; padding: 10px 14px; font-size: 17px; color: #d4c060; font-family: monospace; border-radius: 0 5px 5px 0; line-height: 1.5; }
+.do {
+  background: rgba(212,168,0,.10); border-left: 3px solid #d4a800;
+  padding: 10px 14px; font-size: 17px; color: #d4c060;
+  font-family: monospace; border-radius: 0 5px 5px 0; line-height: 1.5;
+}
 .do::before { content: "DO: "; font-weight: 700; }
-.cmds { background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 12px 16px; }
-.cmds-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #ee0000; margin-bottom: 10px; font-weight: 700; }
+.cmds {
+  background: #0a0a0a; border: 1px solid #2a2a2a;
+  border-radius: 6px; padding: 12px 16px;
+}
+.cmds-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+  color: #ee0000; margin-bottom: 10px; font-weight: 700; }
 .cmds code { display: block; font-family: monospace; font-size: 19px; color: #7ef; margin-bottom: 8px; }
-.wins { background: #0d1a0d; border-left: 3px solid #3a8a3a; padding: 12px 16px; border-radius: 0 6px 6px 0; }
-.wins-label { font-size: 11px; text-transform: uppercase; color: #3a8a3a; font-weight: 700; margin-bottom: 8px; }
-.wins li { font-size: 17px; color: #aaa; margin-bottom: 7px; margin-left: 16px; line-height: 1.4; }
-#nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #111; border-top: 1px solid #222; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 100; }
-#nav button { background: #ee0000; color: #fff; border: none; border-radius: 6px; font-size: 22px; font-weight: 700; padding: 8px 24px; cursor: pointer; }
-#nav button.dim { background: #222; color: #555; }
-#counter { font-size: 18px; font-weight: 700; color: #fff; min-width: 60px; text-align: center; }
+#nav {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 58px;
+  background: #111; border-top: 1px solid #222;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 14px; z-index: 100;
+}
+#nav button {
+  background: #ee0000; color: #fff; border: none; border-radius: 6px;
+  font-size: 24px; font-weight: 700; padding: 6px 28px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#nav button:active { background: #c00; }
+#nav button.dim { background: #222; color: #444; pointer-events: none; }
+#counter { font-size: 18px; font-weight: 700; color: #fff; min-width: 54px; text-align: center; }
 </style>
 </head>
 <body>
 <div id="deck">
 
 <div class="card active" id="c0">
-<div class="label">Before you start</div>
-<h2>Win Conditions</h2>
-<div class="wins">
-<div class="wins-label">Walk out with these</div>
-<ul>
-<li>Lee confirms kpatch POC on a subset of RHEL hosts</li>
-<li>Identify which RHEL hosts run critical grid/OT workloads</li>
-<li>Dominion team receives CVE briefing + kpatch activation guide</li>
-<li>Follow-up scheduled: fleet deployment + CVE scanner deep-dive</li>
-</ul>
-</div>
+  <div class="card-num">1 / 10</div>
+  <h2>Kernel Live Patching — kpatch</h2>
+  <div class="say">Thanks for making time. Today I want to show you a capability that's already in your Red Hat Enterprise Linux subscription — one that eliminates reboots for critical kernel security fixes.</div>
 </div>
 
 <div class="card" id="c1">
-<div class="label">Slide 1</div>
-<h2>Kernel Live Patching</h2>
-<div class="say">Thanks for making time. Today I want to show you a capability already in your RHEL subscription -- one that eliminates reboots for critical kernel security fixes.</div>
+  <div class="card-num">2 / 10</div>
+  <h2>Why Now — Active Exploitation</h2>
+  <div class="say">Two kernel CVEs are being actively exploited right now. One is on the CISA KEV list. And the third one — Fragnesia — was actually introduced by the patch for the first one. The fix broke it worse. Traditional remediation means reboot. On utility infrastructure, that's a maintenance window you may not have.</div>
+  <div class="cue">Don't dwell on fear. This slide earns the right to show the solution. Move briskly.</div>
 </div>
 
 <div class="card" id="c2">
-<div class="label">Slide 2</div>
-<h2>Why Now -- Active Exploitation</h2>
-<div class="say">Two kernel CVEs actively exploited right now. One is on the CISA KEV list. Fragnesia was introduced by the patch for the first one -- the fix broke it worse. Traditional remediation means reboot. On utility infrastructure, that is a maintenance window you may not have.</div>
-<div class="cue">Do not dwell on fear. This earns the right to show the solution. Move briskly.</div>
+  <div class="card-num">3 / 10</div>
+  <h2>Overview — What Is kpatch</h2>
+  <div class="say">kpatch is live kernel patching. It's included in your RHEL subscription. It applies kernel security fixes in memory — no reboot required. When you do reboot on your normal schedule, the permanent fix is waiting in the updated kernel package.</div>
+  <div class="cue">Emphasize: included in subscription. Not an add-on. Not a third-party tool.</div>
 </div>
 
 <div class="card" id="c3">
-<div class="label">Slide 3</div>
-<h2>What Is kpatch</h2>
-<div class="say">kpatch is live kernel patching. Included in your RHEL subscription. Applies kernel security fixes in memory -- no reboot required. When you reboot on your normal schedule, the permanent fix is already waiting.</div>
-<div class="cue">Emphasize: included in subscription. Not an add-on. Not a third-party tool.</div>
+  <div class="card-num">4 / 10</div>
+  <h2>Pros and Limitations</h2>
+  <div class="say">I want to be honest about what kpatch does and doesn't do. It's not a replacement for rebooting — it's a way to extend the window between reboots. The patches are cumulative, so eventually you consolidate with a planned reboot on your schedule. But for critical CVEs — the ones being actively exploited — it gives you immediate protection without downtime.</div>
+  <div class="warn">If someone asks "can we never reboot?" — the answer is no. kpatch buys you time. It does not eliminate reboots.</div>
 </div>
 
 <div class="card" id="c4">
-<div class="label">Slide 4</div>
-<h2>Pros and Limitations</h2>
-<div class="say">kpatch is not a replacement for rebooting -- it extends the window between reboots. Patches are cumulative. Eventually you consolidate with a planned reboot on your schedule. For active CVEs being exploited, it gives immediate protection without downtime.</div>
-<div class="warn">If asked can we never reboot -- answer is no. kpatch buys time. It does not eliminate reboots.</div>
+  <div class="card-num">5 / 10</div>
+  <h2>Real Use Cases — Where kpatch Matters Most</h2>
+  <div class="say">Three real scenarios. First: Dirty Frag is being exploited right now — kpatch lets you fix it today without a maintenance window. Second: NERC CIP requires patching within mandated timelines — kpatch lets you meet those timelines without scheduling downtime across substations. Third: your 70 gigawatt data center pipeline means the systems managing that load need to stay up.</div>
+  <div class="cue">The data center load reference connects to Dominion's $17B capex on data center infrastructure. The systems managing that load are Red Hat's opportunity.</div>
 </div>
 
 <div class="card" id="c5">
-<div class="label">Slide 5</div>
-<h2>Real Use Cases</h2>
-<div class="say">Three scenarios. Dirty Frag: exploited now, fix today without a maintenance window. NERC CIP: meet patching timelines without scheduling substation downtime. 70GW data center pipeline: systems managing that load need to stay up.</div>
-<div class="cue">70GW reference connects to Dominion's 17 billion dollar capex on data center infrastructure.</div>
+  <div class="card-num">6 / 10</div>
+  <h2>Requirements — Getting Started</h2>
+  <div class="say">The base requirement is a RHEL subscription. That's it. The kpatch-dnf plugin is a one-time install. Satellite and Ansible are the scale tools — if you're managing hundreds of hosts, they make this automatic. But a single host can be live-patched in three commands.</div>
 </div>
 
 <div class="card" id="c6">
-<div class="label">Slide 6</div>
-<h2>Requirements</h2>
-<div class="say">Base requirement: a RHEL subscription. That is it. The kpatch-dnf plugin is a one-time install. Satellite and Ansible are the scale tools. But a single host can be live-patched in three commands.</div>
+  <div class="card-num">7 / 10 — DEMO SLIDE</div>
+  <h2>DEMO — Three Commands, No Reboot</h2>
+  <div class="say">Three commands. Install the kpatch-dnf plugin — one time. Enable automatic live patching. Verify what's applied. No reboot. No maintenance window. The kernel is patched in memory right now.</div>
+  <div class="do">Press T to open terminal. Run commands in order. Show kpatch list output. Close terminal with T.</div>
+  <div class="cue">Let the commands breathe. Don't rush. The simplicity IS the demo.</div>
+  <div class="cmds">
+    <div class="cmds-lbl">Commands</div>
+    <code>dnf install -y kpatch-dnf</code>
+    <code>kpatch-dnf auto</code>
+    <code>kpatch list</code>
+  </div>
 </div>
 
 <div class="card" id="c7">
-<div class="label">Slide 7 -- DEMO</div>
-<h2>Three Commands, No Reboot</h2>
-<div class="say">Three commands. Install the plugin. Enable automatic live patching. Verify what is applied. No reboot. No maintenance window. The kernel is patched in memory right now.</div>
-<div class="do">Press T to open terminal. Run commands in order. Show kpatch list output. Close with T.</div>
-<div class="cmds">
-<div class="cmds-label">Demo Commands</div>
-<code>dnf install -y kpatch-dnf</code>
-<code>kpatch-dnf auto</code>
-<code>kpatch list</code>
-</div>
-<div class="cue">Let the commands breathe. Do not rush. The simplicity IS the demo.</div>
+  <div class="card-num">8 / 10</div>
+  <h2>Fleet Deployment — Scaling kpatch</h2>
+  <div class="say">On a single host, kpatch is three commands. Across a fleet, you use the tools you probably already have. Satellite manages the content — kpatch packages flow through your content views like any other update. Ansible automates the enablement. Insights tells you which hosts are exposed so you know where to prioritize.</div>
+  <div class="cue">If they ask about Ansible: this is where the CVE scanner work connects. We have Ansible playbooks that scan for specific CVEs and report exposure. That's a natural extension.</div>
 </div>
 
 <div class="card" id="c8">
-<div class="label">Slide 8</div>
-<h2>Fleet Deployment</h2>
-<div class="say">Single host: three commands. Fleet: use what you already have. Satellite manages content. Ansible automates enablement. Insights shows which hosts are exposed so you know where to prioritize.</div>
-<div class="cue">CVE scanner playbooks exist -- if they ask about Ansible, offer the deep-dive call.</div>
+  <div class="card-num">9 / 10</div>
+  <h2>What You're Taking Home</h2>
+  <div class="say">Four things you're walking away with. A CVE briefing on current kernel threats. A step-by-step kpatch activation guide. An Ansible playbook that deploys kpatch across your fleet. And a CVE scanner that tells you which hosts are exposed.</div>
+  <div class="cue">These are real artifacts, not promises. The CVE briefing is already built. The playbooks exist.</div>
 </div>
 
 <div class="card" id="c9">
-<div class="label">Slide 9</div>
-<h2>What You Are Taking Home</h2>
-<div class="say">Four things. CVE briefing on current kernel threats. Step-by-step kpatch activation guide. Ansible playbook for fleet deployment. CVE scanner that shows which hosts are exposed.</div>
-<div class="cue">These are real artifacts. CVE briefing is built. Playbooks exist.</div>
-</div>
-
-<div class="card" id="c10">
-<div class="label">Slide 10</div>
-<h2>Thank You</h2>
-<div class="cue">Hold for questions.</div>
-<div class="cue">NERC CIP specifics -- offer follow-up with utilities vertical team.</div>
-<div class="cue">CVE scanner deep-dive -- separate call, offer it.</div>
-<div class="cue">POC ask -- Lee decides which hosts. Can start on 1 node today.</div>
+  <div class="card-num">10 / 10</div>
+  <h2>Thank You</h2>
+  <div class="cue">Hold for questions. If they ask about NERC CIP specifics, offer a follow-up with the utilities vertical team. If they ask about the CVE scanner, that's a separate deep-dive — offer it.</div>
 </div>
 
 </div>
 
 <div id="nav">
-<button id="prev" class="dim" onclick="go(-1)">&#9664;</button>
-<div id="counter">0 / 10</div>
-<button id="next" onclick="go(1)">&#9654;</button>
+  <button id="prev" class="dim" onclick="go(-1)">&#8592;</button>
+  <div id="counter">1 / 10</div>
+  <button id="next" onclick="go(1)">&#8594;</button>
 </div>
 
 <script>
-const TOTAL = 11;
+const total = 10;
 let cur = 0;
-function go(dir) {
-  const nxt = cur + dir;
-  if (nxt < 0 || nxt >= TOTAL) return;
+function show(n) {
   document.getElementById('c' + cur).classList.remove('active');
-  cur = nxt;
+  cur = Math.max(0, Math.min(n, total - 1));
   document.getElementById('c' + cur).classList.add('active');
-  document.getElementById('counter').textContent = cur + ' / ' + (TOTAL - 1);
-  document.getElementById('prev').className = cur === 0 ? 'dim' : '';
-  document.getElementById('next').className = cur === TOTAL - 1 ? 'dim' : '';
   document.getElementById('c' + cur).scrollTop = 0;
+  document.getElementById('counter').textContent = (cur + 1) + ' / ' + total;
+  document.getElementById('prev').className = cur === 0 ? 'dim' : '';
+  document.getElementById('next').className = cur === total - 1 ? 'dim' : '';
 }
+function go(d) { show(cur + d); }
 let tx = 0;
-document.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; }, {passive:true});
-document.addEventListener('touchend', function(e) {
-  var dx = e.changedTouches[0].clientX - tx;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
   if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
 }, {passive:true});
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(-1);
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();go(1);}
+  if (e.key==='ArrowLeft' ||e.key==='ArrowUp')               {e.preventDefault();go(-1);}
 });
 </script>
 </body>
