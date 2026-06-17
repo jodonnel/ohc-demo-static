@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Hat kpatch Activation Guide — RHEL Live Kernel Patching — 2026-06-17</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: 'Red Hat Text', 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 2.5rem 3rem;
+  }
+
+  /* ── Header ── */
+  .doc-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 3px solid #ee0000;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .doc-header-left { display: flex; align-items: center; gap: 1rem; }
+
+  .doc-header-text h1 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #1a1a1a;
+    line-height: 1.2;
+  }
+
+  .doc-header-text .subtitle {
+    font-size: 0.82rem;
+    color: #555;
+    margin-top: 0.25rem;
+  }
+
+  .doc-date {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .doc-date .date-val {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+  }
+
+  /* ── Section headings ── */
+  h2 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 2rem 0 0.9rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  h3 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 1.25rem 0 0.45rem;
+  }
+
+  /* ── Quick-start block ── */
+  .quickstart-wrap {
+    background: #1a1a2e;
+    border-radius: 8px;
+    padding: 1.5rem 1.75rem;
+    margin: 0.5rem 0 1.25rem;
+  }
+
+  .quickstart-wrap .qs-label {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ee0000;
+    margin-bottom: 0.75rem;
+  }
+
+  .quickstart-wrap .qs-note {
+    font-size: 0.78rem;
+    color: #9090b0;
+    margin-top: 0.75rem;
+    font-style: italic;
+  }
+
+  /* ── Code blocks ── */
+  .cmd-block {
+    background: #1e1e2e;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 0.6rem 0;
+    font-family: 'Red Hat Mono', 'Courier New', monospace;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .cmd-block .prompt {
+    color: #7ec8e3;
+    user-select: none;
+  }
+
+  .cmd-block .cmd {
+    color: #e2e2f0;
+  }
+
+  .cmd-block .comment {
+    color: #6a6a8a;
+    font-style: italic;
+  }
+
+  .cmd-block .output {
+    color: #a0d0a0;
+    font-size: 0.82rem;
+  }
+
+  .cmd-block .output-dim {
+    color: #707080;
+    font-size: 0.8rem;
+  }
+
+  /* Inline code */
+  code {
+    font-family: 'Red Hat Mono', monospace;
+    font-size: 0.82em;
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    color: #333;
+  }
+
+  /* ── Step list ── */
+  .step-list {
+    counter-reset: step-counter;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .step-list > li {
+    counter-increment: step-counter;
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0 0.85rem;
+    margin-bottom: 1.5rem;
+    align-items: start;
+  }
+
+  .step-list > li::before {
+    content: counter(step-counter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: #ee0000;
+    color: #fff;
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .step-content { min-width: 0; }
+
+  .step-title {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+    color: #1a1a1a;
+  }
+
+  .step-desc {
+    font-size: 0.85rem;
+    color: #333;
+    margin-bottom: 0.3rem;
+    line-height: 1.55;
+  }
+
+  .step-expected {
+    font-size: 0.8rem;
+    color: #555;
+    margin-top: 0.4rem;
+    padding-left: 0.75rem;
+    border-left: 3px solid #e0e0e0;
+  }
+
+  .step-expected strong { color: #1a1a1a; font-size: 0.8rem; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-left: 4px solid #ee0000;
+    background: #fff5f5;
+    padding: 0.8rem 1rem;
+    border-radius: 0 4px 4px 0;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+  .callout.amber {
+    border-left-color: #c28700;
+    background: #fffbf0;
+  }
+  .callout.blue {
+    border-left-color: #0066cc;
+    background: #f0f5ff;
+  }
+  .callout.green {
+    border-left-color: #1a7a3a;
+    background: #f0fff5;
+  }
+  .callout strong { color: #1a1a1a; }
+
+  /* ── Output annotation table ── */
+  .annotate-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin: 0.5rem 0 0.85rem;
+  }
+  .annotate-table th {
+    background: #f5f5f5;
+    padding: 0.4rem 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid #e0e0e0;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .annotate-table td {
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #ececec;
+    vertical-align: top;
+  }
+  .annotate-table .field {
+    font-family: 'Red Hat Mono', monospace;
+    font-size: 0.8em;
+    color: #0066cc;
+    white-space: nowrap;
+  }
+  .annotate-table .good { color: #1a7a3a; font-weight: 600; }
+  .annotate-table .warn { color: #c28700; font-weight: 600; }
+
+  /* ── Troubleshoot cards ── */
+  .ts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin: 0.5rem 0;
+  }
+
+  .ts-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    background: #fafafa;
+  }
+
+  .ts-card .ts-symptom {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #b00;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #ececec;
+  }
+
+  .ts-card .ts-fix {
+    font-size: 0.82rem;
+    color: #333;
+    line-height: 1.55;
+  }
+
+  /* ── Scale callout ── */
+  .scale-box {
+    border: 2px solid #0066cc;
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+    background: #f5f8ff;
+    margin: 1rem 0;
+  }
+
+  .scale-box .scale-label {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 900;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #0066cc;
+    margin-bottom: 0.6rem;
+  }
+
+  .scale-box p {
+    font-size: 0.85rem;
+    color: #1a1a1a;
+    line-height: 1.55;
+    margin-bottom: 0.5rem;
+  }
+
+  .scale-box p:last-child { margin-bottom: 0; }
+
+  .product-pill {
+    display: inline-block;
+    background: #ee0000;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 3px;
+    margin: 0 0.1rem;
+  }
+
+  /* ── Supported versions table ── */
+  .versions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin: 0.5rem 0;
+  }
+  .versions-table th {
+    background: #f5f5f5;
+    padding: 0.45rem 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid #e0e0e0;
+    font-weight: 700;
+  }
+  .versions-table td {
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #ececec;
+    vertical-align: top;
+  }
+  .versions-table .supported { color: #1a7a3a; font-weight: 600; }
+  .versions-table .note { color: #555; font-size: 0.78rem; }
+
+  /* ── Doc link ── */
+  .doc-link {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    margin: 1rem 0;
+  }
+  .doc-link a {
+    color: #0066cc;
+    word-break: break-all;
+    font-family: 'Red Hat Mono', monospace;
+    font-size: 0.8em;
+  }
+
+  /* ── Footer ── */
+  .doc-footer {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+    font-size: 0.75rem;
+    color: #666;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .doc-footer .footer-note { flex: 1; }
+  .doc-footer .footer-contact { text-align: right; white-space: nowrap; font-size: 0.72rem; }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; font-size: 11pt; }
+    .page { padding: 1cm 1.5cm; max-width: 100%; }
+    .quickstart-wrap { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cmd-block { background: #1e1e2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .step-list > li::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .callout, .scale-box, .ts-card { break-inside: avoid; }
+    .step-list > li { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    @page { margin: 1.5cm; size: letter; }
+  }
+
+  @media screen and (max-width: 640px) {
+    .ts-grid { grid-template-columns: 1fr; }
+    .doc-header { flex-direction: column; gap: 0.75rem; }
+    .doc-date { text-align: left; }
+    .doc-footer { flex-direction: column; }
+    .doc-footer .footer-contact { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Document Header ── -->
+  <div class="doc-header">
+    <div class="doc-header-left">
+      <!-- Red Hat wordmark — inline SVG -->
+      <div style="flex-shrink:0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="40" viewBox="0 0 240 80" aria-label="Red Hat">
+          <ellipse cx="68" cy="62" rx="48" ry="12" fill="#ee0000"/>
+          <polygon points="20,62 50,20 86,20 116,62" fill="#cc0000"/>
+          <polygon points="50,20 86,20 80,62 56,62" fill="#ee0000"/>
+          <ellipse cx="68" cy="62" rx="48" ry="12" fill="#ee0000" opacity="0.9"/>
+          <text x="130" y="35" font-family="'Red Hat Display',Arial,sans-serif" font-weight="900" font-size="28" fill="#ee0000">Red Hat</text>
+          <text x="130" y="58" font-family="'Red Hat Text',Arial,sans-serif" font-weight="400" font-size="14" fill="#1a1a1a" letter-spacing="1">ENTERPRISE LINUX</text>
+        </svg>
+      </div>
+      <div class="doc-header-text">
+        <h1>kpatch Activation Guide<br>Live Kernel Patching for RHEL</h1>
+        <div class="subtitle">Step-by-step enablement for RHEL sysadmins &nbsp;·&nbsp; Prepared for Dominion Energy</div>
+      </div>
+    </div>
+    <div class="doc-date">
+      <div>Issue Date</div>
+      <div class="date-val">2026-06-17</div>
+      <div style="margin-top:0.5rem;">Prepared by</div>
+      <div style="font-weight:600;color:#1a1a1a;">Jim O'Donnell</div>
+      <div>Red Hat Solutions Architect</div>
+    </div>
+  </div>
+
+  <!-- ── What is kpatch ── -->
+  <div class="callout blue" style="margin-top:0;">
+    <strong>What is kpatch?</strong> kpatch is Red Hat's implementation of live kernel patching — applying security fixes to the running Linux kernel in memory, without a reboot or maintenance window. The kernel keeps running; processes keep running; nothing notices except the CVE, which is now patched. kpatch is included with all Red Hat Enterprise Linux subscriptions at no additional cost.
+  </div>
+
+  <!-- ── Three-Command Quick Start ── -->
+  <h2>Three-Command Quick Start</h2>
+
+  <div class="quickstart-wrap">
+    <div class="qs-label">Quick Start — Three Commands to Live Patching</div>
+    <div class="cmd-block" style="background:#0d0d1a;margin:0;">
+      <div><span class="prompt">$ </span><span class="cmd">sudo dnf install kpatch-dnf</span>  &nbsp;<span class="comment"># Install the kpatch dnf plugin (one-time)</span></div>
+      <div><span class="prompt">$ </span><span class="cmd">sudo dnf kpatch auto</span>           &nbsp;<span class="comment"># Enable automatic live patching</span></div>
+      <div><span class="prompt">$ </span><span class="cmd">sudo kpatch list</span>               &nbsp;<span class="comment"># Verify which patches are loaded</span></div>
+    </div>
+    <div class="qs-note">Requires: active Red Hat subscription, RHEL 7.7+, x86_64 architecture. Run as root or with sudo.</div>
+  </div>
+
+  <div class="callout green">
+    <strong>That's it for most hosts.</strong> If your subscription is current and your kernel version has patches available, those three commands are the complete activation sequence. The detailed steps below are for environments that need version checks, troubleshooting, or fleet-scale deployment.
+  </div>
+
+  <!-- ── Full Step-by-Step ── -->
+  <h2>Full Step-by-Step Enablement</h2>
+
+  <ol class="step-list">
+
+    <!-- Step 1 -->
+    <li>
+      <div class="step-content">
+        <div class="step-title">Verify your RHEL version and kernel</div>
+        <div class="step-desc">Confirm you are running a supported RHEL version (7.7+, 8.x, or 9.x) and record your current kernel version. kpatch patches are kernel-version-specific — you need to know exactly what you're running.</div>
+        <div class="cmd-block">
+          <div><span class="prompt">$ </span><span class="cmd">cat /etc/redhat-release</span></div>
+          <div class="output">Red Hat Enterprise Linux release 9.4 (Plow)</div>
+          <div style="margin-top:0.5rem;"><span class="prompt">$ </span><span class="cmd">uname -r</span></div>
+          <div class="output">5.14.0-427.26.1.el9_4.x86_64</div>
+          <div style="margin-top:0.5rem;"><span class="prompt">$ </span><span class="cmd">subscription-manager status</span></div>
+          <div class="output">Overall Status: Current</div>
+        </div>
+        <div class="step-expected">
+          <strong>Expected:</strong> RHEL 8.x or 9.x, kernel version in the <code>5.14.0-427.x</code> (RHEL 9.4) or <code>4.18.0-xxx</code> (RHEL 8.x) range. Subscription status must show <strong>Current</strong> — kpatch patches are gated behind an active subscription.
+        </div>
+      </div>
+    </li>
+
+    <!-- Step 2 -->
+    <li>
+      <div class="step-content">
+        <div class="step-title">Install the kpatch-dnf plugin (one-time)</div>
+        <div class="step-desc">The <code>kpatch-dnf</code> package adds a <code>kpatch</code> subcommand to dnf, which handles finding the correct patch packages for your running kernel version automatically. Install it once per host.</div>
+        <div class="cmd-block">
+          <div><span class="prompt">$ </span><span class="cmd">sudo dnf install kpatch-dnf</span></div>
+          <div class="output-dim">Updating Subscription Management repositories.</div>
+          <div class="output-dim">Last metadata expiration check: ...</div>
+          <div class="output">Dependencies resolved.</div>
+          <div class="output">Installing: kpatch-dnf  noarch  0.4-3.el9  rhel-9-for-x86_64-baseos-rpms</div>
+          <div class="output">Complete!</div>
+        </div>
+        <div class="step-expected">
+          <strong>Expected:</strong> dnf resolves and installs <code>kpatch-dnf</code> from the Red Hat BaseOS repository. If the package is not found, verify your subscription is attached and that the BaseOS repository is enabled: <code>subscription-manager repos --list-enabled</code>
+        </div>
+      </div>
+    </li>
+
+    <!-- Step 3 -->
+    <li>
+      <div class="step-content">
+        <div class="step-title">Enable automatic live patching</div>
+        <div class="step-desc">This command queries the Red Hat kpatch catalog for your exact kernel version, downloads the appropriate patch package(s), and loads them directly into the running kernel. No reboot. No maintenance window. The kernel continues to serve workloads throughout.</div>
+        <div class="cmd-block">
+          <div><span class="prompt">$ </span><span class="cmd">sudo dnf kpatch auto</span></div>
+          <div class="output-dim">Fetching kpatch packages for kernel 5.14.0-427.26.1.el9_4.x86_64...</div>
+          <div class="output">Installing: kpatch-patch-5_14_0-427_26_1  x86_64  1-2.el9_4</div>
+          <div class="output-dim">Running scriptlet: kpatch-patch-5_14_0-427_26_1...</div>
+          <div class="output">loading patch module: kpatch-patch-5_14_0-427_26_1.ko</div>
+          <div class="output">Complete!</div>
+        </div>
+        <div class="step-expected">
+          <strong>Expected:</strong> dnf finds one or more <code>kpatch-patch-*</code> packages matching your kernel version, installs them, and the installation scriptlet loads the patch module into the running kernel immediately. If the output says "nothing to do" or shows no patch packages, see the Troubleshooting section.
+        </div>
+      </div>
+    </li>
+
+    <!-- Step 4 -->
+    <li>
+      <div class="step-content">
+        <div class="step-title">Verify patches are loaded</div>
+        <div class="step-desc">The <code>kpatch list</code> command shows all currently loaded kernel patches. Run this immediately after enablement and again after any future patch update to confirm active protection.</div>
+        <div class="cmd-block">
+          <div><span class="prompt">$ </span><span class="cmd">sudo kpatch list</span></div>
+          <div class="output-dim" style="margin-top:0.4rem;">Loaded patch modules:</div>
+          <div class="output">kpatch-patch-5_14_0-427_26_1 [enabled]</div>
+          <div class="output-dim" style="margin-top:0.3rem;">Installed patch modules:</div>
+          <div class="output">kpatch-patch-5_14_0-427_26_1 [enabled]</div>
+        </div>
+        <div class="step-expected">
+          <strong>Expected output fields:</strong>
+        </div>
+        <table class="annotate-table" style="margin-top:0.5rem;">
+          <thead>
+            <tr><th>Field</th><th>Value</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="field">Loaded patch modules</td>
+              <td class="good">one or more entries</td>
+              <td>Patches currently active in the running kernel</td>
+            </tr>
+            <tr>
+              <td class="field">Installed patch modules</td>
+              <td class="good">same entries</td>
+              <td>Patches installed on disk (will reload after reboot)</td>
+            </tr>
+            <tr>
+              <td class="field">[enabled]</td>
+              <td class="good">enabled</td>
+              <td>Patch is active and protecting the kernel right now</td>
+            </tr>
+            <tr>
+              <td class="field">[disabled]</td>
+              <td class="warn">disabled</td>
+              <td>Patch installed but not active — see troubleshooting</td>
+            </tr>
+            <tr>
+              <td class="field">(empty output)</td>
+              <td class="warn">nothing listed</td>
+              <td>No patches loaded — check subscription and kernel version</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </li>
+
+    <!-- Step 5 -->
+    <li>
+      <div class="step-content">
+        <div class="step-title">Enable persistence across reboots</div>
+        <div class="step-desc">The <code>kpatch</code> systemd service ensures that installed patch modules are reloaded after any future kernel restart. Enable it now so that your protection persists even if the system is rebooted for non-kernel reasons (hardware maintenance, power events, etc.).</div>
+        <div class="cmd-block">
+          <div><span class="prompt">$ </span><span class="cmd">sudo systemctl enable --now kpatch</span></div>
+          <div class="output">Created symlink /etc/systemd/system/multi-user.target.wants/kpatch.service</div>
+          <div style="margin-top:0.75rem;"><span class="prompt">$ </span><span class="cmd">sudo systemctl status kpatch</span></div>
+          <div class="output-dim">● kpatch.service - Apply kpatch kernel patches</div>
+          <div class="output-dim">     Loaded: loaded (/usr/lib/systemd/system/kpatch.service; enabled; ...)</div>
+          <div class="output">     Active: active (exited) since ...</div>
+        </div>
+        <div class="step-expected">
+          <strong>Expected:</strong> Service shows <code>active (exited)</code> — this is correct for kpatch. It runs at boot to load patches, then exits. The patches remain active in the kernel. <code>enabled</code> in the Loaded line confirms persistence across reboots.
+        </div>
+        <div class="callout amber" style="margin-top:0.75rem;">
+          <strong>Note on kernel updates:</strong> If the kernel itself is updated (e.g., via <code>dnf update kernel</code>) and the system reboots to the new kernel, you must run <code>sudo dnf kpatch auto</code> again on the new kernel version to re-apply live patches. The kpatch catalog will have patches for the new kernel once Red Hat publishes them.
+        </div>
+      </div>
+    </li>
+
+  </ol><!-- end step-list -->
+
+  <!-- ── Supported Versions ── -->
+  <h2>Supported RHEL Versions</h2>
+
+  <table class="versions-table">
+    <thead>
+      <tr>
+        <th>RHEL Version</th>
+        <th>kpatch Support</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>RHEL 9.x</td>
+        <td class="supported">Fully supported</td>
+        <td class="note">Preferred. Full kpatch catalog. Latest CVE patches released here first.</td>
+      </tr>
+      <tr>
+        <td>RHEL 8.x</td>
+        <td class="supported">Fully supported</td>
+        <td class="note">Full catalog. kpatch patches available for 8.6 through latest 8.x EUS releases.</td>
+      </tr>
+      <tr>
+        <td>RHEL 8.8 specifically</td>
+        <td class="supported">Confirmed — Dirty Frag patches available</td>
+        <td class="note">CVE-2026-43284, CVE-2026-46300 (RHSB-2026-003) kpatch confirmed for 8.8.</td>
+      </tr>
+      <tr>
+        <td>RHEL 7.7+</td>
+        <td class="supported">Supported (Extended Life)</td>
+        <td class="note">kpatch available but catalog coverage narrower than RHEL 8/9. Migrate to RHEL 9 for full coverage.</td>
+      </tr>
+      <tr>
+        <td>RHEL 7.0–7.6</td>
+        <td style="color:#c28700;font-weight:600;">Limited</td>
+        <td class="note">Older kernels — reduced catalog. Strongly recommended to update to 7.7+ or migrate to RHEL 8/9.</td>
+      </tr>
+      <tr>
+        <td>RHEL 6.x</td>
+        <td style="color:#b00;font-weight:600;">End of Extended Life — not supported</td>
+        <td class="note">No kpatch support. Migrate immediately — RHEL 6 receives no security patches of any kind.</td>
+      </tr>
+      <tr>
+        <td>ARM / aarch64</td>
+        <td style="color:#c05000; font-weight:600;">Not generally supported</td>
+        <td class="note">x86_64 required for full kpatch coverage. ARM/aarch64 kernel module loading is not supported. Verify with Red Hat before attempting deployment on ARM nodes.</td>
+      </tr>
+      <tr>
+        <td>x86_64</td>
+        <td class="supported">Full catalog — all supported RHEL 8/9</td>
+        <td class="note">Primary architecture. Complete CVE patch coverage.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Troubleshooting ── -->
+  <h2>Troubleshooting</h2>
+
+  <div class="ts-grid">
+
+    <div class="ts-card">
+      <div class="ts-symptom">kpatch list shows nothing / empty output</div>
+      <div class="ts-fix">
+        <strong>Check 1 — Subscription:</strong><br>
+        <code>subscription-manager status</code><br>
+        Must show <em>Current</em>. If expired or unattached, patches will not download.<br><br>
+        <strong>Check 2 — Kernel version in catalog:</strong><br>
+        <code>sudo dnf kpatch check</code><br>
+        If output is empty, no patches exist yet for your exact kernel version. Check the Red Hat Security Advisories page or pin the kernel to a version with known patches (RHEL 9.4: <code>5.14.0-427.x</code>).
+      </div>
+    </div>
+
+    <div class="ts-card">
+      <div class="ts-symptom">dnf kpatch auto says "nothing to do"</div>
+      <div class="ts-fix">
+        <strong>Possible causes:</strong>
+        <ul style="margin:0.4rem 0 0 1.1rem;font-size:0.82rem;line-height:1.6;">
+          <li>Patches for this kernel version not yet published</li>
+          <li>All available patches already installed (run <code>kpatch list</code> to confirm)</li>
+          <li>BaseOS/AppStream repos disabled</li>
+        </ul>
+        <strong style="display:block;margin-top:0.5rem;">Verify repos:</strong>
+        <code>subscription-manager repos --list-enabled | grep baseos</code>
+      </div>
+    </div>
+
+    <div class="ts-card">
+      <div class="ts-symptom">Patch shows [disabled] in kpatch list</div>
+      <div class="ts-fix">
+        A patch module is installed but not active. Manually load it:<br>
+        <code>sudo kpatch load /usr/lib/kpatch/$(uname -r)/</code><br><br>
+        If the load fails with a module error, the patch may not be compatible with your exact running kernel build. Check that <code>uname -r</code> matches the patch package name exactly.
+      </div>
+    </div>
+
+    <div class="ts-card">
+      <div class="ts-symptom">subscription-manager status not Current</div>
+      <div class="ts-fix">
+        <strong>Re-register and attach:</strong><br>
+        <code>sudo subscription-manager register --auto-attach</code><br><br>
+        If in a managed environment (Satellite):<br>
+        <code>sudo subscription-manager register --org=&lt;org&gt; --activationkey=&lt;key&gt;</code><br><br>
+        Contact your Red Hat SA for activation key assistance.
+      </div>
+    </div>
+
+    <div class="ts-card">
+      <div class="ts-symptom">kpatch-dnf package not found in dnf</div>
+      <div class="ts-fix">
+        <strong>Enable the correct repo:</strong><br>
+        <code>subscription-manager repos --enable rhel-9-for-x86_64-baseos-rpms</code><br>
+        (Replace <code>9</code> with your RHEL major version.)<br><br>
+        Then retry: <code>sudo dnf install kpatch-dnf</code>
+      </div>
+    </div>
+
+    <div class="ts-card">
+      <div class="ts-symptom">System rebooted — patches gone</div>
+      <div class="ts-fix">
+        If kpatch systemd service is not enabled, patches don't survive reboot:<br>
+        <code>sudo systemctl enable --now kpatch</code><br><br>
+        If the kernel was updated before reboot, re-run:<br>
+        <code>sudo dnf kpatch auto</code><br>
+        to apply patches for the new kernel version.
+      </div>
+    </div>
+
+  </div><!-- end ts-grid -->
+
+  <!-- ── At Scale callout ── -->
+  <h2>Deploying at Scale</h2>
+
+  <div class="scale-box">
+    <div class="scale-label">Fleet Deployment — Red Hat Automation Stack</div>
+    <p>
+      The three-command activation above works for individual hosts. For a fleet of dozens or hundreds of RHEL hosts — such as across Dominion's generation control, EMS, and SCADA infrastructure — use the Red Hat automation stack to deploy kpatch centrally with no per-host login required.
+    </p>
+    <p>
+      <span class="product-pill">Red Hat Ansible Automation Platform</span> provides a ready-made fleet deployment playbook that runs <code>dnf kpatch auto</code> and validates <code>kpatch list</code> across all target hosts in parallel. Your Red Hat SA can provide this playbook directly.
+    </p>
+    <p>
+      <span class="product-pill">Red Hat Satellite</span> manages kpatch content views — pin approved patch versions per environment tier (dev / staging / production), enforce patch SLAs, and track which hosts have patches applied vs. pending.
+    </p>
+    <p>
+      <span class="product-pill">Red Hat Insights</span> provides a live dashboard of patch compliance across your entire fleet — which hosts are patched, which CVEs remain open, and which hosts have active kpatch modules loaded. No agent required beyond the built-in <code>insights-client</code> included with RHEL.
+    </p>
+    <p style="margin-top:0.5rem;font-weight:600;">Your Red Hat SA can provide a fleet deployment playbook and an Insights compliance dashboard walkthrough — contact Jim O'Donnell to arrange this.</p>
+  </div>
+
+  <!-- ── Official Docs Link ── -->
+  <h2>Official Documentation</h2>
+
+  <div class="doc-link">
+    <strong>Red Hat Enterprise Linux 9 — Applying Patches with Kernel Live Patching</strong><br>
+    <a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_and_monitoring_security_updates/applying-patches-with-kernel-live-patching_managing-and-monitoring-security-updates">
+      https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_and_monitoring_security_updates/applying-patches-with-kernel-live-patching_managing-and-monitoring-security-updates
+    </a>
+    <div style="margin-top:0.5rem;font-size:0.78rem;color:#555;">Additional references: <strong>access.redhat.com/security/vulnerabilities</strong> — current CVE advisories and kpatch availability status</div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="doc-footer">
+    <div class="footer-note">
+      Red Hat Enterprise Linux subscribers can contact your Red Hat Solutions Architect for kpatch enablement assistance, fleet deployment playbooks, and Red Hat Insights integration guidance. Use of kpatch is included at no additional cost with all RHEL subscriptions.
+    </div>
+    <div class="footer-contact">
+      Jim O'Donnell<br>
+      Red Hat Solutions Architect<br>
+      jim.odonnell@redhat.com
+    </div>
+  </div>
+
+</div><!-- end .page -->
+</body>
+</html>
