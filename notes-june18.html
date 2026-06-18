@@ -2,224 +2,436 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>June 18 Field Notes — Sealed Air + Sallie Mae</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Notes — June 18</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: #111;
-  color: #e8e8e8;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 18px;
-  line-height: 1.55;
-  padding: 16px;
-  max-width: none;
-}
-h1 {
-  font-size: 1.7em;
-  color: #fff;
-  border-bottom: 2px solid #444;
-  padding-bottom: 8px;
-  margin-bottom: 18px;
-}
-h2 {
-  font-size: 1.35em;
-  color: #f0c040;
-  margin: 28px 0 10px 0;
-  border-left: 4px solid #f0c040;
-  padding-left: 10px;
-}
-h3 {
-  font-size: 1.1em;
-  color: #7dd3fc;
-  margin: 20px 0 6px 0;
-}
-p { margin: 8px 0; }
-ul, ol {
-  margin: 8px 0 8px 22px;
-}
-li { margin: 5px 0; }
-.alert-red {
-  background: #5a0a0a;
-  border: 2px solid #cc2222;
-  color: #ffaaaa;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin: 14px 0;
-  font-size: 1.1em;
-  font-weight: bold;
-}
-.alert-amber {
-  background: #3a2800;
-  border: 2px solid #c07800;
-  color: #ffd080;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin: 14px 0;
-}
-.say-box {
-  background: #0d2a1a;
-  border-left: 4px solid #22cc66;
-  color: #a0f0b8;
-  border-radius: 6px;
-  padding: 14px 16px;
-  margin: 14px 0;
-  font-style: italic;
-  font-size: 1.05em;
-}
-.say-box .label {
-  color: #22cc66;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 0.85em;
-  letter-spacing: 0.08em;
-  display: block;
-  margin-bottom: 6px;
-}
-.watch-box {
-  background: #28100a;
-  border-left: 4px solid #e05020;
-  color: #f0b090;
-  border-radius: 6px;
-  padding: 14px 16px;
-  margin: 14px 0;
-}
-.watch-box .label {
-  color: #e05020;
-  font-weight: bold;
-  font-size: 0.85em;
-  letter-spacing: 0.08em;
-  display: block;
-  margin-bottom: 6px;
-}
-.people-box {
-  background: #181830;
-  border: 1px solid #334;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin: 14px 0;
-}
-.people-box .label {
-  color: #7dd3fc;
-  font-weight: bold;
-  font-size: 0.85em;
-  letter-spacing: 0.08em;
-  display: block;
-  margin-bottom: 6px;
-}
-.roi-box {
-  background: #0d1e2a;
-  border: 1px solid #2255aa;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin: 14px 0;
-}
-.roi-box .label {
-  color: #7dd3fc;
-  font-weight: bold;
-  font-size: 0.85em;
-  letter-spacing: 0.08em;
-  display: block;
-  margin-bottom: 6px;
-}
-.stat { font-size: 1.3em; font-weight: bold; color: #7dd3fc; }
-.meeting-divider {
-  border: none;
-  border-top: 3px solid #333;
-  margin: 36px 0;
-}
-.time-badge {
-  display: inline-block;
-  background: #222;
-  border: 1px solid #555;
-  border-radius: 6px;
-  padding: 4px 12px;
-  font-size: 0.95em;
-  color: #ccc;
-  margin-bottom: 10px;
-}
-.layer {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin: 10px 0;
-}
-.layer-num {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #f0c040;
-}
-.uc-num {
-  font-weight: bold;
-  color: #f0c040;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0d0d0d; color: #e0e0e0; font-family: -apple-system, "Red Hat Display", "Segoe UI", system-ui, sans-serif; }
+
+  /* Meeting selector */
+  .mtg-bar { display: flex; background: #1a1a1a; border-bottom: 2px solid #333; }
+  .mtg-btn { flex: 1; padding: 14px 8px; text-align: center; font-size: 0.9rem; font-weight: 700; color: #888; cursor: pointer; border-bottom: 3px solid transparent; }
+  .mtg-btn.active { color: #fff; border-bottom-color: #ee0000; background: #222; }
+  .mtg-label { font-size: 0.65rem; display: block; color: #666; margin-top: 2px; font-weight: 400; }
+
+  /* Meeting panel */
+  .mtg-panel { display: none; }
+  .mtg-panel.active { display: block; }
+
+  /* Card nav */
+  .card-nav { display: flex; background: #111; border-bottom: 1px solid #222; overflow-x: auto; padding: 0 4px; }
+  .card-btn { padding: 10px 14px; font-size: 0.78rem; color: #666; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; }
+  .card-btn.active { color: #eee; border-bottom-color: #ee0000; }
+
+  /* Cards */
+  .card { display: none; padding: 20px 16px 40px; min-height: calc(100vh - 110px); }
+  .card.active { display: block; }
+
+  .card-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1.2; }
+  .card-sub { font-size: 0.8rem; color: #666; margin-bottom: 20px; }
+
+  .say { background: #1a1600; border-left: 4px solid #c9a227; padding: 14px; margin: 12px 0; border-radius: 4px; }
+  .say::before { content: "SAY"; font-size: 0.68rem; font-weight: 700; color: #c9a227; display: block; margin-bottom: 6px; letter-spacing: 1px; }
+  .say p { font-size: 1rem; line-height: 1.65; color: #ddd; }
+
+  .warn { background: #1a0808; border-left: 4px solid #ee0000; padding: 14px; margin: 12px 0; border-radius: 4px; }
+  .warn::before { content: "WATCH OUT"; font-size: 0.68rem; font-weight: 700; color: #ee0000; display: block; margin-bottom: 6px; letter-spacing: 1px; }
+  .warn p { font-size: 0.95rem; line-height: 1.6; color: #ddd; }
+
+  .do-block { background: #0a1a0a; border-left: 4px solid #3fb950; padding: 14px; margin: 12px 0; border-radius: 4px; }
+  .do-block::before { content: "DO"; font-size: 0.68rem; font-weight: 700; color: #3fb950; display: block; margin-bottom: 6px; letter-spacing: 1px; }
+  .do-block p, .do-block li { font-size: 0.95rem; line-height: 1.6; color: #ddd; }
+
+  .info-block { background: #0a1220; border-left: 4px solid #5bc0de; padding: 14px; margin: 12px 0; border-radius: 4px; }
+  .info-block p, .info-block li { font-size: 0.95rem; line-height: 1.6; color: #ddd; }
+
+  .stat-big { font-size: 2.8rem; font-weight: 900; color: #ee0000; line-height: 1; display: block; }
+  .stat-label { font-size: 0.8rem; color: #888; margin-bottom: 16px; display: block; }
+
+  code { font-family: monospace; background: #1e1e1e; padding: 2px 6px; border-radius: 3px; font-size: 0.9rem; color: #7ec8e3; }
+  pre { font-family: monospace; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; padding: 14px; margin: 12px 0; font-size: 0.9rem; color: #7ec8e3; overflow-x: auto; line-height: 1.6; }
+
+  ul { margin: 8px 0 8px 18px; }
+  li { margin-bottom: 6px; font-size: 0.95rem; line-height: 1.55; }
+
+  .people-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .person { background: #1a1a1a; border-radius: 6px; padding: 10px 12px; font-size: 0.88rem; }
+  .person strong { display: block; color: #fff; margin-bottom: 2px; }
+  .person span { color: #888; font-size: 0.78rem; }
+  .person.rh { border-left: 3px solid #ee0000; }
+  .person.cust { border-left: 3px solid #5bc0de; }
+
+  /* Bottom nav */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; border-top: 1px solid #333; display: flex; z-index: 20; }
+  .nav-btn { flex: 1; padding: 14px; text-align: center; font-size: 1.5rem; cursor: pointer; color: #666; }
+  .nav-btn:hover { color: #fff; background: #222; }
+
+  .alert-banner { background: #2a0808; border: 2px solid #ee0000; border-radius: 8px; padding: 14px 16px; margin: 0 0 16px; }
+  .alert-banner strong { color: #ff6b6b; display: block; font-size: 1.05rem; margin-bottom: 4px; }
+  .alert-banner p { font-size: 0.9rem; color: #ddd; }
 </style>
 </head>
 <body>
-<h1>Field Notes — Thursday June 18</h1>
-<p style="color:#888; font-size:0.9em;">Generated by Chloe &middot; phone-friendly &middot; scroll to navigate</p>
-<h2>MEETING 1 &mdash; Sealed Air: RHEL / SAP Strategy</h2>
-<div class="alert-red">&#9888; HARD STOP 09:10 &mdash; Sallie Mae starts 09:15. Set alarm for 09:05.<br>You missed Sallie Mae last call. Ekstrom is watching. Do not run over.</div>
-<span class="time-badge">08:30 &ndash; 09:10 ET &nbsp;|&nbsp; Thursday</span>
-<h3>Context</h3>
-<ul>
-<li>All Red Hat &mdash; NOT SUSE. Don&rsquo;t treat this as a competitive swap.</li>
-<li>CD&amp;R private equity, $7.9B debt load. Unplanned downtime hits debt covenants directly.</li>
-<li>Urgency frame: every unplanned outage is a covenant risk, not just an IT headache.</li>
-</ul>
-<div class="say-box"><span class="label">SAY THIS TO OPEN</span>&ldquo;The question you&rsquo;re really asking is: how do we patch kernel CVEs without scheduling a SAP maintenance window every time? Here&rsquo;s the three-layer answer.&rdquo;</div>
-<h3>The Three-Layer Answer</h3>
-<div class="layer"><span class="layer-num">1 &mdash; kpatch</span><br><strong>Zero reboots for ~95% of kernel CVEs.</strong><br>Stat: 23 days &rarr; under 4 hours (Forrester TEI / Red Hat Smart Management).<br>SAP-certified since 2018 &mdash; SAP Note 2382421.<br>Patches live in-memory. HANA keeps running. No maintenance window.<br>Delivered via Red Hat Satellite content views &mdash; no manual package chase.</div>
-<div class="layer"><span class="layer-num">2 &mdash; Extended Update Support (E4S)</span><br><strong>Stay on the SAP-certified minor version.</strong><br>Red Hat backports CVE fixes &mdash; no minor-version upgrades needed.<br>Sweet spot: <strong>RHEL 9.6</strong>, E4S support until Nov 2028.<br>Bundled in RHEL for SAP Solutions subscription &mdash; no extra SKU.</div>
-<div class="layer"><span class="layer-num">3 &mdash; Image Mode (RHEL 10)</span><br><strong>Bootc immutable images &mdash; new builds only.</strong><br>RHEL 10 GA February 2026, SAP certified.<br><em>NOT</em> for existing 2TB HANA nodes. Position for net-new greenfield builds.</div>
-<div class="watch-box"><span class="label">WATCH &mdash; DO NOT SAY</span>Do NOT name any CVE as &ldquo;Copy Fail&rdquo; or &ldquo;mythos&rdquo; &mdash; those are unverified. Say: <em>&ldquo;the recent kernel CVE wave.&rdquo;</em></div>
-<h3>Platform Story</h3>
-<ul>
-<li><strong>Detect</strong> &mdash; Red Hat Lightspeed (CVE exposure, prioritized)</li>
-<li><strong>Deliver</strong> &mdash; Red Hat Satellite (content views, patch policy)</li>
-<li><strong>Execute</strong> &mdash; Red Hat Ansible Automation Platform (zero-touch rollout)</li>
-<li><strong>Verify</strong> &mdash; kpatch list + Lightspeed CVE status (proof of closure)</li>
-</ul>
-<h3>Discovery Questions</h3>
-<ol>
-<li>How many nodes, and what RHEL versions are running on HANA?</li>
-<li>Any RHEL 7 still in production?</li>
-<li>Current patch cadence and maintenance window length?</li>
-<li>Have you heard of or tried kpatch?</li>
-<li>Do you have Red Hat Satellite deployed?</li>
-</ol>
-<div class="people-box"><span class="label">PEOPLE IN THE ROOM</span><ul style="margin:0 0 0 18px;">
-<li><strong>Sealed Air IT:</strong> Mike Calhoun, Gregg Dean, Jericho Sei, Vern Reeves</li>
-<li><strong>RH AE:</strong> Brian Keleher</li>
-<li><strong>RH driver:</strong> Ekstrom (jekstrom) &mdash; he set this up, he&rsquo;s watching</li>
-</ul></div>
-<p><strong>Leave-behind:</strong> Drop <code>kpatch-onepager.html</code> in the Teams chat before you exit.</p>
-<hr class="meeting-divider">
-<h2>MEETING 2 &mdash; Sallie Mae Half-Day QBR</h2>
-<span class="time-badge">09:15 ET &nbsp;|&nbsp; ~4 hours &nbsp;|&nbsp; Customer-Led</span>
-<div class="alert-amber">&#9432; FORMAT: <strong>They present to their own leadership.</strong> Jim coaches. This is NOT a pitch. Stay in advisor mode. Let them drive.</div>
-<div class="watch-box"><span class="label">WATCH BEFORE YOU START</span>Troy is out &mdash; confirm pre-call coverage with whoever is standing in.</div>
-<div class="roi-box"><span class="label">ROI STATS (IDC study &mdash; have these ready)</span><ul style="margin:0 0 0 18px;">
-<li><span class="stat">501%</span> 3-year ROI</li>
-<li><span class="stat">7 months</span> payback period</li>
-<li><span class="stat">88%</span> less time on patch tracking</li>
-<li><span class="stat">48%</span> faster VM deployment</li>
-</ul></div>
-<h3>Their 7 Use Cases &mdash; Priority Order</h3>
-<div class="layer"><span class="uc-num">1 &mdash; CIS Compliance</span> <em style="color:#888;">(biggest pain)</em><br>Back-and-forth with security is killing them.<br><strong>Red Hat Lightspeed answer:</strong> SCAP score + auto-generated Ansible fix playbook + Image Builder bakes CIS profile at build time &rarr; born-compliant images.<div class="say-box" style="margin-top:10px;"><span class="label">SAY</span>&ldquo;Lightspeed gives you two things: the score and the fix. Same tool, same session. You stop toggling between your scanner and your remediation queue.&rdquo;</div></div>
-<div class="layer"><span class="uc-num">2 &mdash; AWS AMI Management</span><br>Monthly AMI builds, compliance baked in.<br>Image Builder + CIS profiles = AMIs that are born-compliant. Fits their existing monthly cadence.</div>
-<div class="layer"><span class="uc-num">3 &mdash; Security Posture</span><br>They run alongside Qualys and Wiz.<br>Red Hat Lightspeed = OS layer. Complementary, not competitive. Don&rsquo;t displace their tools &mdash; add the OS intelligence layer they&rsquo;re missing.</div>
-<div class="layer"><span class="uc-num">4 &mdash; Admin Efficiency</span><br>AI-prioritized Lightspeed Advisor surfaces what to fix first across the fleet.<br>Reduces alert fatigue, focuses admin time.</div>
-<div class="layer"><span class="uc-num">5 &mdash; Dynatrace Integration</span><br>No native connector exists. Say that clearly.<br>Both platforms have mature REST APIs. Event-Driven Ansible (EDA) is the bridge.<br><strong>Three options to offer:</strong><ol style="margin:8px 0 0 20px;"><li>Custom script (simplest, brittle)</li><li>Webhook (lightweight, event-driven)</li><li>AAP Extension 2.0 (most durable, full lifecycle)</li></ol><div class="say-box" style="margin-top:10px;"><span class="label">SAY</span>&ldquo;No turnkey connector, but both platforms have mature REST APIs &mdash; and Event-Driven Ansible is purpose-built to be that bridge. We have three patterns to show you depending on how much you want to own.&rdquo;</div></div>
-<div class="layer"><span class="uc-num">6 &mdash; Subscription Visibility</span><br>PAYG usage shows in Red Hat Lightspeed, billed through AWS. That part works.<br><strong>JBoss tracking does NOT exist.</strong> Say so plainly. Do not imply it&rsquo;s coming.</div>
-<div class="layer"><span class="uc-num">7 &mdash; AI Recommendations</span><br>This IS Red Hat Lightspeed Advisor. That&rsquo;s the product.<br><strong>It does NOT auto-apply fixes.</strong> Recommend only. This is the right answer for InfoSec approval concerns &mdash; AI suggests, humans approve, AAP executes.</div>
-<div class="watch-box"><span class="label">WATCH &mdash; LANGUAGE TRAPS</span><ul style="margin:0 0 0 18px;">
-<li>Say <strong>&ldquo;Red Hat Lightspeed&rdquo;</strong> &mdash; NOT &ldquo;Insights&rdquo;</li>
-<li>JBoss tracking does NOT exist &mdash; do not hedge or imply roadmap</li>
-<li>AI recommends, it does NOT auto-apply &mdash; this is a feature for their InfoSec team</li>
-<li>Troy is out &mdash; confirm pre-call coverage before 09:15</li>
-</ul></div>
-<p style="color:#666; font-size:0.85em; margin-top:36px; border-top:1px solid #222; padding-top:12px;">Generated by Chloe &mdash; cc:session (sonnet-4-6) &mdash; 2026-06-18</p>
+
+<!-- MEETING SELECTOR -->
+<div class="mtg-bar">
+  <div class="mtg-btn active" onclick="switchMeeting('sa')">
+    Sealed Air
+    <span class="mtg-label">08:30 · Hard stop 09:20</span>
+  </div>
+  <div class="mtg-btn" onclick="switchMeeting('sm')">
+    Sallie Mae
+    <span class="mtg-label">09:30 · Half-day QBR</span>
+  </div>
+</div>
+
+<!-- ========== SEALED AIR ========== -->
+<div class="mtg-panel active" id="mtg-sa">
+  <div class="card-nav" id="nav-sa">
+    <div class="card-btn active" onclick="switchCard('sa',0)">Alert</div>
+    <div class="card-btn" onclick="switchCard('sa',1)">People</div>
+    <div class="card-btn" onclick="switchCard('sa',2)">Open</div>
+    <div class="card-btn" onclick="switchCard('sa',3)">kpatch</div>
+    <div class="card-btn" onclick="switchCard('sa',4)">E4S</div>
+    <div class="card-btn" onclick="switchCard('sa',5)">Discovery</div>
+    <div class="card-btn" onclick="switchCard('sa',6)">CVEs</div>
+  </div>
+
+  <!-- SA Card 0: Alert -->
+  <div class="card active" id="sa-card-0">
+    <div class="card-title">Sealed Air</div>
+    <div class="card-sub">RHEL / Satellite / SAP Discussion · 2026-06-18</div>
+    <div class="alert-banner">
+      <strong>⚠ HARD STOP 09:20</strong>
+      <p>Sallie Mae kicks off at 09:30. You missed the last Sealed Air call. Ekstrom was annoyed. Set a 09:15 alarm right now.</p>
+    </div>
+    <div class="info-block">
+      <p><strong>Their ask (verbatim from Ekstrom):</strong> "Give them a strategy to manage kernel patching without blowing up SAP."</p>
+    </div>
+    <div class="info-block">
+      <p><strong>Context:</strong> CD&amp;R took Sealed Air private — $10.3B closed April 2026. $7.9B acquisition debt. Every maintenance window costs money. kpatch eliminates emergency windows. That's your urgency hook — math, not fear.</p>
+    </div>
+    <div class="warn">
+      <p>Ekstrom mentioned "Copy Fail" and "mythos" CVEs by name. Mappings unverified — do not name them. Use the general kernel CVE pattern instead.</p>
+    </div>
+  </div>
+
+  <!-- SA Card 1: People -->
+  <div class="card" id="sa-card-1">
+    <div class="card-title">People</div>
+    <div class="card-sub">Sealed Air &amp; Red Hat</div>
+    <div class="people-grid">
+      <div class="person cust"><strong>Mike Calhoun</strong><span>Sealed Air — IT</span></div>
+      <div class="person cust"><strong>Gregg Dean</strong><span>Sealed Air — IT</span></div>
+      <div class="person cust"><strong>Jericho Sei</strong><span>Sealed Air — IT</span></div>
+      <div class="person cust"><strong>Vern Reeves</strong><span>Sealed Air — IT</span></div>
+      <div class="person cust"><strong>Marc Hamer</strong><span>CIO/CDO — decision maker</span></div>
+      <div class="person cust"><strong>Dustin Semach</strong><span>CEO — PE-appointed Feb 2025</span></div>
+      <div class="person rh"><strong>Jim O'Donnell</strong><span>RHEL SSA — you</span></div>
+      <div class="person rh"><strong>Brian Keleher</strong><span>AE — commercial owner</span></div>
+      <div class="person rh"><strong>Ekstrom</strong><span>jekstrom — RH driver</span></div>
+    </div>
+  </div>
+
+  <!-- SA Card 2: Open -->
+  <div class="card" id="sa-card-2">
+    <div class="card-title">How to Open</div>
+    <div class="card-sub">Spring-loaded posture</div>
+    <div class="say">
+      <p>"The question you're really asking is: how do we patch kernel CVEs without scheduling a SAP maintenance window every time? Here's the three-layer answer."</p>
+    </div>
+    <div class="info-block">
+      <p>The goal isn't to respond faster to a CVE — it's to already be positioned before the alert fires. Satellite has the content synced. AAP has the playbook tested. kpatch applies in-memory in minutes.</p>
+    </div>
+    <div class="do-block">
+      <p>Detect → Deliver → Execute → Verify:</p>
+      <ul>
+        <li><strong>Detect:</strong> Red Hat Insights — CVEs mapped to your nodes</li>
+        <li><strong>Deliver:</strong> Red Hat Satellite — content management, kpatch-patch RPMs</li>
+        <li><strong>Execute:</strong> Red Hat Ansible Automation Platform — orchestrates, audit trail</li>
+        <li><strong>Verify:</strong> <code>kpatch list</code> + Insights CVE status closed</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA Card 3: kpatch -->
+  <div class="card" id="sa-card-3">
+    <div class="card-title">kpatch</div>
+    <div class="card-sub">Live kernel patching — the immediate win</div>
+    <span class="stat-big">23 days</span>
+    <span class="stat-label">→ under 4 hours for kernel CVE cycle (Forrester TEI)</span>
+    <div class="info-block">
+      <ul>
+        <li>Patches kernel CVEs <strong>in-memory</strong> — HANA stays running</li>
+        <li>Certified with SAP HANA since 2018 (SAP Note 2382421)</li>
+        <li>No reboot required for ~95% of critical kernel CVEs</li>
+        <li>No SAP maintenance window</li>
+      </ul>
+    </div>
+    <div class="warn">
+      <p>kpatch <strong>defers</strong> the reboot, it doesn't eliminate it. They still reboot eventually for glibc, OpenSSL, userspace. kpatch lets them take the reboot on their schedule — not at 2am during an active CVE.</p>
+    </div>
+  </div>
+
+  <!-- SA Card 4: E4S -->
+  <div class="card" id="sa-card-4">
+    <div class="card-title">E4S + Image Mode</div>
+    <div class="card-sub">Layers 2 and 3</div>
+    <div class="info-block">
+      <p><strong>Extended Update Support (E4S):</strong> Stay on a SAP-certified minor release forever. Red Hat backports security patches — no minor version bump required. Bundled in RHEL for SAP Solutions sub.</p>
+      <p style="margin-top:10px;">Current sweet spot: <strong>RHEL 9.6</strong> — E4S until Nov 2028, latest features, SAP-certified.</p>
+    </div>
+    <div class="info-block" style="margin-top:12px;">
+      <p><strong>Image Mode (horizon):</strong> bootc-based, immutable OS. Patch = image pull + rollback. RHEL 10 GA Feb 2026, SAP HANA certified. Honest caveat: 2TB-RAM HANA rebuilds are expensive. Don't push this on existing nodes.</p>
+    </div>
+    <div class="say">
+      <p>"E4S decouples kernel CVE patching from SAP version upgrades. kpatch handles what can't wait. Satellite delivers both. That's the whole strategy."</p>
+    </div>
+  </div>
+
+  <!-- SA Card 5: Discovery -->
+  <div class="card" id="sa-card-5">
+    <div class="card-title">Discovery Questions</div>
+    <div class="card-sub">What to learn in the meeting</div>
+    <ul>
+      <li>How many RHEL nodes total? SAP vs non-SAP breakdown?</li>
+      <li>Which RHEL minor versions are in the SAP landscape today?</li>
+      <li>Any nodes still on RHEL 7?</li>
+      <li>On-prem, AWS, or hybrid for SAP HANA?</li>
+      <li>Who's the SAP Basis team — internal or SI?</li>
+      <li>Current kernel patch cadence for HANA hosts?</li>
+      <li>How long does a HANA maintenance window take to schedule?</li>
+      <li>Are they running Red Hat Satellite, or managing manually?</li>
+      <li>How do they prioritize CVEs — Insights, scanner, manual?</li>
+      <li>Have they heard of kpatch / live kernel patching?</li>
+    </ul>
+  </div>
+
+  <!-- SA Card 6: CVEs -->
+  <div class="card" id="sa-card-6">
+    <div class="card-title">CVE Landscape</div>
+    <div class="card-sub">Reference only — don't lead with this</div>
+    <div class="warn">
+      <p>Do NOT name "Copy Fail" or "mythos" CVEs — mappings unverified.</p>
+    </div>
+    <div class="info-block">
+      <ul>
+        <li><strong>RHSB-2026-003 "Dirty Frag"</strong> — LPE across ~9 years of kernels. kpatch available for RHEL 8.8.</li>
+        <li><strong>RHSB-2026-002</strong> — Privilege escalation, kernel crypto. Patched across E4S streams.</li>
+        <li><strong>CVE-2024-6387 regreSSHion</strong> — Remote code exec on SSH-exposed hosts. Ask if they've confirmed closure.</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <p>Frame: $7.9B debt + breach/downtime = existential, not just operational. Makes kpatch a CFO-level conversation. But lead with operational value — let the financial context sit in the background.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== SALLIE MAE ========== -->
+<div class="mtg-panel" id="mtg-sm">
+  <div class="card-nav" id="nav-sm">
+    <div class="card-btn active" onclick="switchCard('sm',0)">Format</div>
+    <div class="card-btn" onclick="switchCard('sm',1)">People</div>
+    <div class="card-btn" onclick="switchCard('sm',2)">Insights</div>
+    <div class="card-btn" onclick="switchCard('sm',3)">CIS</div>
+    <div class="card-btn" onclick="switchCard('sm',4)">Lightspeed</div>
+    <div class="card-btn" onclick="switchCard('sm',5)">Image Bld</div>
+    <div class="card-btn" onclick="switchCard('sm',6)">Close</div>
+  </div>
+
+  <!-- SM Card 0: Format -->
+  <div class="card active" id="sm-card-0">
+    <div class="card-title">Sallie Mae QBR</div>
+    <div class="card-sub">Half-Day · Starts 09:30 · Customer-Led</div>
+    <div class="alert-banner">
+      <strong>THIS IS NOT A RED HAT DEMO</strong>
+      <p>Sallie Mae's admins present to their own leadership what they've learned. You coach from the side. Frame everything around their team's competence, not ours.</p>
+    </div>
+    <div class="info-block">
+      <p><strong>Agenda:</strong></p>
+      <ul>
+        <li>0:00 Opening</li>
+        <li>0:15 Insights — customer-driven</li>
+        <li>0:45 CIS compliance</li>
+        <li>1:15 Break</li>
+        <li>1:30 Lightspeed (Troy leads)</li>
+        <li>2:15 Dynatrace integration</li>
+        <li>2:45 Image Builder</li>
+        <li>3:15 Roadmap</li>
+        <li>3:45 Close</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <p><strong>Their environment:</strong> ~200 RHEL 8, ~50 RHEL 9, all AWS EC2. Almost off RHEL 7. Qualys for vuln scanning. CIS compliance = #1 pain. Dynatrace. AAP in use.</p>
+    </div>
+  </div>
+
+  <!-- SM Card 1: People -->
+  <div class="card" id="sm-card-1">
+    <div class="card-title">People</div>
+    <div class="card-sub">Sallie Mae &amp; Red Hat</div>
+    <div class="people-grid">
+      <div class="person cust"><strong>Andy Stetter</strong><span>Manager — the audience</span></div>
+      <div class="person cust"><strong>Jeremiah Williams</strong><span>Win/Linux SME — likely presenter</span></div>
+      <div class="person cust"><strong>Parker Staph</strong><span>Linux / Ansible fan — likely presenter</span></div>
+      <div class="person cust"><strong>Parasaram Krapa</strong><span>Romy/Rom</span></div>
+      <div class="person cust"><strong>Naveen Yalamanchili</strong><span></span></div>
+      <div class="person cust"><strong>Rushyanth Yellala</strong><span></span></div>
+      <div class="person cust"><strong>Rainer Kraft</strong><span></span></div>
+      <div class="person rh"><strong>Scott Haddock</strong><span>AE — opens and closes</span></div>
+      <div class="person rh"><strong>Troy Sikes</strong><span>Account SA — leads Lightspeed</span></div>
+      <div class="person rh"><strong>Brian James</strong><span>RHEL Sales Specialist</span></div>
+      <div class="person rh"><strong>Jim O'Donnell</strong><span>RHEL SSA — you (coach)</span></div>
+      <div class="person rh"><strong>Erica Sell</strong><span>SA</span></div>
+    </div>
+  </div>
+
+  <!-- SM Card 2: Insights -->
+  <div class="card" id="sm-card-2">
+    <div class="card-title">Insights (0:15)</div>
+    <div class="card-sub">Customer-driven — Jeremiah or Parker presents</div>
+    <div class="do-block">
+      <p>Let them drive. Your job: fill gaps when they get stuck. Don't take over the demo.</p>
+    </div>
+    <div class="say">
+      <p>"What you're seeing here is your actual environment — not a demo org. These are your CVEs, your compliance gaps, your advisories. That's the difference between a slide and a tool."</p>
+    </div>
+    <div class="warn">
+      <p>If their Insights data is thin (few systems enrolled): switch to the interactive demo fallback tab. Don't apologize — pivot clean: "Let me show you what full enrollment looks like."</p>
+    </div>
+    <div class="info-block">
+      <p><strong>Fallback URL:</strong> redhat.com/architect/portfolio/detail/111-red-hat-insights-interactive-experience</p>
+    </div>
+  </div>
+
+  <!-- SM Card 3: CIS -->
+  <div class="card" id="sm-card-3">
+    <div class="card-title">CIS Compliance (0:45)</div>
+    <div class="card-sub">Their #1 pain — the security back-and-forth</div>
+    <div class="info-block">
+      <p>Their current loop: Qualys scan → security finds failures → Linux team manually traces each finding → remediates → rescans. Every cycle takes days. The back-and-forth with the security team is the actual pain.</p>
+    </div>
+    <div class="say">
+      <p>"Insights knows the CIS benchmark. It knows which hosts are failing which controls right now. And it can generate the Ansible playbook to fix them. You go from 'here's your scan report' to 'here's the remediation, ready to run' in one step."</p>
+    </div>
+    <div class="do-block">
+      <p>In console.redhat.com: Compliance → Policies → show their CIS score. If score is visible, great. If thin: describe the workflow — scan → advisory → remediation playbook → AAP run → rescan.</p>
+    </div>
+    <div class="warn">
+      <p>Don't promise a specific CIS score improvement. Show the workflow, not a number.</p>
+    </div>
+  </div>
+
+  <!-- SM Card 4: Lightspeed -->
+  <div class="card" id="sm-card-4">
+    <div class="card-title">Lightspeed (1:30)</div>
+    <div class="card-sub">Troy leads — you support</div>
+    <div class="info-block">
+      <p>Troy owns this section. Your role: technical backup if questions get into RHEL-specific territory.</p>
+    </div>
+    <div class="say">
+      <p>"Parker, you've been writing Ansible by hand. Lightspeed writes the task from a natural-language description. You review it, modify it, run it. You're still the engineer — Lightspeed handles the boilerplate."</p>
+    </div>
+    <div class="do-block">
+      <p>Demo pattern: type a plain English task description → Lightspeed suggests a playbook → modify one line → run it. Show Parker and Jeremiah doing it, not Red Hat.</p>
+    </div>
+    <div class="warn">
+      <p>If RHDP lab is slow: switch to the Ansible Lightspeed reference page + talk through the workflow. Don't wait for a hung environment.</p>
+    </div>
+  </div>
+
+  <!-- SM Card 5: Image Builder -->
+  <div class="card" id="sm-card-5">
+    <div class="card-title">Image Builder (2:45)</div>
+    <div class="card-sub">Born-compliant AMIs for AWS</div>
+    <div class="say">
+      <p>"Right now, when you spin up a new EC2 instance, you get a base image and then you patch it into compliance — that's manual work every time. Image Builder lets you bake compliance in. The AMI is CIS-compliant on first boot. Nothing to remediate."</p>
+    </div>
+    <div class="info-block">
+      <p>For Sallie Mae specifically: they're on AWS EC2, mostly RHEL 8 + 9. Image Builder + AWS = publish a compliant RHEL AMI directly to their account. New instances inherit compliance automatically.</p>
+    </div>
+    <div class="do-block">
+      <p>In console.redhat.com → Image Builder: show a blueprint with a CIS profile baked in. If they ask about RHEL 10: it's GA Feb 2026, same Image Builder workflow, no drama.</p>
+    </div>
+  </div>
+
+  <!-- SM Card 6: Close -->
+  <div class="card" id="sm-card-6">
+    <div class="card-title">Close (3:45)</div>
+    <div class="card-sub">Scott closes — you hand off</div>
+    <div class="info-block">
+      <p>Scott Haddock owns the commercial close. Your job: make sure you leave with clear next actions from the customer side — not vague "let's follow up."</p>
+    </div>
+    <div class="do-block">
+      <p>Suggested close questions:</p>
+      <ul>
+        <li>How many systems do you want to get to full Insights enrollment by end of Q3?</li>
+        <li>Is Jeremiah or Parker interested in a Lightspeed sandbox to practice before rollout?</li>
+        <li>CIS compliance — what's the target score and timeline?</li>
+      </ul>
+    </div>
+    <div class="say">
+      <p>"Your team did the hard part today — they ran their own environment in front of leadership. That's a different kind of confidence than watching a Red Hat demo."</p>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-btn" onclick="prevCard()">◀</div>
+  <div class="nav-btn" style="font-size:0.75rem; color:#555; padding-top:16px;" id="card-counter">1 / 7</div>
+  <div class="nav-btn" onclick="nextCard()">▶</div>
+</div>
+
+<script>
+  var currentMtg = 'sa';
+  var currentCards = { sa: 0, sm: 0 };
+  var cardCounts = { sa: 7, sm: 7 };
+
+  function switchMeeting(mtg) {
+    document.querySelectorAll('.mtg-btn').forEach(function(b,i){ b.classList.toggle('active', i === (mtg==='sa'?0:1)); });
+    document.querySelectorAll('.mtg-panel').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('mtg-'+mtg).classList.add('active');
+    currentMtg = mtg;
+    updateCounter();
+  }
+
+  function switchCard(mtg, idx) {
+    var panels = document.querySelectorAll('#mtg-'+mtg+' .card');
+    var btns = document.querySelectorAll('#nav-'+mtg+' .card-btn');
+    panels.forEach(function(p){ p.classList.remove('active'); });
+    btns.forEach(function(b){ b.classList.remove('active'); });
+    if(panels[idx]) panels[idx].classList.add('active');
+    if(btns[idx]) btns[idx].classList.add('active');
+    currentCards[mtg] = idx;
+    updateCounter();
+    window.scrollTo(0,0);
+  }
+
+  function nextCard() {
+    var next = (currentCards[currentMtg] + 1) % cardCounts[currentMtg];
+    switchCard(currentMtg, next);
+  }
+
+  function prevCard() {
+    var prev = (currentCards[currentMtg] - 1 + cardCounts[currentMtg]) % cardCounts[currentMtg];
+    switchCard(currentMtg, prev);
+  }
+
+  function updateCounter() {
+    document.getElementById('card-counter').textContent = (currentCards[currentMtg]+1) + ' / ' + cardCounts[currentMtg];
+  }
+
+  // Swipe support
+  var startX = 0;
+  document.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; });
+  document.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - startX;
+    if(Math.abs(dx) > 50) { dx < 0 ? nextCard() : prevCard(); }
+  });
+
+  updateCounter();
+</script>
 </body>
 </html>
