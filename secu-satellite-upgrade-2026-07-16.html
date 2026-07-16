@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Path to Satellite 6.16 — SECU</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rh-red: #ee0000;
+    --rh-dark: #151515;
+    --rh-gray: #3c3f42;
+    --rh-light: #f5f5f5;
+    --rh-mid: #d2d2d2;
+    --rh-blue: #0066cc;
+    --warn: #f0ab00;
+    --good: #3e8635;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Red Hat Display', 'Red Hat Text', 'Open Sans', Arial, sans-serif;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .deck {
+    width: 100vw; height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: none;
+    flex-direction: column;
+  }
+  .slide.active { display: flex; }
+
+  /* ── COVER ── */
+  .slide-cover {
+    background: var(--rh-dark);
+    color: white;
+    justify-content: center;
+    padding: 0 10%;
+  }
+  .slide-cover .eyebrow {
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rh-red);
+    margin-bottom: 1.5rem;
+  }
+  .slide-cover h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .slide-cover h1 span { color: var(--rh-red); }
+  .slide-cover .subtitle {
+    font-size: 1.4rem;
+    color: var(--rh-mid);
+    margin-bottom: 3rem;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 3rem;
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+  }
+  .cover-meta span { font-size: 0.9rem; color: #999; }
+  .cover-meta strong { color: white; }
+
+  /* ── SECTION DIVIDER ── */
+  .slide-divider {
+    background: var(--rh-red);
+    color: white;
+    justify-content: center;
+    padding: 0 10%;
+  }
+  .slide-divider .section-num {
+    font-size: 6rem;
+    font-weight: 900;
+    opacity: 0.2;
+    line-height: 1;
+    margin-bottom: -1rem;
+  }
+  .slide-divider h2 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .slide-divider p {
+    font-size: 1.3rem;
+    margin-top: 1rem;
+    opacity: 0.85;
+    max-width: 700px;
+  }
+
+  /* ── BODY SLIDES ── */
+  .slide-body {
+    background: white;
+    flex-direction: column;
+  }
+  .slide-header {
+    background: var(--rh-dark);
+    padding: 1.8rem 10%;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .slide-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+  }
+  .slide-header .tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rh-red);
+    border: 1px solid var(--rh-red);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+  }
+  .slide-content {
+    flex: 1;
+    padding: 3rem 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ── STATUS SLIDE ── */
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+  .status-card {
+    border-left: 4px solid var(--rh-mid);
+    padding: 1.2rem 1.5rem;
+    background: var(--rh-light);
+  }
+  .status-card.warn { border-color: var(--warn); }
+  .status-card.danger { border-color: var(--rh-red); }
+  .status-card.good { border-color: var(--good); }
+  .status-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .status-card p { font-size: 0.95rem; color: #444; line-height: 1.5; }
+  .status-card .badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+  }
+  .badge-warn { background: var(--warn); color: #000; }
+  .badge-danger { background: var(--rh-red); color: white; }
+  .badge-good { background: var(--good); color: white; }
+
+  /* ── FEATURE COLUMNS ── */
+  .feature-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+  .feature-col {
+    border-top: 3px solid var(--rh-mid);
+    padding-top: 1rem;
+  }
+  .feature-col.v614 { border-color: #666; }
+  .feature-col.v615 { border-color: var(--rh-blue); }
+  .feature-col.v616 { border-color: var(--rh-red); }
+  .feature-col .version {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.8rem;
+  }
+  .feature-col.v614 .version { color: #666; }
+  .feature-col.v615 .version { color: var(--rh-blue); }
+  .feature-col.v616 .version { color: var(--rh-red); }
+  .feature-col h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .feature-col p { font-size: 0.85rem; color: #555; line-height: 1.5; margin-bottom: 1.2rem; }
+
+  /* ── UPGRADE PATH ── */
+  .upgrade-path {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 2rem 0;
+  }
+  .hop {
+    flex: 1;
+    background: var(--rh-light);
+    border: 2px solid var(--rh-mid);
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .hop.current { border-color: var(--warn); background: #fff8e6; }
+  .hop.gate { border-color: var(--rh-red); background: #fff0f0; }
+  .hop.target { border-color: var(--good); background: #f0fff0; }
+  .hop .ver { font-size: 1.5rem; font-weight: 900; }
+  .hop .rhel { font-size: 0.75rem; color: #777; margin-top: 0.2rem; }
+  .hop .note { font-size: 0.7rem; color: #555; margin-top: 0.4rem; }
+  .arrow {
+    font-size: 1.5rem;
+    color: var(--rh-mid);
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+  .leapp-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0.3rem;
+    flex-shrink: 0;
+  }
+  .leapp-label .arrow-line {
+    width: 40px; height: 2px;
+    background: var(--rh-red);
+    position: relative;
+  }
+  .leapp-label .label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--rh-red);
+    font-weight: 700;
+    margin-top: 0.3rem;
+  }
+  .path-notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .path-note { font-size: 0.8rem; color: #444; line-height: 1.5; }
+  .path-note strong { color: var(--rh-dark); display: block; margin-bottom: 0.2rem; }
+
+  /* ── GOTCHAS ── */
+  .gotcha-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .gotcha {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    padding: 1.2rem 1.5rem;
+    border-radius: 4px;
+    background: var(--rh-light);
+    border-left: 4px solid var(--rh-red);
+  }
+  .gotcha .num {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--rh-red);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .gotcha h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .gotcha p { font-size: 0.9rem; color: #444; line-height: 1.5; }
+  .gotcha .action {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--rh-blue);
+    margin-top: 0.4rem;
+  }
+
+  /* ── DEMO SCREENS ── */
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .demo-screen {
+    border: 1px solid var(--rh-mid);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .demo-screen .screen-header {
+    background: var(--rh-dark);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    font-family: monospace;
+  }
+  .demo-screen .screen-body {
+    padding: 1rem;
+    background: var(--rh-light);
+    min-height: 100px;
+  }
+  .demo-screen h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .demo-screen p { font-size: 0.8rem; color: #555; line-height: 1.4; }
+  .demo-screen .nav-path {
+    font-size: 0.7rem;
+    font-family: monospace;
+    color: var(--rh-blue);
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── NEXT STEPS ── */
+  .next-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  .next-col h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rh-red);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--rh-red);
+  }
+  .step-item {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+  .step-item .step-num {
+    width: 24px; height: 24px;
+    background: var(--rh-dark);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .step-item p { font-size: 0.9rem; color: #333; line-height: 1.4; }
+  .step-item strong { color: var(--rh-dark); }
+
+  /* ── CLOSING ── */
+  .slide-close {
+    background: var(--rh-dark);
+    color: white;
+    justify-content: center;
+    padding: 0 10%;
+    text-align: center;
+  }
+  .slide-close h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+  .slide-close p { font-size: 1.2rem; color: var(--rh-mid); margin-bottom: 2rem; }
+  .close-contact {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    border-top: 1px solid #333;
+    padding-top: 2rem;
+  }
+  .contact-item { text-align: center; }
+  .contact-item .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #777; }
+  .contact-item .value { font-size: 1rem; color: white; margin-top: 0.3rem; }
+
+  /* ── FOOTER ── */
+  .slide-footer {
+    padding: 0.5rem 10%;
+    background: var(--rh-light);
+    border-top: 2px solid var(--rh-red);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    color: #666;
+    flex-shrink: 0;
+  }
+  .slide-footer .rh-logo {
+    color: var(--rh-red);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+  }
+  .slide-footer .slide-num {
+    font-weight: 700;
+    color: #999;
+  }
+
+  /* ── NAVIGATION — keyboard only, hidden from customer view ── */
+  .nav { display: none; }
+  .slide-counter { display: none; }
+
+  /* ── LOGOS ── */
+  .cover-logo-bar {
+    position: absolute;
+    top: 2rem;
+    right: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+  .cover-logo-bar img { height: 36px; }
+  .cover-sat-logo {
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+  }
+  .cover-sat-logo img { height: 48px; }
+  .footer-logo img { height: 18px; }
+
+  .intro-text {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.7;
+    max-width: 800px;
+    margin-bottom: 2rem;
+  }
+  .highlight { color: var(--rh-red); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: COVER -->
+  <div class="slide slide-cover active" id="slide-1">
+    <div class="cover-logo-bar">
+      <img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Reverse-RGB.svg" alt="Red Hat">
+    </div>
+    <div class="cover-sat-logo">
+      <img src="file:///home/jodonnell/brand-assets/logos/product/Product logos/Red Hat Satellite/Logo-Red_Hat-Satellite-A-Reverse-RGB.svg" alt="Red Hat Satellite">
+    </div>
+    <div class="eyebrow">Upgrade Planning Session</div>
+    <h1>Your Path to<br>Satellite <span>6.16</span></h1>
+    <div class="subtitle">From where you are to where you need to be</div>
+    <div class="cover-meta">
+      <span><strong>Audience</strong><br>SECU Infrastructure Team</span>
+      <span><strong>Presented by</strong><br>Jim O'Donnell, Red Hat</span>
+      <span><strong>Date</strong><br>July 16, 2026</span>
+      <span><strong>Scope</strong><br>Satellite 6.13 → 6.16 Upgrade</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: SUPPORT LIFECYCLE -->
+  <div class="slide slide-body" id="slide-2">
+    <div class="slide-header">
+      <h2>6.13 Is in Maintenance Only — and the Clock Is Running</h2>
+      <span class="tag">Support Lifecycle</span>
+    </div>
+    <div class="slide-content" style="display:flex;flex-direction:column;gap:1.2rem;">
+      <p style="font-size:1.15rem;color:#444;line-height:1.6;max-width:900px;"><strong style="color:#3e8635;">Green</strong> = full support — new features, bug fixes, security patches. <strong style="color:#f0ab00;">Amber</strong> = maintenance only — critical security fixes only, no new features, no non-critical bugs. <strong style="color:#ee0000;">Red line</strong> = today.</p>
+      <div style="position:relative;height:42vh;">
+        <canvas id="lifecycleChart"></canvas>
+      </div>
+      <div style="display:flex;gap:2.5rem;align-items:center;justify-content:flex-start;font-size:1rem;">
+        <span style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:22px;height:14px;background:#3e8635;border-radius:2px;"></span><strong>Full Support</strong></span>
+        <span style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:22px;height:14px;background:#f0ab00;border-radius:2px;"></span><strong>Maintenance Only</strong></span>
+        <span style="display:flex;align-items:center;gap:0.5rem;"><span style="display:inline-block;width:3px;height:18px;background:#ee0000;"></span><strong style="color:#ee0000;">TODAY — July 2026</strong></span>
+      </div>
+      <div style="background:#fff0f0;border-left:5px solid #ee0000;padding:1rem 1.5rem;border-radius:0 4px 4px 0;font-size:1.05rem;line-height:1.6;">
+        <strong>You are on 6.13 — maintenance only since November 2024.</strong> You are getting security patches only. No bug fixes, no new features. 6.14 full support ended May 2025. The urgency to upgrade isn't theoretical — it's on this chart.
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="footer-logo"><img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat"></span>
+      <span>SECU — Satellite 6.13 → 6.16 Upgrade Planning — July 2026</span>
+      <span>CONFIDENTIAL &nbsp;|&nbsp; <span class="slide-num" data-slide></span></span>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    (function() {
+      var chartCreated = false;
+      function createLifecycleChart() {
+        if (chartCreated) return;
+        chartCreated = true;
+        function toM(y, m) { return (y - 2023) * 12 + (m - 1); }
+        var versions = ['6.13', '6.14', '6.15', '6.16'];
+        var gaStarts = [toM(2023,11), toM(2024,5), toM(2024,11), toM(2025,5)];
+        var fullLen  = [toM(2024,11)-toM(2023,11), toM(2025,5)-toM(2024,5), toM(2025,11)-toM(2024,11), toM(2026,5)-toM(2025,5)];
+        var maintLen = [toM(2025,11)-toM(2024,11), toM(2026,5)-toM(2025,5),  toM(2026,11)-toM(2025,11), toM(2027,5)-toM(2026,5)];
+        var today = toM(2026, 7);
+        var timelineEnd = toM(2027, 12);
+        var ctx = document.getElementById('lifecycleChart').getContext('2d');
+        Chart.register({
+          id: 'todayLine',
+          afterDraw: function(chart) {
+            var c = chart.ctx, ca = chart.chartArea, sc = chart.scales;
+            var x = sc.x.getPixelForValue(today);
+            c.save();
+            c.beginPath(); c.strokeStyle='#ee0000'; c.lineWidth=2.5; c.setLineDash([6,4]);
+            c.moveTo(x, ca.top); c.lineTo(x, ca.bottom); c.stroke(); c.setLineDash([]);
+            c.font = "bold 13px 'Red Hat Display',Arial,sans-serif";
+            c.fillStyle='#ee0000'; c.textAlign='center';
+            c.fillText('TODAY', x, ca.top - 6);
+            c.restore();
+          }
+        });
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: versions,
+            datasets: [
+              { label: 'Pre-GA',           data: gaStarts, backgroundColor: 'transparent', stack: 'lc' },
+              { label: 'Full Support',      data: fullLen,  backgroundColor: '#3e8635', stack: 'lc', borderRadius: 3 },
+              { label: 'Maintenance Only',  data: maintLen, backgroundColor: '#f0ab00', stack: 'lc', borderRadius: 3 },
+            ]
+          },
+          options: {
+            indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { filter: function(item) { return item.dataset.label !== 'Pre-GA'; } }
+            },
+            scales: {
+              x: {
+                stacked: true, min: 0, max: timelineEnd,
+                ticks: {
+                  font: { family: "'Red Hat Display',Arial,sans-serif", size: 14 },
+                  callback: function(val) {
+                    var year = 2023 + Math.floor(val / 12);
+                    var month = val % 12;
+                    if (month === 0) return 'Jan ' + year;
+                    if (month === 6) return 'Jul ' + year;
+                    return null;
+                  },
+                  maxRotation: 0, autoSkip: false,
+                },
+                grid: { color: '#e8e8e8' },
+              },
+              y: {
+                stacked: true,
+                ticks: { font: { family: "'Red Hat Display',Arial,sans-serif", size: 15, weight: 'bold' } },
+                grid: { display: false },
+              }
+            }
+          }
+        });
+      }
+        // Expose globally so showSlide() can call this when slide 2 becomes active
+      window._initChart2 = createLifecycleChart;
+    })();
+    </script>
+  </div>
+
+  <!-- SLIDE 3: CAPABILITY GROWTH -->
+  <div class="slide slide-body" id="slide-3">
+    <div class="slide-header">
+      <h2>Each Release Closes Gaps — 6.16 Closes All of Them</h2>
+      <span class="tag">Capability by Version</span>
+    </div>
+    <div class="slide-content" style="display:flex;flex-direction:row;gap:3rem;align-items:center;">
+      <div style="flex:1.2;display:flex;justify-content:center;align-items:center;height:100%;">
+        <canvas id="featureRadarChart" style="width:100%;max-width:680px;"></canvas>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:1.4rem;">
+        <p style="font-size:1.05rem;color:#444;line-height:1.7;">Five capability dimensions scored across released versions (solid lines) and projected future versions (dashed). Each hop closes a gap. <strong style="color:#ee0000;">6.16 is your target — and Red Hat's roadmap keeps building on it.</strong></p>
+        <div style="background:#f5f5f5;border-top:4px solid #666;border-radius:4px;padding:1.1rem 1.3rem;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#666;margin-bottom:0.5rem;">6.14</div>
+          <div style="font-size:1rem;font-weight:600;color:#151515;margin-bottom:0.3rem;">Content View Intelligence</div>
+          <div style="font-size:0.9rem;color:#444;">Visual publish indicators. Convert2RHEL readiness. Tighter default security posture.</div>
+        </div>
+        <div style="background:#f5f5f5;border-top:4px solid #0066cc;border-radius:4px;padding:1.1rem 1.3rem;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#0066cc;margin-bottom:0.5rem;">6.15 — biggest operational shift</div>
+          <div style="font-size:1rem;font-weight:600;color:#151515;margin-bottom:0.3rem;">Remote Execution replaces Katello-agent entirely</div>
+          <div style="font-size:0.9rem;color:#444;">Agentless host management. New UI navigation. Task failure email alerts.</div>
+        </div>
+        <div style="background:#fff0f0;border-top:4px solid #ee0000;border-radius:4px;padding:1.1rem 1.3rem;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#ee0000;margin-bottom:0.5rem;">6.16 — your target</div>
+          <div style="font-size:1rem;font-weight:600;color:#151515;margin-bottom:0.3rem;">SCA + Compliance Remediation Wizard</div>
+          <div style="font-size:0.9rem;color:#444;">Hosts register and pick up content automatically. OpenSCAP failures remediated through a UI wizard — no manual job creation.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span class="footer-logo"><img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat"></span>
+      <span>SECU — Satellite 6.13 → 6.16 Upgrade Planning — July 2026</span>
+      <span>CONFIDENTIAL &nbsp;|&nbsp; <span class="slide-num" data-slide></span></span>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    (function() {
+      var radarDone = false;
+      function createRadarChart() {
+        if (radarDone) return; radarDone = true;
+      const ctx = document.getElementById('featureRadarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Content Mgmt', 'Host Operations', 'Security/Compliance', 'UI / UX', 'Subscriptions'],
+          datasets: [
+            { label: '6.14', data: [4,3,3,3,3], borderColor: '#666', backgroundColor: 'rgba(102,102,102,0.12)', borderWidth: 2, pointBackgroundColor: '#666', pointRadius: 4 },
+            { label: '6.15', data: [4,5,4,5,4], borderColor: '#0066cc', backgroundColor: 'rgba(0,102,204,0.12)', borderWidth: 2, pointBackgroundColor: '#0066cc', pointRadius: 4 },
+            { label: '6.16', data: [5,5,5,5,5], borderColor: '#ee0000', backgroundColor: 'rgba(238,0,0,0.12)', borderWidth: 2.5, pointBackgroundColor: '#ee0000', pointRadius: 5 },
+            { label: '6.17 (projected)', data: [5.5,5.5,5.5,5,5], borderColor: '#ee0000', backgroundColor: 'transparent', borderWidth: 2, borderDash: [6,4], pointBackgroundColor: '#ee0000', pointRadius: 3, pointStyle: 'circle' },
+            { label: '6.18 (projected)', data: [6,5.5,6,5.5,5.5], borderColor: '#ee0000', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [3,5], pointBackgroundColor: 'transparent', pointRadius: 2, pointStyle: 'circle' },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: true,
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { font: { family: "'Red Hat Display',Arial,sans-serif", size: 14 }, padding: 20, usePointStyle: true, pointStyleWidth: 16,
+              filter: (item) => item.text.includes('projected') ? true : true
+            } }
+          },
+          scales: {
+            r: {
+              min: 0, max: 6,
+              ticks: { stepSize: 1, font: { size: 13 }, color: '#888', backdropColor: 'transparent' },
+              pointLabels: { font: { family: "'Red Hat Display',Arial,sans-serif", size: 15, weight: '600' }, color: '#151515' },
+              grid: { color: '#ddd' }, angleLines: { color: '#ddd' },
+            }
+          }
+        }
+      });
+      } // end createRadarChart
+      window._initChart3 = createRadarChart;
+    })();
+    </script>
+  </div>
+
+  <!-- SLIDE 4: THREE CRITICAL PRE-CHECKS -->
+  <div class="slide slide-body" id="slide-4">
+    <div class="slide-header">
+      <h2>Three Things That Will Break Your Upgrade If You Ignore Them</h2>
+      <span class="tag">Critical Pre-Checks</span>
+    </div>
+    <div class="slide-content" style="display:flex;flex-direction:column;gap:0.8rem;padding-top:1.2rem;padding-bottom:1.2rem;">
+
+      <!-- ROW 1 -->
+      <div style="display:flex;align-items:stretch;flex:1;">
+        <div style="flex:1;background:#2b2b2b;padding:1.2rem 4rem 1.2rem 1.5rem;display:flex;align-items:center;gap:1.5rem;clip-path:polygon(0% 0%, calc(100% - 38px) 0%, 100% 50%, calc(100% - 38px) 100%, 0% 100%);">
+          <div style="font-size:3.5rem;font-weight:900;color:rgba(255,255,255,0.18);line-height:1;flex-shrink:0;width:2.5rem;text-align:center;">1</div>
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#aaa;margin-bottom:0.35rem;">At 6.15</div>
+            <div style="font-size:1.3rem;font-weight:700;color:white;line-height:1.2;margin-bottom:0.3rem;">Katello-Agent Is Gone</div>
+            <div style="font-size:0.92rem;color:#ccc;line-height:1.5;">Hard removal — not deprecated. Hosts still running it <strong style="color:white;">silently stop receiving updates.</strong></div>
+          </div>
+        </div>
+        <div style="flex:1;background:#ee0000;padding:1.2rem 3rem 1.2rem 4.5rem;display:flex;align-items:center;gap:1.5rem;clip-path:polygon(38px 0%, 100% 0%, 100% 100%, 38px 100%, 0% 50%);margin-left:-2px;">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.65);margin-bottom:0.35rem;">Action</div>
+            <div style="font-size:1.2rem;font-weight:700;color:white;line-height:1.2;margin-bottom:0.3rem;">Run <code style="background:rgba(0,0,0,0.3);padding:0.15em 0.5em;border-radius:3px;font-size:0.9em;">katello-agent list</code></div>
+            <div style="font-size:0.92rem;color:rgba(255,255,255,0.9);line-height:1.5;">Count affected hosts. Migrate ALL to Remote Execution before the 6.15 hop.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div style="display:flex;align-items:stretch;flex:1;">
+        <div style="flex:1;background:#2b2b2b;padding:1.2rem 4rem 1.2rem 1.5rem;display:flex;align-items:center;gap:1.5rem;clip-path:polygon(0% 0%, calc(100% - 38px) 0%, 100% 50%, calc(100% - 38px) 100%, 0% 100%);">
+          <div style="font-size:3.5rem;font-weight:900;color:rgba(255,255,255,0.18);line-height:1;flex-shrink:0;width:2.5rem;text-align:center;">2</div>
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#aaa;margin-bottom:0.35rem;">At 6.16</div>
+            <div style="font-size:1.3rem;font-weight:700;color:white;line-height:1.2;margin-bottom:0.3rem;">Entitlement Mode Is Removed</div>
+            <div style="font-size:0.92rem;color:#ccc;line-height:1.5;">SCA mandatory. Scripts calling <code style="background:#444;padding:0.1em 0.35em;border-radius:3px;color:white;font-size:0.88em;">subscription-manager attach</code> <strong style="color:white;">break.</strong></div>
+          </div>
+        </div>
+        <div style="flex:1;background:#ee0000;padding:1.2rem 3rem 1.2rem 4.5rem;display:flex;align-items:center;gap:1.5rem;clip-path:polygon(38px 0%, 100% 0%, 100% 100%, 38px 100%, 0% 50%);margin-left:-2px;">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.65);margin-bottom:0.35rem;">Action</div>
+            <div style="font-size:1.2rem;font-weight:700;color:white;line-height:1.2;margin-bottom:0.3rem;">Audit every subscription script</div>
+            <div style="font-size:0.92rem;color:rgba(255,255,255,0.9);line-height:1.5;">Find every call to <code style="background:rgba(0,0,0,0.3);padding:0.1em 0.4em;border-radius:3px;font-size:0.88em;">subscription-manager attach</code>. Rewrite before 6.16.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3 -->
+      <div style="display:flex;align-items:stretch;flex:1;">
+        <div style="flex:1;background:#2b2b2b;padding:1.2rem 4rem 1.2rem 1.5rem;display:flex;align-items:center;gap:1.5rem;clip-path:polygon(0% 0%, calc(100% - 38px) 0%, 100% 50%, calc(100% - 38px) 100%, 0% 100%);">
+          <div style="font-size:3.5rem;font-weight:900;color:rgba(255,255,255,0.18);line-height:1;flex-shrink:0;width:2.5rem;text-align:center;">3</div>
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#aaa;margin-bottom:0.35rem;">Plan Now</div>
+            <div style="font-size:1.3rem;font-weight:700;color:white;line-height:1.2;margin-bottom:0.3rem;">RHEL 8 Ends at 6.17</div>
+            <div style="font-size:0.92rem;color:#ccc;line-height:1.5;">6.13–6.15 are <strong style="color:white;">RHEL 8 only.</strong> 6.17 requires RHEL 9. Miss LEAPP planning and you block the next hop.</div>
+          </div>
+        </div>
+        <div style="flex:1;background:#ee0000;padding:1.2rem 3rem 1.2rem 4.5rem;display:flex;align-items:center;gap:1.5rem;clip-path:polygon(38px 0%, 100% 0%, 100% 100%, 38px 100%, 0% 50%);margin-left:-2px;">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.65);margin-bottom:0.35rem;">Action</div>
+            <div style="font-size:1.2rem;font-weight:700;color:white;line-height:1.2;margin-bottom:0.3rem;">Run <code style="background:rgba(0,0,0,0.3);padding:0.15em 0.5em;border-radius:3px;font-size:0.9em;">cat /etc/redhat-release</code></div>
+            <div style="font-size:0.92rem;color:rgba(255,255,255,0.9);line-height:1.5;">On the Satellite server. RHEL 8 = start LEAPP planning now; schedule after 6.16 landing.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <script>window._sizeArrows4 = function(){};</script>
+    <div class="slide-footer">
+      <span class="footer-logo"><img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat"></span>
+      <span>SECU — Satellite 6.13 → 6.16 Upgrade Planning — July 2026</span>
+      <span>CONFIDENTIAL &nbsp;|&nbsp; <span class="slide-num" data-slide></span></span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: UPGRADE PATH -->
+  <div class="slide slide-body" id="slide-5">
+    <div class="slide-header">
+      <h2>Upgrade Path: 6.13 → 6.16</h2>
+      <span class="tag">Sequential — No Skipping</span>
+    </div>
+    <div class="slide-content" style="display:flex;flex-direction:column;gap:2.2rem;justify-content:center;">
+
+      <!-- PIPELINE -->
+      <div style="display:flex;align-items:stretch;">
+
+        <div style="flex:1.1;border:3px solid #f0ab00;border-radius:8px;background:#fff8e6;padding:2rem 1.2rem;text-align:center;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-size:3.2rem;font-weight:900;color:#f0ab00;line-height:1;">6.13</div>
+          <div style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9a6700;margin:0.7rem 0 0.4rem;">RHEL 8 only</div>
+          <div style="font-size:1.05rem;font-weight:700;color:#9a6700;">&#128205; You are here</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:88px;flex-shrink:0;gap:0.3rem;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#555;text-align:center;line-height:1.3;">satellite-<br>maintain</div>
+          <div style="font-size:2.4rem;color:#555;line-height:1;">&#8594;</div>
+        </div>
+
+        <div style="flex:1;border:2px solid #888;border-radius:8px;background:#f5f5f5;padding:2rem 1.2rem;text-align:center;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-size:3.2rem;font-weight:900;color:#555;line-height:1;">6.14</div>
+          <div style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin:0.7rem 0 0.4rem;">RHEL 8 only</div>
+          <div style="font-size:0.95rem;color:#777;">Content View intel</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:88px;flex-shrink:0;gap:0.3rem;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#555;text-align:center;line-height:1.3;">satellite-<br>maintain</div>
+          <div style="font-size:2.4rem;color:#555;line-height:1;">&#8594;</div>
+        </div>
+
+        <div style="flex:1;border:2px solid #0066cc;border-radius:8px;background:#f0f6ff;padding:2rem 1.2rem;text-align:center;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-size:3.2rem;font-weight:900;color:#0066cc;line-height:1;">6.15</div>
+          <div style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#004fa3;margin:0.7rem 0 0.4rem;">RHEL 8 only</div>
+          <div style="font-size:0.95rem;color:#004fa3;line-height:1.5;">RE replaces katello-agent<br>PG12 &#8594; PG13</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:88px;flex-shrink:0;gap:0.3rem;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#555;text-align:center;line-height:1.3;">satellite-<br>maintain</div>
+          <div style="font-size:2.4rem;color:#555;line-height:1;">&#8594;</div>
+        </div>
+
+        <div style="flex:1.1;border:3px solid #3e8635;border-radius:8px;background:#f0fff0;padding:2rem 1.2rem;text-align:center;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-size:3.2rem;font-weight:900;color:#3e8635;line-height:1;">6.16</div>
+          <div style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#2d6127;margin:0.7rem 0 0.4rem;">RHEL 8 or 9</div>
+          <div style="font-size:1.05rem;font-weight:700;color:#2d6127;">&#10003; Target</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:88px;flex-shrink:0;gap:0.25rem;opacity:0.55;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#888;text-align:center;line-height:1.3;">LEAPP<br>optional</div>
+          <div style="font-size:2.4rem;color:#aaa;line-height:1;">&#8594;</div>
+        </div>
+
+        <div style="flex:0.75;border:2px dashed #ccc;border-radius:8px;background:#fafafa;padding:2rem 1rem;text-align:center;display:flex;flex-direction:column;justify-content:center;opacity:0.55;">
+          <div style="font-size:2.8rem;font-weight:900;color:#aaa;line-height:1;">6.17+</div>
+          <div style="font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;margin:0.7rem 0 0.4rem;">RHEL 9 required</div>
+          <div style="font-size:0.95rem;color:#bbb;">Future</div>
+        </div>
+
+      </div>
+
+      <!-- INFO BOXES -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;">
+
+        <div style="background:#f5f5f5;border-left:5px solid #151515;padding:1.2rem 1.4rem;border-radius:0 6px 6px 0;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#444;margin-bottom:0.7rem;">Before Each Hop</div>
+          <ol style="margin:0;padding-left:1.2rem;font-size:0.95rem;color:#222;line-height:2.1;">
+            <li><code style="background:#e0e0e0;padding:0.1em 0.45em;border-radius:3px;">satellite-maintain health check</code></li>
+            <li><code style="background:#e0e0e0;padding:0.1em 0.45em;border-radius:3px;">satellite-maintain backup</code></li>
+            <li><code style="background:#e0e0e0;padding:0.1em 0.45em;border-radius:3px;">satellite-maintain upgrade run</code></li>
+          </ol>
+        </div>
+
+        <div style="background:#fff8e6;border-left:5px solid #f0ab00;padding:1.2rem 1.4rem;border-radius:0 6px 6px 0;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#9a6700;margin-bottom:0.7rem;">At 6.15 &#8594; 6.16</div>
+          <div style="font-size:0.95rem;color:#222;line-height:1.75;">PostgreSQL auto-upgrades <strong>PG12 &#8594; PG13</strong>. Free disk in <code style="background:#f0e0a0;padding:0.1em 0.4em;border-radius:3px;">/var/lib/pgsql/</code> must equal current DB size before you start.</div>
+        </div>
+
+        <div style="background:#f0fff0;border-left:5px solid #3e8635;padding:1.2rem 1.4rem;border-radius:0 6px 6px 0;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#2d6127;margin-bottom:0.7rem;">Capsule Servers</div>
+          <div style="font-size:0.95rem;color:#222;line-height:1.75;">May lag Satellite by <strong>max 1 version</strong>. Always upgrade Satellite first, then immediately upgrade Capsules to match.</div>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="slide-footer">
+      <span class="footer-logo"><img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat"></span>
+      <span>SECU — Satellite 6.13 → 6.16 Upgrade Planning — July 2026</span>
+      <span>CONFIDENTIAL &nbsp;|&nbsp; <span class="slide-num" data-slide></span></span>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: WHAT 6.16 LOOKS LIKE -->
+  <div class="slide slide-body" id="slide-6">
+    <div class="slide-header">
+      <h2>What You'll Actually Use in 6.16</h2>
+      <span class="tag">Key Screens</span>
+    </div>
+    <div class="slide-content" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1rem;padding-top:0.5rem;">
+
+      <div style="background:#fafafa;border:2px solid #d2d2d2;border-radius:6px;padding:1.2rem 1.5rem;display:flex;flex-direction:column;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:0.3rem;">Content &#8250; Content Views</div>
+        <div style="font-size:1.15rem;font-weight:700;color:#151515;margin-bottom:0.5rem;">Content Views</div>
+        <div style="font-size:0.88rem;color:#444;line-height:1.65;flex:1;">Versioned snapshots of your patch content. You create a version, test it in Dev, promote to QA, then Production. Hosts only ever see what you've deliberately promoted — no accidental early push of a bad patch.</div>
+      </div>
+
+      <div style="background:#fafafa;border:2px solid #d2d2d2;border-radius:6px;padding:1.2rem 1.5rem;display:flex;flex-direction:column;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:0.3rem;">Hosts &#8250; All Hosts</div>
+        <div style="font-size:1.15rem;font-weight:700;color:#151515;margin-bottom:0.5rem;">Host Inventory + Errata</div>
+        <div style="font-size:0.88rem;color:#444;line-height:1.65;flex:1;">Every managed system in one view: applicable errata, installable packages, patch status, last check-in time, lifecycle environment. Replaces what you'd normally have to piece together from yum and subscription-manager separately.</div>
+      </div>
+
+      <div style="background:#fff0f0;border:2px solid #ee0000;border-radius:6px;padding:1.2rem 1.5rem;display:flex;flex-direction:column;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ee0000;margin-bottom:0.3rem;">Hosts &#8250; Compliance &#8250; Reports &nbsp;<span style="background:#ee0000;color:white;padding:0.1em 0.4em;border-radius:2px;font-size:0.6rem;">NEW IN 6.16</span></div>
+        <div style="font-size:1.15rem;font-weight:700;color:#151515;margin-bottom:0.5rem;">OpenSCAP + Remediation Wizard</div>
+        <div style="font-size:0.88rem;color:#444;line-height:1.65;flex:1;">CIS Benchmark and STIG scans run on schedule, results per host as pass/fail percentages. Failing rules now have a built-in Remediation Wizard — generates and runs the fix playbook without leaving the UI.</div>
+      </div>
+
+      <div style="background:#fafafa;border:2px solid #d2d2d2;border-radius:6px;padding:1.2rem 1.5rem;display:flex;flex-direction:column;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:0.3rem;">Hosts &#8250; Remote Execution &#8250; Job Templates</div>
+        <div style="font-size:1.15rem;font-weight:700;color:#151515;margin-bottom:0.5rem;">Remote Execution Jobs</div>
+        <div style="font-size:0.88rem;color:#444;line-height:1.65;flex:1;">Run commands, scripts, and Ansible playbooks against any managed host without an agent installed. This is what replaces Katello-agent — dispatch jobs to a group of hosts, see live output per host, re-run failures.</div>
+      </div>
+
+    </div>
+    <div class="slide-footer">
+      <span class="footer-logo"><img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat"></span>
+      <span>SECU — Satellite 6.13 → 6.16 Upgrade Planning — July 2026</span>
+      <span>CONFIDENTIAL &nbsp;|&nbsp; <span class="slide-num" data-slide></span></span>
+    </div>
+  </div>
+
+    <!-- SLIDE 7: NEXT STEPS -->
+  <div class="slide slide-body" id="slide-7">
+    <div class="slide-header">
+      <h2>What Happens Next</h2>
+      <span class="tag">Action Plan</span>
+    </div>
+    <div class="slide-content" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;padding-top:0.5rem;">
+
+      <!-- LEFT: Your Team -->
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#6a4e00;background:#f0ab00;padding:0.55rem 1rem;border-radius:4px;">Your Team — Before We Start</div>
+        <div style="background:#fff8e6;border:2px solid #f0ab00;border-radius:6px;padding:1.1rem 1.4rem;">
+          <div style="font-size:1.05rem;font-weight:700;color:#151515;margin-bottom:0.35rem;">Inventory katello-agent hosts</div>
+          <div style="font-size:0.88rem;color:#444;line-height:1.55;">Run <code style="background:#f0e0a0;padding:0.1em 0.4em;border-radius:3px;">katello-agent list</code> on Satellite. Count affected hosts — that number is your migration backlog before hop to 6.15.</div>
+        </div>
+        <div style="background:#fff8e6;border:2px solid #f0ab00;border-radius:6px;padding:1.1rem 1.4rem;">
+          <div style="font-size:1.05rem;font-weight:700;color:#151515;margin-bottom:0.35rem;">Confirm subscription mode + audit scripts</div>
+          <div style="font-size:0.88rem;color:#444;line-height:1.55;">Determine SCA vs entitlement mode. Find every script using <code style="background:#f0e0a0;padding:0.1em 0.4em;border-radius:3px;">subscription-manager attach</code>. Those break at 6.16.</div>
+        </div>
+        <div style="background:#fff8e6;border:2px solid #f0ab00;border-radius:6px;padding:1.1rem 1.4rem;">
+          <div style="font-size:1.05rem;font-weight:700;color:#151515;margin-bottom:0.35rem;">Check OS + disk on the Satellite host</div>
+          <div style="font-size:0.88rem;color:#444;line-height:1.55;"><code style="background:#f0e0a0;padding:0.1em 0.4em;border-radius:3px;">cat /etc/redhat-release</code> and free space in <code style="background:#f0e0a0;padding:0.1em 0.4em;border-radius:3px;">/var/lib/pgsql/</code>. Both required before hop 1.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Red Hat Brings -->
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:white;background:#ee0000;padding:0.55rem 1rem;border-radius:4px;">Red Hat Brings</div>
+        <div style="background:#fff0f0;border:2px solid #ee0000;border-radius:6px;padding:1.1rem 1.4rem;">
+          <div style="font-size:1.05rem;font-weight:700;color:#151515;margin-bottom:0.35rem;">Katello-agent → Remote Execution playbook</div>
+          <div style="font-size:0.88rem;color:#444;line-height:1.55;">Ansible automation that migrates hosts in bulk. You give us the inventory count; we run the playbook.</div>
+        </div>
+        <div style="background:#fff0f0;border:2px solid #ee0000;border-radius:6px;padding:1.1rem 1.4rem;">
+          <div style="font-size:1.05rem;font-weight:700;color:#151515;margin-bottom:0.35rem;">Pre-upgrade health check walkthrough</div>
+          <div style="font-size:0.88rem;color:#444;line-height:1.55;">We run <code style="background:#ffd6d6;padding:0.1em 0.4em;border-radius:3px;">satellite-maintain health check</code> with you on a dedicated call. Every warning cleared before you start.</div>
+        </div>
+        <div style="background:#fff0f0;border:2px solid #ee0000;border-radius:6px;padding:1.1rem 1.4rem;">
+          <div style="font-size:1.05rem;font-weight:700;color:#151515;margin-bottom:0.35rem;">LEAPP planning + proactive support case</div>
+          <div style="font-size:0.88rem;color:#444;line-height:1.55;">RHEL 8 Satellite = start LEAPP inhibitor review now. Open the support case before upgrade day — not during.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="slide-footer">
+      <span class="footer-logo"><img src="file:///home/jodonnell/brand-assets/logos/red-hat/Red Hat/Logo-Red_Hat-A-Standard-RGB.svg" alt="Red Hat"></span>
+      <span>SECU — Satellite 6.13 → 6.16 Upgrade Planning — July 2026</span>
+      <span>CONFIDENTIAL &nbsp;|&nbsp; <span class="slide-num" data-slide></span></span>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: CLOSE -->
+  <div class="slide slide-close" id="slide-8">
+    <h2>Red Hat is ready when you are.</h2>
+    <p>The path is documented. The tooling exists. You don't have to figure this out alone.</p>
+    <div class="close-contact">
+      <div class="contact-item">
+        <div class="label">Your Red Hat Contact</div>
+        <div class="value">Jim O'Donnell</div>
+      </div>
+      <div class="contact-item">
+        <div class="label">Email</div>
+        <div class="value">jimodonnell@redhat.com</div>
+      </div>
+      <div class="contact-item">
+        <div class="label">Next Action</div>
+        <div class="value">Katello-agent audit + OS check</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prevSlide()">← Prev</button>
+  <button onclick="nextSlide()">Next →</button>
+</div>
+<div class="slide-counter" id="counter">1 / 8</div>
+
+<script>
+  let current = 1;
+  const total = 8;
+
+  // Presenter notes per slide — press N to toggle
+  const NOTES = {
+    1: "Introduce yourself. Tell them what you'll cover: why the urgency, what they gain at each hop, the upgrade path itself, what to watch out for, a look at what 6.16 actually looks like in the UI, and concrete next steps.",
+    2: "6.13 has been in maintenance-only since November 2024 — that's security patches only. No bug fixes, no new features. 6.14 full support ended May 2025. Right now, only 6.15 and 6.16 carry full support. The longer they wait, the smaller the support window they're stepping into. This isn't theoretical.",
+    3: "Five dimensions. 6.14 was a modest gain — better Content View intelligence, Convert2RHEL readiness. 6.15 is the biggest operational shift: katello-agent is HARD removed, not deprecated. Remote Execution replaces it. 6.16 closes all the gaps: SCA mandatory, compliance wizard, RHEL 9 support. The dotted lines are projected — Red Hat's six-month cadence is reliable.",
+    4: "Three things will break the upgrade if they don't do this work first. Walk through each one:\n• Katello-agent: run the list command NOW. That number is their migration backlog.\n• Subscription automation: find every script touching 'subscription-manager attach'. Fix before 6.16.\n• RHEL version: this one determines whether they need LEAPP planning before 6.17.",
+    5: "No skipping — it's three hops: 6.13 → 6.14 → 6.15 → 6.16. Same command each time. The important callout: at 6.15 → 6.16 Postgres auto-upgrades PG12 to PG13. They need free disk equal to their database size in /var/lib/pgsql/ before that hop. Capsule servers follow Satellite immediately — max 1 version behind.",
+    6: "This is what they'll actually use in 6.16. Content Views: versioned patch snapshots — hosts only see what you promote. Host Inventory: every system, its patch state, compliance score, last check-in. Compliance + Remediation: brand new in 6.16 — OpenSCAP failures now have a built-in wizard, no manual Ansible required.",
+    7: "Split it out: what their team does BEFORE we start, and what Red Hat brings to make it work. This isn't a one-way handoff. Walk them through the left column so they can commit to dates, then show them what they get in return on the right.",
+    8: "Close strong. The support case before upgrade day — not during — is the thing to land. We're ready to schedule the health check call. Get a date on the calendar before the call ends.",
+  };
+
+  let notesOpen = false;
+  function getNotesEl() { return document.getElementById('notes-panel'); }
+
+  function showSlide(n) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    const slide = document.getElementById('slide-' + n);
+    slide.classList.add('active');
+    const numEl = slide.querySelector('[data-slide]');
+    if (numEl) numEl.textContent = n + ' / ' + total;
+    current = n;
+    // Lazy chart + sizing init for specific slides
+    if (n === 2 && window._initChart2) requestAnimationFrame(function(){ requestAnimationFrame(window._initChart2); });
+    if (n === 3 && window._initChart3) requestAnimationFrame(function(){ requestAnimationFrame(window._initChart3); });
+    if (n === 4 && window._sizeArrows4) requestAnimationFrame(window._sizeArrows4);
+    // Update notes panel if open
+    const _ne = getNotesEl(); if (_ne && notesOpen) _ne.querySelector('#notes-text').textContent = NOTES[n] || '';
+    try { localStorage.setItem('chloe_notes_slide', n); localStorage.setItem('chloe_notes_text', NOTES[n] || ''); } catch(e){}
+  }
+
+  function nextSlide() { if (current < total) showSlide(current + 1); }
+  function prevSlide() { if (current > 1) showSlide(current - 1); }
+
+  function toggleNotes() {
+    notesOpen = !notesOpen;
+    const ne = getNotesEl();
+    if (ne) {
+      ne.style.display = notesOpen ? 'flex' : 'none';
+      ne.querySelector('#notes-text').textContent = NOTES[current] || '';
+    }
+  }
+
+  function openNotesWindow() {
+    var allNotes = Object.entries(NOTES).map(function([k,v]){ return '<div style="margin-bottom:2rem;"><h3 style=\'color:#ee0000;margin:0 0 0.5rem\'>'+(k)+' / '+total+'</h3><p style=\'white-space:pre-wrap;margin:0;line-height:1.7;\'>'+v+'</p></div>'; }).join('<hr style="border:none;border-top:1px solid #333;margin:1.5rem 0">');
+    var w = window.open('','SpeakerNotes','width=780,height=520,resizable=yes,scrollbars=yes');
+    w.document.write('<html><head><title>Speaker Notes</title><style>body{font-family:system-ui,sans-serif;background:#111;color:#ddd;padding:2rem;font-size:1rem;}h3{font-size:1.1rem;}hr{border-top:1px solid #333}</style></head><body><h2 style="color:#ee0000;margin-top:0">Speaker Notes — SECU Satellite 6.13→6.16</h2>'+allNotes+'<script>setInterval(function(){var s=localStorage.getItem("chloe_notes_slide"),t=localStorage.getItem("chloe_notes_text");if(s&&document.getElementById("live")){document.getElementById("live").innerHTML="<b style=\'color:#ee0000\'>CURRENT — Slide "+s+"</b><br><br>"+t;}},800);<\/script><div id="live" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;border-top:3px solid #ee0000;padding:1rem 2rem;font-size:1rem;"></div></body></html>');
+    w.document.close();
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+    if (e.key === 'n' || e.key === 'N') toggleNotes();
+    if (e.key === 'p' || e.key === 'P') openNotesWindow();
+    if (e.key === 'Escape' && notesOpen) toggleNotes();
+  });
+</script>
+
+<!-- PRESENTER NOTES PANEL — press N to toggle, hidden during customer view -->
+<div id="notes-panel" style="display:none;position:fixed;bottom:0;left:0;right:0;height:28vh;background:rgba(21,21,21,0.96);border-top:3px solid #ee0000;z-index:9999;flex-direction:column;padding:1rem 3rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+    <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#ee0000;">Presenter Notes — Press N to hide</span>
+    <span onclick="toggleNotes()" style="color:#aaa;cursor:pointer;font-size:1.1rem;">&#x2715;</span>
+  </div>
+  <div id="notes-text" style="font-family:'Red Hat Display','Open Sans',Arial,sans-serif;font-size:1.05rem;color:#e8e8e8;line-height:1.7;overflow-y:auto;white-space:pre-wrap;"></div>
+</div>
+</body>
+</html>
